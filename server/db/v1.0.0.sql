@@ -213,6 +213,37 @@ VALUES
 INSERT IGNORE INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
 VALUES (@kanji_questions, @ks_part2, 0);
 
+-- -----------------------------------------------------------------------
+-- Page access
+--
+-- Participants arrive from a letter and are not logged in, so every study
+-- page needs read access for all groups. Without these rows the pages render
+-- "Kein Zugriff — Um diese Seite zu erreichen müssen Sie eingeloggt sein."
+--
+-- Write permissions go to admin only. The surveyJS / labJS styles store
+-- responses through UserInput, not through page ACL, so participants do not
+-- need insert rights here.
+-- -----------------------------------------------------------------------
+
+INSERT IGNORE INTO `acl_groups` (`id_groups`, `id_pages`, `acl_select`, `acl_insert`, `acl_update`, `acl_delete`)
+    SELECT g.id, p.id, 1,
+           IF(g.name = 'admin', 1, 0), IF(g.name = 'admin', 1, 0), IF(g.name = 'admin', 1, 0)
+    FROM `groups` g
+    CROSS JOIN `pages` p
+    WHERE p.keyword IN ('kanji-adults', 'kanji-adults-survey',
+                        'kanji-adults-task', 'kanji-adults-questions');
+
+-- Guest access. Participants arrive from a letter without logging in, and the
+-- guest user (id 1) belongs to no group — core checks ACL against the session
+-- user, so group grants alone never apply to it. Public pages therefore need a
+-- direct `acl_users` row, which is how the existing open pages (home, login,
+-- theorie, …) are configured.
+INSERT IGNORE INTO `acl_users` (`id_users`, `id_pages`, `acl_select`, `acl_insert`, `acl_update`, `acl_delete`)
+    SELECT (SELECT id FROM users WHERE email = 'guest'), p.id, 1, 0, 0, 0
+    FROM `pages` p
+    WHERE p.keyword IN ('kanji-adults', 'kanji-adults-survey',
+                        'kanji-adults-task', 'kanji-adults-questions');
+
 
 -- -----------------------------------------------------------------------
 -- Study content: SurveyJS surveys
