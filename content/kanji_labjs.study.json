@@ -1,0 +1,1308 @@
+{
+    "type": "lab.flow.Sequence",
+    "title": "Kanji Adults",
+    "parameters": [],
+    "responses": [],
+    "messageHandlers": [],
+    "files": {
+        "Fixationskreuz.jpg": "{{ASSET_BASE}}/Fixationskreuz.jpg",
+        "Herbst_Kanji.jpg": "{{ASSET_BASE}}/Herbst_Kanji.jpg",
+        "Herbst.jpg": "{{ASSET_BASE}}/Herbst.jpg",
+        "Ast_Kanji.jpg": "{{ASSET_BASE}}/Ast_Kanji.jpg",
+        "Ast.jpg": "{{ASSET_BASE}}/Ast.jpg",
+        "Baumwolle_Kanji.jpg": "{{ASSET_BASE}}/Baumwolle_Kanji.jpg",
+        "Baumwolle.jpg": "{{ASSET_BASE}}/Baumwolle.jpg",
+        "Pflanze_Kanji.jpg": "{{ASSET_BASE}}/Pflanze_Kanji.jpg",
+        "Pflanze.jpg": "{{ASSET_BASE}}/Pflanze.jpg",
+        "Welt_Kanji.jpg": "{{ASSET_BASE}}/Welt_Kanji.jpg",
+        "Welt.jpg": "{{ASSET_BASE}}/Welt.jpg",
+        "Stock_Kanji.jpg": "{{ASSET_BASE}}/Stock_Kanji.jpg",
+        "Stock.jpg": "{{ASSET_BASE}}/Stock.jpg",
+        "Zeit_Kanji.jpg": "{{ASSET_BASE}}/Zeit_Kanji.jpg",
+        "Zeit.jpg": "{{ASSET_BASE}}/Zeit.jpg",
+        "Dunkelheit_Kanji.jpg": "{{ASSET_BASE}}/Dunkelheit_Kanji.jpg",
+        "Dunkelheit.jpg": "{{ASSET_BASE}}/Dunkelheit.jpg",
+        "Nebel_Kanji.jpg": "{{ASSET_BASE}}/Nebel_Kanji.jpg",
+        "Nebel.jpg": "{{ASSET_BASE}}/Nebel.jpg",
+        "Wald_Kanji.jpg": "{{ASSET_BASE}}/Wald_Kanji.jpg",
+        "Wald.jpg": "{{ASSET_BASE}}/Wald.jpg",
+        "See_Kanji.jpg": "{{ASSET_BASE}}/See_Kanji.jpg",
+        "See.jpg": "{{ASSET_BASE}}/See.jpg",
+        "Klippe_Kanji.jpg": "{{ASSET_BASE}}/Klippe_Kanji.jpg",
+        "Klippe.jpg": "{{ASSET_BASE}}/Klippe.jpg",
+        "Nacht_Kanji.jpg": "{{ASSET_BASE}}/Nacht_Kanji.jpg",
+        "Nacht.jpg": "{{ASSET_BASE}}/Nacht.jpg",
+        "Mittag_Kanji.jpg": "{{ASSET_BASE}}/Mittag_Kanji.jpg",
+        "Mittag.jpg": "{{ASSET_BASE}}/Mittag.jpg",
+        "Schwarz_Kanji.jpg": "{{ASSET_BASE}}/Schwarz_Kanji.jpg",
+        "Schwarz.jpg": "{{ASSET_BASE}}/Schwarz.jpg",
+        "Gelb_Kanji.jpg": "{{ASSET_BASE}}/Gelb_Kanji.jpg",
+        "Gelb.jpg": "{{ASSET_BASE}}/Gelb.jpg",
+        "Kalt_Kanji.jpg": "{{ASSET_BASE}}/Kalt_Kanji.jpg",
+        "Kalt.jpg": "{{ASSET_BASE}}/Kalt.jpg",
+        "Eiszapfen_Kanji.jpg": "{{ASSET_BASE}}/Eiszapfen_Kanji.jpg",
+        "Eiszapfen.jpg": "{{ASSET_BASE}}/Eiszapfen.jpg",
+        "Vorsicht_Kanji.jpg": "{{ASSET_BASE}}/Vorsicht_Kanji.jpg",
+        "Vorsicht.jpg": "{{ASSET_BASE}}/Vorsicht.jpg",
+        "Gefaehrlich_Kanji.jpg": "{{ASSET_BASE}}/Gefaehrlich_Kanji.jpg",
+        "Gefaehrlich.jpg": "{{ASSET_BASE}}/Gefaehrlich.jpg",
+        "Rot_Kanji.jpg": "{{ASSET_BASE}}/Rot_Kanji.jpg",
+        "Rot.jpg": "{{ASSET_BASE}}/Rot.jpg",
+        "Asien_Kanji.jpg": "{{ASSET_BASE}}/Asien_Kanji.jpg",
+        "Asien.jpg": "{{ASSET_BASE}}/Asien.jpg",
+        "Afrika_Kanji.jpg": "{{ASSET_BASE}}/Afrika_Kanji.jpg",
+        "Afrika.jpg": "{{ASSET_BASE}}/Afrika.jpg",
+        "Insel_Kanji.jpg": "{{ASSET_BASE}}/Insel_Kanji.jpg",
+        "Insel.jpg": "{{ASSET_BASE}}/Insel.jpg",
+        "Sommer_Kanji.jpg": "{{ASSET_BASE}}/Sommer_Kanji.jpg",
+        "Sommer.jpg": "{{ASSET_BASE}}/Sommer.jpg",
+        "Hoehle_Kanji.jpg": "{{ASSET_BASE}}/Hoehle_Kanji.jpg",
+        "Hoehle.jpg": "{{ASSET_BASE}}/Hoehle.jpg",
+        "Berg_Kanji.jpg": "{{ASSET_BASE}}/Berg_Kanji.jpg",
+        "Berg.jpg": "{{ASSET_BASE}}/Berg.jpg",
+        "Fels_Kanji.jpg": "{{ASSET_BASE}}/Fels_Kanji.jpg",
+        "Fels.jpg": "{{ASSET_BASE}}/Fels.jpg",
+        "Leben_Kanji.jpg": "{{ASSET_BASE}}/Leben_Kanji.jpg",
+        "Leben.jpg": "{{ASSET_BASE}}/Leben.jpg",
+        "Weiss_Kanji.jpg": "{{ASSET_BASE}}/Weiss_Kanji.jpg",
+        "Weiss.jpg": "{{ASSET_BASE}}/Weiss.jpg",
+        "Palme_Kanji.jpg": "{{ASSET_BASE}}/Palme_Kanji.jpg",
+        "Palme.jpg": "{{ASSET_BASE}}/Palme.jpg",
+        "Strand_Kanji.jpg": "{{ASSET_BASE}}/Strand_Kanji.jpg",
+        "Strand.jpg": "{{ASSET_BASE}}/Strand.jpg",
+        "Bakterium_Kanji.jpg": "{{ASSET_BASE}}/Bakterium_Kanji.jpg",
+        "Bakterium.jpg": "{{ASSET_BASE}}/Bakterium.jpg",
+        "Sueden_Kanji.jpg": "{{ASSET_BASE}}/Sueden_Kanji.jpg",
+        "Sueden.jpg": "{{ASSET_BASE}}/Sueden.jpg",
+        "Huegel_Kanji.jpg": "{{ASSET_BASE}}/Huegel_Kanji.jpg",
+        "Huegel.jpg": "{{ASSET_BASE}}/Huegel.jpg",
+        "Rechts_Kanji.jpg": "{{ASSET_BASE}}/Rechts_Kanji.jpg",
+        "Rechts.jpg": "{{ASSET_BASE}}/Rechts.jpg",
+        "Schnee_Kanji.jpg": "{{ASSET_BASE}}/Schnee_Kanji.jpg",
+        "Schnee.jpg": "{{ASSET_BASE}}/Schnee.jpg",
+        "Regen_Kanji.jpg": "{{ASSET_BASE}}/Regen_Kanji.jpg",
+        "Regen.jpg": "{{ASSET_BASE}}/Regen.jpg",
+        "Wolke_Kanji.jpg": "{{ASSET_BASE}}/Wolke_Kanji.jpg",
+        "Wolke.jpg": "{{ASSET_BASE}}/Wolke.jpg",
+        "Winter_Kanji.jpg": "{{ASSET_BASE}}/Winter_Kanji.jpg",
+        "Winter.jpg": "{{ASSET_BASE}}/Winter.jpg",
+        "Fruehling_Kanji.jpg": "{{ASSET_BASE}}/Fruehling_Kanji.jpg",
+        "Fruehling.jpg": "{{ASSET_BASE}}/Fruehling.jpg",
+        "Klima_Kanji.jpg": "{{ASSET_BASE}}/Klima_Kanji.jpg",
+        "Klima.jpg": "{{ASSET_BASE}}/Klima.jpg",
+        "Braun_Kanji.jpg": "{{ASSET_BASE}}/Braun_Kanji.jpg",
+        "Braun.jpg": "{{ASSET_BASE}}/Braun.jpg",
+        "Gruen_Kanji.jpg": "{{ASSET_BASE}}/Gruen_Kanji.jpg",
+        "Gruen.jpg": "{{ASSET_BASE}}/Gruen.jpg",
+        "Violett_Kanji.jpg": "{{ASSET_BASE}}/Violett_Kanji.jpg",
+        "Violett.jpg": "{{ASSET_BASE}}/Violett.jpg",
+        "Dunkelblau_Kanji.jpg": "{{ASSET_BASE}}/Dunkelblau_Kanji.jpg",
+        "Dunkelblau.jpg": "{{ASSET_BASE}}/Dunkelblau.jpg",
+        "Meer_Kanji.jpg": "{{ASSET_BASE}}/Meer_Kanji.jpg",
+        "Meer.jpg": "{{ASSET_BASE}}/Meer.jpg",
+        "Teich_Kanji.jpg": "{{ASSET_BASE}}/Teich_Kanji.jpg",
+        "Teich.jpg": "{{ASSET_BASE}}/Teich.jpg",
+        "Wasser_Kanji.jpg": "{{ASSET_BASE}}/Wasser_Kanji.jpg",
+        "Wasser.jpg": "{{ASSET_BASE}}/Wasser.jpg",
+        "Baum_Kanji.jpg": "{{ASSET_BASE}}/Baum_Kanji.jpg",
+        "Baum.jpg": "{{ASSET_BASE}}/Baum.jpg",
+        "Wind_Kanji.jpg": "{{ASSET_BASE}}/Wind_Kanji.jpg",
+        "Wind.jpg": "{{ASSET_BASE}}/Wind.jpg",
+        "Regenbogen_Kanji.jpg": "{{ASSET_BASE}}/Regenbogen_Kanji.jpg",
+        "Regenbogen.jpg": "{{ASSET_BASE}}/Regenbogen.jpg",
+        "Ticket_Kanji.jpg": "{{ASSET_BASE}}/Ticket_Kanji.jpg",
+        "Ticket.jpg": "{{ASSET_BASE}}/Ticket.jpg",
+        "Osten_Kanji.jpg": "{{ASSET_BASE}}/Osten_Kanji.jpg",
+        "Osten.jpg": "{{ASSET_BASE}}/Osten.jpg",
+        "Arzt_Kanji.jpg": "{{ASSET_BASE}}/Arzt_Kanji.jpg",
+        "Arzt.jpg": "{{ASSET_BASE}}/Arzt.jpg",
+        "Europa_Kanji.jpg": "{{ASSET_BASE}}/Europa_Kanji.jpg",
+        "Europa.jpg": "{{ASSET_BASE}}/Europa.jpg",
+        "Westen_Kanji.jpg": "{{ASSET_BASE}}/Westen_Kanji.jpg",
+        "Westen.jpg": "{{ASSET_BASE}}/Westen.jpg",
+        "Vier_Kanji.jpg": "{{ASSET_BASE}}/Vier_Kanji.jpg",
+        "Vier.jpg": "{{ASSET_BASE}}/Vier.jpg",
+        "Jahr_Kanji.jpg": "{{ASSET_BASE}}/Jahr_Kanji.jpg",
+        "Jahr.jpg": "{{ASSET_BASE}}/Jahr.jpg",
+        "Links_Kanji.jpg": "{{ASSET_BASE}}/Links_Kanji.jpg",
+        "Links.jpg": "{{ASSET_BASE}}/Links.jpg",
+        "Baer_Kanji.jpg": "{{ASSET_BASE}}/Baer_Kanji.jpg",
+        "Baer.jpg": "{{ASSET_BASE}}/Baer.jpg",
+        "Fisch_Kanji.jpg": "{{ASSET_BASE}}/Fisch_Kanji.jpg",
+        "Fisch.jpg": "{{ASSET_BASE}}/Fisch.jpg",
+        "CJ_unsicher.png": "{{ASSET_BASE}}/CJ_unsicher.png",
+        "CJ_mittel.png": "{{ASSET_BASE}}/CJ_mittel.png",
+        "CJ_sicher.png": "{{ASSET_BASE}}/CJ_sicher.png",
+        "CJ_unsicher_EN.png": "{{ASSET_BASE}}/CJ_unsicher_EN.png",
+        "CJ_mittel_EN.png": "{{ASSET_BASE}}/CJ_mittel_EN.png",
+        "CJ_sicher_EN.png": "{{ASSET_BASE}}/CJ_sicher_EN.png",
+        "CJ_unsicher_FR.png": "{{ASSET_BASE}}/CJ_unsicher_FR.png",
+        "CJ_mittel_FR.png": "{{ASSET_BASE}}/CJ_mittel_FR.png",
+        "CJ_sicher_FR.png": "{{ASSET_BASE}}/CJ_sicher_FR.png",
+        "CJ_unsicher_IT.png": "{{ASSET_BASE}}/CJ_unsicher_IT.png",
+        "CJ_mittel_IT.png": "{{ASSET_BASE}}/CJ_mittel_IT.png",
+        "CJ_sicher_IT.png": "{{ASSET_BASE}}/CJ_sicher_IT.png"
+    },
+    "content": [
+        {
+            "type": "lab.flow.Loop",
+            "title": "Learn practice",
+            "templateParameters": [
+                {
+                    "list": "P",
+                    "trial": "1",
+                    "concept": "Baer",
+                    "kanji_img": "Baer_Kanji.jpg",
+                    "meaning_img": "Baer.jpg"
+                },
+                {
+                    "list": "P",
+                    "trial": "2",
+                    "concept": "Fisch",
+                    "kanji_img": "Fisch_Kanji.jpg",
+                    "meaning_img": "Fisch.jpg"
+                }
+            ],
+            "shuffle": false,
+            "template": {
+                "type": "lab.flow.Sequence",
+                "title": "Learn practice trial",
+                "content": [
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Fixation",
+                        "content": "<div class=\"kanji-stage\"><img class=\"kanji-fix\" src=\"${this.files['Fixationskreuz.jpg']}\"></div>",
+                        "timeout": "500",
+                        "files": {
+                            "Fixationskreuz.jpg": "{{ASSET_BASE}}/Fixationskreuz.jpg"
+                        },
+                        "parameters": [],
+                        "responses": [],
+                        "messageHandlers": []
+                    },
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Learn stimulus",
+                        "content": "<div class=\"kanji-stage kanji-pair\"><img class=\"kanji-item\" src=\"${ this.files[this.parameters.kanji_img] }\"><img class=\"kanji-item\" src=\"${ this.files[this.parameters.meaning_img] }\"></div>",
+                        "timeout": "5000",
+                        "parameters": [],
+                        "responses": [],
+                        "messageHandlers": []
+                    }
+                ]
+            }
+        },
+        {
+            "type": "lab.flow.Loop",
+            "title": "Recall practice",
+            "templateParameters": [
+                {
+                    "list": "P",
+                    "trial": "1",
+                    "concept": "Baer",
+                    "kanji_img": "Baer_Kanji.jpg",
+                    "correct_img": "Baer.jpg",
+                    "distractor_img": "Fisch.jpg",
+                    "orig_pos": "1"
+                }
+            ],
+            "shuffle": false,
+            "template": {
+                "type": "lab.flow.Sequence",
+                "title": "Recall practice trial",
+                "content": [
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Fixation",
+                        "content": "<div class=\"kanji-stage\"><img class=\"kanji-fix\" src=\"${this.files['Fixationskreuz.jpg']}\"></div>",
+                        "timeout": "500",
+                        "files": {
+                            "Fixationskreuz.jpg": "{{ASSET_BASE}}/Fixationskreuz.jpg"
+                        },
+                        "parameters": [],
+                        "responses": [],
+                        "messageHandlers": []
+                    },
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Recall choice",
+                        "content": "<div class=\"kanji-stage\"><img class=\"kanji-cue\" src=\"${ this.files[this.parameters.kanji_img] }\"><div class=\"kanji-choices\"><div class=\"kanji-opt\" data-side=\"left\"><img src=\"${ this.files[this.state.left_img] }\"></div><div class=\"kanji-opt\" data-side=\"right\"><img src=\"${ this.files[this.state.right_img] }\"></div></div></div>",
+                        "responses": [
+                            {
+                                "label": "left",
+                                "event": "click",
+                                "target": ".kanji-opt[data-side=\"left\"]"
+                            },
+                            {
+                                "label": "right",
+                                "event": "click",
+                                "target": ".kanji-opt[data-side=\"right\"]"
+                            }
+                        ],
+                        "messageHandlers": [
+                            {
+                                "title": "randomise sides",
+                                "message": "before:prepare",
+                                "code": "const flip = Math.random() < 0.5;\nthis.state.correct_side = flip ? 'left' : 'right';\nthis.state.left_img  = flip ? this.parameters.correct_img : this.parameters.distractor_img;\nthis.state.right_img = flip ? this.parameters.distractor_img : this.parameters.correct_img;\n"
+                            },
+                            {
+                                "title": "score",
+                                "message": "after:end",
+                                "code": "const side = this.state.response;\nthis.data.correct_side = this.state.correct_side;\nthis.data.chosen_side  = side;\nthis.data.chosen_img   = side === 'left' ? this.state.left_img : this.state.right_img;\nthis.data.correct      = side === this.state.correct_side ? 1 : 0;\n"
+                            }
+                        ],
+                        "parameters": []
+                    },
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Confidence",
+                        "content": "<div class=\"kanji-stage\"><div class=\"kanji-choices kanji-cj\"><div class=\"kanji-opt\" data-cj=\"1\"><img src=\"${ this.files[this.state.cj_unsicher] }\"></div><div class=\"kanji-opt\" data-cj=\"2\"><img src=\"${ this.files[this.state.cj_mittel] }\"></div><div class=\"kanji-opt\" data-cj=\"3\"><img src=\"${ this.files[this.state.cj_sicher] }\"></div></div></div>",
+                        "responses": [
+                            {
+                                "label": "1",
+                                "event": "click",
+                                "target": ".kanji-opt[data-cj=\"1\"]"
+                            },
+                            {
+                                "label": "2",
+                                "event": "click",
+                                "target": ".kanji-opt[data-cj=\"2\"]"
+                            },
+                            {
+                                "label": "3",
+                                "event": "click",
+                                "target": ".kanji-opt[data-cj=\"3\"]"
+                            }
+                        ],
+                        "messageHandlers": [
+                            {
+                                "title": "localise scale",
+                                "message": "before:prepare",
+                                "code": "const sfx = { de: '', en: '_EN', fr: '_FR', it: '_IT' }[this.options.datastore.get('language') || 'de'] ?? '';\nthis.state.cj_unsicher = 'CJ_unsicher' + sfx + '.png';\nthis.state.cj_mittel   = 'CJ_mittel'   + sfx + '.png';\nthis.state.cj_sicher   = 'CJ_sicher'   + sfx + '.png';\n"
+                            },
+                            {
+                                "title": "record",
+                                "message": "after:end",
+                                "code": "this.data.confidence = parseInt(this.state.response, 10);\n"
+                            }
+                        ],
+                        "parameters": []
+                    }
+                ]
+            }
+        },
+        {
+            "type": "lab.html.Screen",
+            "title": "Save: practice",
+            "content": "<div class=\"kanji-stage\"><p class=\"kanji-wait\">…</p></div>",
+            "timeout": "50",
+            "messageHandlers": [
+                {
+                    "title": "save",
+                    "message": "after:end",
+                    "code": "if (typeof saveDataToSelfHelp === 'function') {\n  saveDataToSelfHelp('updated', { block: 'practice' });\n}\n"
+                }
+            ],
+            "parameters": [],
+            "responses": []
+        },
+        {
+            "type": "lab.flow.Loop",
+            "title": "Learn A",
+            "templateParameters": [
+                {
+                    "list": "A",
+                    "trial": "1",
+                    "concept": "Herbst",
+                    "kanji_img": "Herbst_Kanji.jpg",
+                    "meaning_img": "Herbst.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "2",
+                    "concept": "Ast",
+                    "kanji_img": "Ast_Kanji.jpg",
+                    "meaning_img": "Ast.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "3",
+                    "concept": "Baumwolle",
+                    "kanji_img": "Baumwolle_Kanji.jpg",
+                    "meaning_img": "Baumwolle.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "4",
+                    "concept": "Pflanze",
+                    "kanji_img": "Pflanze_Kanji.jpg",
+                    "meaning_img": "Pflanze.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "5",
+                    "concept": "Welt",
+                    "kanji_img": "Welt_Kanji.jpg",
+                    "meaning_img": "Welt.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "6",
+                    "concept": "Stock",
+                    "kanji_img": "Stock_Kanji.jpg",
+                    "meaning_img": "Stock.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "7",
+                    "concept": "Zeit",
+                    "kanji_img": "Zeit_Kanji.jpg",
+                    "meaning_img": "Zeit.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "8",
+                    "concept": "Dunkelheit",
+                    "kanji_img": "Dunkelheit_Kanji.jpg",
+                    "meaning_img": "Dunkelheit.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "9",
+                    "concept": "Nebel",
+                    "kanji_img": "Nebel_Kanji.jpg",
+                    "meaning_img": "Nebel.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "10",
+                    "concept": "Wald",
+                    "kanji_img": "Wald_Kanji.jpg",
+                    "meaning_img": "Wald.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "11",
+                    "concept": "See",
+                    "kanji_img": "See_Kanji.jpg",
+                    "meaning_img": "See.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "12",
+                    "concept": "Klippe",
+                    "kanji_img": "Klippe_Kanji.jpg",
+                    "meaning_img": "Klippe.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "13",
+                    "concept": "Nacht",
+                    "kanji_img": "Nacht_Kanji.jpg",
+                    "meaning_img": "Nacht.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "14",
+                    "concept": "Mittag",
+                    "kanji_img": "Mittag_Kanji.jpg",
+                    "meaning_img": "Mittag.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "15",
+                    "concept": "Schwarz",
+                    "kanji_img": "Schwarz_Kanji.jpg",
+                    "meaning_img": "Schwarz.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "16",
+                    "concept": "Gelb",
+                    "kanji_img": "Gelb_Kanji.jpg",
+                    "meaning_img": "Gelb.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "17",
+                    "concept": "Kalt",
+                    "kanji_img": "Kalt_Kanji.jpg",
+                    "meaning_img": "Kalt.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "18",
+                    "concept": "Eiszapfen",
+                    "kanji_img": "Eiszapfen_Kanji.jpg",
+                    "meaning_img": "Eiszapfen.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "19",
+                    "concept": "Vorsicht",
+                    "kanji_img": "Vorsicht_Kanji.jpg",
+                    "meaning_img": "Vorsicht.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "20",
+                    "concept": "Gefaehrlich",
+                    "kanji_img": "Gefaehrlich_Kanji.jpg",
+                    "meaning_img": "Gefaehrlich.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "21",
+                    "concept": "Rot",
+                    "kanji_img": "Rot_Kanji.jpg",
+                    "meaning_img": "Rot.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "22",
+                    "concept": "Asien",
+                    "kanji_img": "Asien_Kanji.jpg",
+                    "meaning_img": "Asien.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "23",
+                    "concept": "Afrika",
+                    "kanji_img": "Afrika_Kanji.jpg",
+                    "meaning_img": "Afrika.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "24",
+                    "concept": "Insel",
+                    "kanji_img": "Insel_Kanji.jpg",
+                    "meaning_img": "Insel.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "25",
+                    "concept": "Sommer",
+                    "kanji_img": "Sommer_Kanji.jpg",
+                    "meaning_img": "Sommer.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "26",
+                    "concept": "Hoehle",
+                    "kanji_img": "Hoehle_Kanji.jpg",
+                    "meaning_img": "Hoehle.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "27",
+                    "concept": "Berg",
+                    "kanji_img": "Berg_Kanji.jpg",
+                    "meaning_img": "Berg.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "28",
+                    "concept": "Fels",
+                    "kanji_img": "Fels_Kanji.jpg",
+                    "meaning_img": "Fels.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "29",
+                    "concept": "Leben",
+                    "kanji_img": "Leben_Kanji.jpg",
+                    "meaning_img": "Leben.jpg"
+                },
+                {
+                    "list": "A",
+                    "trial": "30",
+                    "concept": "Weiss",
+                    "kanji_img": "Weiss_Kanji.jpg",
+                    "meaning_img": "Weiss.jpg"
+                }
+            ],
+            "shuffle": true,
+            "template": {
+                "type": "lab.flow.Sequence",
+                "title": "Learn A trial",
+                "content": [
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Fixation",
+                        "content": "<div class=\"kanji-stage\"><img class=\"kanji-fix\" src=\"${this.files['Fixationskreuz.jpg']}\"></div>",
+                        "timeout": "500",
+                        "files": {
+                            "Fixationskreuz.jpg": "{{ASSET_BASE}}/Fixationskreuz.jpg"
+                        },
+                        "parameters": [],
+                        "responses": [],
+                        "messageHandlers": []
+                    },
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Learn stimulus",
+                        "content": "<div class=\"kanji-stage kanji-pair\"><img class=\"kanji-item\" src=\"${ this.files[this.parameters.kanji_img] }\"><img class=\"kanji-item\" src=\"${ this.files[this.parameters.meaning_img] }\"></div>",
+                        "timeout": "5000",
+                        "parameters": [],
+                        "responses": [],
+                        "messageHandlers": []
+                    }
+                ]
+            }
+        },
+        {
+            "type": "lab.html.Screen",
+            "title": "Save: learn_A",
+            "content": "<div class=\"kanji-stage\"><p class=\"kanji-wait\">…</p></div>",
+            "timeout": "50",
+            "messageHandlers": [
+                {
+                    "title": "save",
+                    "message": "after:end",
+                    "code": "if (typeof saveDataToSelfHelp === 'function') {\n  saveDataToSelfHelp('updated', { block: 'learn_A' });\n}\n"
+                }
+            ],
+            "parameters": [],
+            "responses": []
+        },
+        {
+            "type": "lab.flow.Loop",
+            "title": "Recall A",
+            "templateParameters": [
+                {
+                    "list": "A",
+                    "trial": "1",
+                    "concept": "Herbst",
+                    "kanji_img": "Herbst_Kanji.jpg",
+                    "correct_img": "Herbst.jpg",
+                    "distractor_img": "Ast.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "A",
+                    "trial": "2",
+                    "concept": "Baumwolle",
+                    "kanji_img": "Baumwolle_Kanji.jpg",
+                    "correct_img": "Baumwolle.jpg",
+                    "distractor_img": "Pflanze.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "A",
+                    "trial": "3",
+                    "concept": "Welt",
+                    "kanji_img": "Welt_Kanji.jpg",
+                    "correct_img": "Welt.jpg",
+                    "distractor_img": "Stock.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "A",
+                    "trial": "4",
+                    "concept": "Zeit",
+                    "kanji_img": "Zeit_Kanji.jpg",
+                    "correct_img": "Zeit.jpg",
+                    "distractor_img": "Dunkelheit.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "A",
+                    "trial": "5",
+                    "concept": "Nebel",
+                    "kanji_img": "Nebel_Kanji.jpg",
+                    "correct_img": "Nebel.jpg",
+                    "distractor_img": "Wald.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "A",
+                    "trial": "6",
+                    "concept": "See",
+                    "kanji_img": "See_Kanji.jpg",
+                    "correct_img": "See.jpg",
+                    "distractor_img": "Klippe.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "A",
+                    "trial": "7",
+                    "concept": "Nacht",
+                    "kanji_img": "Nacht_Kanji.jpg",
+                    "correct_img": "Nacht.jpg",
+                    "distractor_img": "Mittag.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "A",
+                    "trial": "8",
+                    "concept": "Schwarz",
+                    "kanji_img": "Schwarz_Kanji.jpg",
+                    "correct_img": "Schwarz.jpg",
+                    "distractor_img": "Gelb.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "A",
+                    "trial": "9",
+                    "concept": "Kalt",
+                    "kanji_img": "Kalt_Kanji.jpg",
+                    "correct_img": "Kalt.jpg",
+                    "distractor_img": "Eiszapfen.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "A",
+                    "trial": "10",
+                    "concept": "Vorsicht",
+                    "kanji_img": "Vorsicht_Kanji.jpg",
+                    "correct_img": "Vorsicht.jpg",
+                    "distractor_img": "Gefaehrlich.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "A",
+                    "trial": "11",
+                    "concept": "Gefaehrlich",
+                    "kanji_img": "Gefaehrlich_Kanji.jpg",
+                    "correct_img": "Gefaehrlich.jpg",
+                    "distractor_img": "Rot.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "A",
+                    "trial": "12",
+                    "concept": "Asien",
+                    "kanji_img": "Asien_Kanji.jpg",
+                    "correct_img": "Asien.jpg",
+                    "distractor_img": "Afrika.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "A",
+                    "trial": "13",
+                    "concept": "Insel",
+                    "kanji_img": "Insel_Kanji.jpg",
+                    "correct_img": "Insel.jpg",
+                    "distractor_img": "Sommer.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "A",
+                    "trial": "14",
+                    "concept": "Hoehle",
+                    "kanji_img": "Hoehle_Kanji.jpg",
+                    "correct_img": "Hoehle.jpg",
+                    "distractor_img": "Berg.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "A",
+                    "trial": "15",
+                    "concept": "Leben",
+                    "kanji_img": "Leben_Kanji.jpg",
+                    "correct_img": "Leben.jpg",
+                    "distractor_img": "Weiss.jpg",
+                    "orig_pos": "2"
+                }
+            ],
+            "shuffle": true,
+            "template": {
+                "type": "lab.flow.Sequence",
+                "title": "Recall A trial",
+                "content": [
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Fixation",
+                        "content": "<div class=\"kanji-stage\"><img class=\"kanji-fix\" src=\"${this.files['Fixationskreuz.jpg']}\"></div>",
+                        "timeout": "500",
+                        "files": {
+                            "Fixationskreuz.jpg": "{{ASSET_BASE}}/Fixationskreuz.jpg"
+                        },
+                        "parameters": [],
+                        "responses": [],
+                        "messageHandlers": []
+                    },
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Recall choice",
+                        "content": "<div class=\"kanji-stage\"><img class=\"kanji-cue\" src=\"${ this.files[this.parameters.kanji_img] }\"><div class=\"kanji-choices\"><div class=\"kanji-opt\" data-side=\"left\"><img src=\"${ this.files[this.state.left_img] }\"></div><div class=\"kanji-opt\" data-side=\"right\"><img src=\"${ this.files[this.state.right_img] }\"></div></div></div>",
+                        "responses": [
+                            {
+                                "label": "left",
+                                "event": "click",
+                                "target": ".kanji-opt[data-side=\"left\"]"
+                            },
+                            {
+                                "label": "right",
+                                "event": "click",
+                                "target": ".kanji-opt[data-side=\"right\"]"
+                            }
+                        ],
+                        "messageHandlers": [
+                            {
+                                "title": "randomise sides",
+                                "message": "before:prepare",
+                                "code": "const flip = Math.random() < 0.5;\nthis.state.correct_side = flip ? 'left' : 'right';\nthis.state.left_img  = flip ? this.parameters.correct_img : this.parameters.distractor_img;\nthis.state.right_img = flip ? this.parameters.distractor_img : this.parameters.correct_img;\n"
+                            },
+                            {
+                                "title": "score",
+                                "message": "after:end",
+                                "code": "const side = this.state.response;\nthis.data.correct_side = this.state.correct_side;\nthis.data.chosen_side  = side;\nthis.data.chosen_img   = side === 'left' ? this.state.left_img : this.state.right_img;\nthis.data.correct      = side === this.state.correct_side ? 1 : 0;\n"
+                            }
+                        ],
+                        "parameters": []
+                    },
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Confidence",
+                        "content": "<div class=\"kanji-stage\"><div class=\"kanji-choices kanji-cj\"><div class=\"kanji-opt\" data-cj=\"1\"><img src=\"${ this.files[this.state.cj_unsicher] }\"></div><div class=\"kanji-opt\" data-cj=\"2\"><img src=\"${ this.files[this.state.cj_mittel] }\"></div><div class=\"kanji-opt\" data-cj=\"3\"><img src=\"${ this.files[this.state.cj_sicher] }\"></div></div></div>",
+                        "responses": [
+                            {
+                                "label": "1",
+                                "event": "click",
+                                "target": ".kanji-opt[data-cj=\"1\"]"
+                            },
+                            {
+                                "label": "2",
+                                "event": "click",
+                                "target": ".kanji-opt[data-cj=\"2\"]"
+                            },
+                            {
+                                "label": "3",
+                                "event": "click",
+                                "target": ".kanji-opt[data-cj=\"3\"]"
+                            }
+                        ],
+                        "messageHandlers": [
+                            {
+                                "title": "localise scale",
+                                "message": "before:prepare",
+                                "code": "const sfx = { de: '', en: '_EN', fr: '_FR', it: '_IT' }[this.options.datastore.get('language') || 'de'] ?? '';\nthis.state.cj_unsicher = 'CJ_unsicher' + sfx + '.png';\nthis.state.cj_mittel   = 'CJ_mittel'   + sfx + '.png';\nthis.state.cj_sicher   = 'CJ_sicher'   + sfx + '.png';\n"
+                            },
+                            {
+                                "title": "record",
+                                "message": "after:end",
+                                "code": "this.data.confidence = parseInt(this.state.response, 10);\n"
+                            }
+                        ],
+                        "parameters": []
+                    }
+                ]
+            }
+        },
+        {
+            "type": "lab.html.Screen",
+            "title": "Save: recall_A",
+            "content": "<div class=\"kanji-stage\"><p class=\"kanji-wait\">…</p></div>",
+            "timeout": "50",
+            "messageHandlers": [
+                {
+                    "title": "save",
+                    "message": "after:end",
+                    "code": "if (typeof saveDataToSelfHelp === 'function') {\n  saveDataToSelfHelp('updated', { block: 'recall_A' });\n}\n"
+                }
+            ],
+            "parameters": [],
+            "responses": []
+        },
+        {
+            "type": "lab.flow.Loop",
+            "title": "Learn B",
+            "templateParameters": [
+                {
+                    "list": "B",
+                    "trial": "1",
+                    "concept": "Palme",
+                    "kanji_img": "Palme_Kanji.jpg",
+                    "meaning_img": "Palme.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "2",
+                    "concept": "Strand",
+                    "kanji_img": "Strand_Kanji.jpg",
+                    "meaning_img": "Strand.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "3",
+                    "concept": "Bakterium",
+                    "kanji_img": "Bakterium_Kanji.jpg",
+                    "meaning_img": "Bakterium.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "4",
+                    "concept": "Sueden",
+                    "kanji_img": "Sueden_Kanji.jpg",
+                    "meaning_img": "Sueden.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "5",
+                    "concept": "Huegel",
+                    "kanji_img": "Huegel_Kanji.jpg",
+                    "meaning_img": "Huegel.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "6",
+                    "concept": "Rechts",
+                    "kanji_img": "Rechts_Kanji.jpg",
+                    "meaning_img": "Rechts.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "7",
+                    "concept": "Schnee",
+                    "kanji_img": "Schnee_Kanji.jpg",
+                    "meaning_img": "Schnee.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "8",
+                    "concept": "Regen",
+                    "kanji_img": "Regen_Kanji.jpg",
+                    "meaning_img": "Regen.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "9",
+                    "concept": "Wolke",
+                    "kanji_img": "Wolke_Kanji.jpg",
+                    "meaning_img": "Wolke.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "10",
+                    "concept": "Winter",
+                    "kanji_img": "Winter_Kanji.jpg",
+                    "meaning_img": "Winter.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "11",
+                    "concept": "Fruehling",
+                    "kanji_img": "Fruehling_Kanji.jpg",
+                    "meaning_img": "Fruehling.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "12",
+                    "concept": "Klima",
+                    "kanji_img": "Klima_Kanji.jpg",
+                    "meaning_img": "Klima.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "13",
+                    "concept": "Braun",
+                    "kanji_img": "Braun_Kanji.jpg",
+                    "meaning_img": "Braun.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "14",
+                    "concept": "Gruen",
+                    "kanji_img": "Gruen_Kanji.jpg",
+                    "meaning_img": "Gruen.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "15",
+                    "concept": "Violett",
+                    "kanji_img": "Violett_Kanji.jpg",
+                    "meaning_img": "Violett.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "16",
+                    "concept": "Dunkelblau",
+                    "kanji_img": "Dunkelblau_Kanji.jpg",
+                    "meaning_img": "Dunkelblau.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "17",
+                    "concept": "Meer",
+                    "kanji_img": "Meer_Kanji.jpg",
+                    "meaning_img": "Meer.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "18",
+                    "concept": "Teich",
+                    "kanji_img": "Teich_Kanji.jpg",
+                    "meaning_img": "Teich.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "19",
+                    "concept": "Wasser",
+                    "kanji_img": "Wasser_Kanji.jpg",
+                    "meaning_img": "Wasser.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "20",
+                    "concept": "Baum",
+                    "kanji_img": "Baum_Kanji.jpg",
+                    "meaning_img": "Baum.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "21",
+                    "concept": "Wind",
+                    "kanji_img": "Wind_Kanji.jpg",
+                    "meaning_img": "Wind.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "22",
+                    "concept": "Regenbogen",
+                    "kanji_img": "Regenbogen_Kanji.jpg",
+                    "meaning_img": "Regenbogen.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "23",
+                    "concept": "Ticket",
+                    "kanji_img": "Ticket_Kanji.jpg",
+                    "meaning_img": "Ticket.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "24",
+                    "concept": "Osten",
+                    "kanji_img": "Osten_Kanji.jpg",
+                    "meaning_img": "Osten.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "25",
+                    "concept": "Arzt",
+                    "kanji_img": "Arzt_Kanji.jpg",
+                    "meaning_img": "Arzt.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "26",
+                    "concept": "Europa",
+                    "kanji_img": "Europa_Kanji.jpg",
+                    "meaning_img": "Europa.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "27",
+                    "concept": "Westen",
+                    "kanji_img": "Westen_Kanji.jpg",
+                    "meaning_img": "Westen.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "28",
+                    "concept": "Vier",
+                    "kanji_img": "Vier_Kanji.jpg",
+                    "meaning_img": "Vier.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "29",
+                    "concept": "Jahr",
+                    "kanji_img": "Jahr_Kanji.jpg",
+                    "meaning_img": "Jahr.jpg"
+                },
+                {
+                    "list": "B",
+                    "trial": "30",
+                    "concept": "Links",
+                    "kanji_img": "Links_Kanji.jpg",
+                    "meaning_img": "Links.jpg"
+                }
+            ],
+            "shuffle": true,
+            "template": {
+                "type": "lab.flow.Sequence",
+                "title": "Learn B trial",
+                "content": [
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Fixation",
+                        "content": "<div class=\"kanji-stage\"><img class=\"kanji-fix\" src=\"${this.files['Fixationskreuz.jpg']}\"></div>",
+                        "timeout": "500",
+                        "files": {
+                            "Fixationskreuz.jpg": "{{ASSET_BASE}}/Fixationskreuz.jpg"
+                        },
+                        "parameters": [],
+                        "responses": [],
+                        "messageHandlers": []
+                    },
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Learn stimulus",
+                        "content": "<div class=\"kanji-stage kanji-pair\"><img class=\"kanji-item\" src=\"${ this.files[this.parameters.kanji_img] }\"><img class=\"kanji-item\" src=\"${ this.files[this.parameters.meaning_img] }\"></div>",
+                        "timeout": "5000",
+                        "parameters": [],
+                        "responses": [],
+                        "messageHandlers": []
+                    }
+                ]
+            }
+        },
+        {
+            "type": "lab.html.Screen",
+            "title": "Save: learn_B",
+            "content": "<div class=\"kanji-stage\"><p class=\"kanji-wait\">…</p></div>",
+            "timeout": "50",
+            "messageHandlers": [
+                {
+                    "title": "save",
+                    "message": "after:end",
+                    "code": "if (typeof saveDataToSelfHelp === 'function') {\n  saveDataToSelfHelp('updated', { block: 'learn_B' });\n}\n"
+                }
+            ],
+            "parameters": [],
+            "responses": []
+        },
+        {
+            "type": "lab.flow.Loop",
+            "title": "Recall B",
+            "templateParameters": [
+                {
+                    "list": "B",
+                    "trial": "1",
+                    "concept": "Palme",
+                    "kanji_img": "Palme_Kanji.jpg",
+                    "correct_img": "Palme.jpg",
+                    "distractor_img": "Strand.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "B",
+                    "trial": "2",
+                    "concept": "Bakterium",
+                    "kanji_img": "Bakterium_Kanji.jpg",
+                    "correct_img": "Bakterium.jpg",
+                    "distractor_img": "Sueden.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "B",
+                    "trial": "3",
+                    "concept": "Huegel",
+                    "kanji_img": "Huegel_Kanji.jpg",
+                    "correct_img": "Huegel.jpg",
+                    "distractor_img": "Rechts.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "B",
+                    "trial": "4",
+                    "concept": "Schnee",
+                    "kanji_img": "Schnee_Kanji.jpg",
+                    "correct_img": "Schnee.jpg",
+                    "distractor_img": "Regen.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "B",
+                    "trial": "5",
+                    "concept": "Wolke",
+                    "kanji_img": "Wolke_Kanji.jpg",
+                    "correct_img": "Wolke.jpg",
+                    "distractor_img": "Winter.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "B",
+                    "trial": "6",
+                    "concept": "Fruehling",
+                    "kanji_img": "Fruehling_Kanji.jpg",
+                    "correct_img": "Fruehling.jpg",
+                    "distractor_img": "Klima.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "B",
+                    "trial": "7",
+                    "concept": "Braun",
+                    "kanji_img": "Braun_Kanji.jpg",
+                    "correct_img": "Braun.jpg",
+                    "distractor_img": "Gruen.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "B",
+                    "trial": "8",
+                    "concept": "Violett",
+                    "kanji_img": "Violett_Kanji.jpg",
+                    "correct_img": "Violett.jpg",
+                    "distractor_img": "Dunkelblau.jpg",
+                    "orig_pos": "1"
+                },
+                {
+                    "list": "B",
+                    "trial": "9",
+                    "concept": "Meer",
+                    "kanji_img": "Meer_Kanji.jpg",
+                    "correct_img": "Meer.jpg",
+                    "distractor_img": "Teich.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "B",
+                    "trial": "10",
+                    "concept": "Wasser",
+                    "kanji_img": "Wasser_Kanji.jpg",
+                    "correct_img": "Wasser.jpg",
+                    "distractor_img": "Baum.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "B",
+                    "trial": "11",
+                    "concept": "Wind",
+                    "kanji_img": "Wind_Kanji.jpg",
+                    "correct_img": "Wind.jpg",
+                    "distractor_img": "Regenbogen.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "B",
+                    "trial": "12",
+                    "concept": "Ticket",
+                    "kanji_img": "Ticket_Kanji.jpg",
+                    "correct_img": "Ticket.jpg",
+                    "distractor_img": "Osten.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "B",
+                    "trial": "13",
+                    "concept": "Arzt",
+                    "kanji_img": "Arzt_Kanji.jpg",
+                    "correct_img": "Arzt.jpg",
+                    "distractor_img": "Europa.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "B",
+                    "trial": "14",
+                    "concept": "Westen",
+                    "kanji_img": "Westen_Kanji.jpg",
+                    "correct_img": "Westen.jpg",
+                    "distractor_img": "Vier.jpg",
+                    "orig_pos": "2"
+                },
+                {
+                    "list": "B",
+                    "trial": "15",
+                    "concept": "Jahr",
+                    "kanji_img": "Jahr_Kanji.jpg",
+                    "correct_img": "Jahr.jpg",
+                    "distractor_img": "Links.jpg",
+                    "orig_pos": "2"
+                }
+            ],
+            "shuffle": true,
+            "template": {
+                "type": "lab.flow.Sequence",
+                "title": "Recall B trial",
+                "content": [
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Fixation",
+                        "content": "<div class=\"kanji-stage\"><img class=\"kanji-fix\" src=\"${this.files['Fixationskreuz.jpg']}\"></div>",
+                        "timeout": "500",
+                        "files": {
+                            "Fixationskreuz.jpg": "{{ASSET_BASE}}/Fixationskreuz.jpg"
+                        },
+                        "parameters": [],
+                        "responses": [],
+                        "messageHandlers": []
+                    },
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Recall choice",
+                        "content": "<div class=\"kanji-stage\"><img class=\"kanji-cue\" src=\"${ this.files[this.parameters.kanji_img] }\"><div class=\"kanji-choices\"><div class=\"kanji-opt\" data-side=\"left\"><img src=\"${ this.files[this.state.left_img] }\"></div><div class=\"kanji-opt\" data-side=\"right\"><img src=\"${ this.files[this.state.right_img] }\"></div></div></div>",
+                        "responses": [
+                            {
+                                "label": "left",
+                                "event": "click",
+                                "target": ".kanji-opt[data-side=\"left\"]"
+                            },
+                            {
+                                "label": "right",
+                                "event": "click",
+                                "target": ".kanji-opt[data-side=\"right\"]"
+                            }
+                        ],
+                        "messageHandlers": [
+                            {
+                                "title": "randomise sides",
+                                "message": "before:prepare",
+                                "code": "const flip = Math.random() < 0.5;\nthis.state.correct_side = flip ? 'left' : 'right';\nthis.state.left_img  = flip ? this.parameters.correct_img : this.parameters.distractor_img;\nthis.state.right_img = flip ? this.parameters.distractor_img : this.parameters.correct_img;\n"
+                            },
+                            {
+                                "title": "score",
+                                "message": "after:end",
+                                "code": "const side = this.state.response;\nthis.data.correct_side = this.state.correct_side;\nthis.data.chosen_side  = side;\nthis.data.chosen_img   = side === 'left' ? this.state.left_img : this.state.right_img;\nthis.data.correct      = side === this.state.correct_side ? 1 : 0;\n"
+                            }
+                        ],
+                        "parameters": []
+                    },
+                    {
+                        "type": "lab.html.Screen",
+                        "title": "Confidence",
+                        "content": "<div class=\"kanji-stage\"><div class=\"kanji-choices kanji-cj\"><div class=\"kanji-opt\" data-cj=\"1\"><img src=\"${ this.files[this.state.cj_unsicher] }\"></div><div class=\"kanji-opt\" data-cj=\"2\"><img src=\"${ this.files[this.state.cj_mittel] }\"></div><div class=\"kanji-opt\" data-cj=\"3\"><img src=\"${ this.files[this.state.cj_sicher] }\"></div></div></div>",
+                        "responses": [
+                            {
+                                "label": "1",
+                                "event": "click",
+                                "target": ".kanji-opt[data-cj=\"1\"]"
+                            },
+                            {
+                                "label": "2",
+                                "event": "click",
+                                "target": ".kanji-opt[data-cj=\"2\"]"
+                            },
+                            {
+                                "label": "3",
+                                "event": "click",
+                                "target": ".kanji-opt[data-cj=\"3\"]"
+                            }
+                        ],
+                        "messageHandlers": [
+                            {
+                                "title": "localise scale",
+                                "message": "before:prepare",
+                                "code": "const sfx = { de: '', en: '_EN', fr: '_FR', it: '_IT' }[this.options.datastore.get('language') || 'de'] ?? '';\nthis.state.cj_unsicher = 'CJ_unsicher' + sfx + '.png';\nthis.state.cj_mittel   = 'CJ_mittel'   + sfx + '.png';\nthis.state.cj_sicher   = 'CJ_sicher'   + sfx + '.png';\n"
+                            },
+                            {
+                                "title": "record",
+                                "message": "after:end",
+                                "code": "this.data.confidence = parseInt(this.state.response, 10);\n"
+                            }
+                        ],
+                        "parameters": []
+                    }
+                ]
+            }
+        },
+        {
+            "type": "lab.html.Screen",
+            "title": "Save: recall_B",
+            "content": "<div class=\"kanji-stage\"><p class=\"kanji-wait\">…</p></div>",
+            "timeout": "50",
+            "messageHandlers": [
+                {
+                    "title": "save",
+                    "message": "after:end",
+                    "code": "if (typeof saveDataToSelfHelp === 'function') {\n  saveDataToSelfHelp('finished', { block: 'recall_B' });\n}\n"
+                }
+            ],
+            "parameters": [],
+            "responses": []
+        }
+    ]
+}

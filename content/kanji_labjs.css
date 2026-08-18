@@ -1,0 +1,72 @@
+/* Kanji Adults — lab.js task styling.
+   Paste into the study's global CSS (lab.js Builder → Study → Style),
+   or ship via the labJS style's `css` field. */
+
+.kanji-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  gap: 2rem;
+}
+
+/* Fixation cross — small and centred. */
+.kanji-fix { width: 64px; height: auto; }
+
+/* Learning trial: kanji and meaning side by side.
+   Matches the Qualtrics LA2 layout (max-width 45% each). */
+.kanji-pair {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.kanji-pair .kanji-item {
+  max-width: 45%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Recall trial: kanji cue above, options below. */
+.kanji-cue {
+  max-width: 35%;
+  height: auto;
+  object-fit: contain;
+}
+
+.kanji-choices {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.kanji-opt {
+  border: 2px solid #000;
+  border-radius: 12px;
+  background: #fff;
+  padding: 6px;
+  cursor: pointer;
+  transition: border-color .2s ease, transform .1s ease;
+}
+.kanji-opt img {
+  width: 200px;
+  height: auto;
+  border-radius: 10px;
+  display: block;
+}
+.kanji-opt:hover { border-color: #2563eb; }
+.kanji-opt:active { transform: scale(.98); }
+
+/* Confidence scale — three smaller tiles. */
+.kanji-cj .kanji-opt img { width: 120px; }
+
+.kanji-wait { color: #999; font-size: 2rem; }
+
+/* Touch targets on small screens. */
+@media (max-width: 768px) {
+  .kanji-opt img { width: 40vw; }
+  .kanji-cj .kanji-opt img { width: 24vw; }
+  .kanji-cue { max-width: 60%; }
+  .kanji-pair .kanji-item { max-width: 44%; }
+}

@@ -1,0 +1,29 @@
+<?php
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+?>
+<?php
+    // Folder: sh-shp-kanji-adults → plugins.name = kanji-adults.
+    if (!defined('KANJI_ADULTS_PLUGIN_NAME')) {
+        define('KANJI_ADULTS_PLUGIN_NAME', 'kanji-adults');
+    }
+
+    // Page keywords created by server/db/v1.0.0.sql.
+    if (!defined('KANJI_PAGE_WELCOME')) {
+        define('KANJI_PAGE_WELCOME', 'kanji-adults');
+    }
+    if (!defined('KANJI_PAGE_SURVEY')) {
+        define('KANJI_PAGE_SURVEY', 'kanji-adults-survey');
+    }
+    if (!defined('KANJI_PAGE_TASK')) {
+        define('KANJI_PAGE_TASK', 'kanji-adults-task');
+    }
+    if (!defined('KANJI_PAGE_QUESTIONS')) {
+        define('KANJI_PAGE_QUESTIONS', 'kanji-adults-questions');
+    }
+
+    if (!defined('transactionBy_by_kanji_adults')) {
+        define('transactionBy_by_kanji_adults', 'by_kanji_adults');
+    }
+?>
