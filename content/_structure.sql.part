@@ -29,10 +29,17 @@ INSERT IGNORE INTO `pages` (
 
 SET @kanji_welcome = (SELECT id FROM pages WHERE keyword = 'kanji-adults');
 
+-- Show the study entry point in the site header. Only the welcome page is
+-- listed: the survey/task/questions pages are reached by redirect, and a nav
+-- link would let a participant jump straight into the task.
+UPDATE `pages` SET `nav_position` = 25 WHERE `keyword` = 'kanji-adults';
+
 INSERT IGNORE INTO `pages_fields_translation` (`id_pages`, `id_fields`, `id_languages`, `content`)
 VALUES
     (@kanji_welcome, get_field_id('label'), '0000000002', 'Kanji Lernaufgabe'),
-    (@kanji_welcome, get_field_id('title'), '0000000002', 'Kanji Lernaufgabe');
+    (@kanji_welcome, get_field_id('title'), '0000000002', 'Kanji Lernaufgabe'),
+    (@kanji_welcome, get_field_id('label'), '0000000003', 'Kanji Learning Task'),
+    (@kanji_welcome, get_field_id('title'), '0000000003', 'Kanji Learning Task');
 
 -- Welcome sections
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
@@ -51,7 +58,7 @@ VALUES
 INSERT IGNORE INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
     (@kw_text, get_field_id('text_md'), '0000000002', '0000000001',
-'# Willkommen
+CONCAT('# Willkommen
 
 Vielen Dank für Ihr Interesse an unserer Studie.
 
@@ -61,7 +68,7 @@ und später fortsetzen.
 
 Sie benötigen den **Code aus dem Brief**, den Sie erhalten haben.
 
-[Aufgabe starten](/kanji-adults-survey)');
+[Aufgabe starten](', @base_path, '/kanji-adults-survey)'));
 
 INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`) VALUES
     (@kw_container, @kw_text, 0);
