@@ -1,6 +1,6 @@
 # SelfHelp Plugin — Kanji Adults
 
-The Kanji Adults parent–child dyad study: a paired-associate Kanji memory task
+The Kanji Adults parent–child study: a paired-associate Kanji memory task
 with questionnaires, ported from Qualtrics.
 
 | Layer | Value |
@@ -17,7 +17,7 @@ memory task into the tables the surveyjs and lab_js plugins read.
 
 - SelfHelp v7.8.1+
 - [sh-shp-survey_js](https://github.com/humdek-unibe-ch/sh-shp-survey_js)
-- [sh-shp-lab_js](https://github.com/humdek-unibe-ch/sh-shp-lab_js) (cloned as `server/plugins/lab`)
+- [sh-shp-lab_js](https://github.com/humdek-unibe-ch/sh-shp-lab_js)
 
 Both must be installed **before** this plugin's migration runs — it references
 the `surveyJS` and `labJS` styles by name.
@@ -25,7 +25,7 @@ the `surveyJS` and `labJS` styles by name.
 ## Installation
 
 1. Install `sh-shp-survey_js` and `sh-shp-lab_js` and run their migrations.
-2. Place this plugin under `server/plugins/kanji_adults`.
+2. Clone this plugin into `server/plugins`.
 3. Upload the study images (173 files) to a served folder (default
    `/assets/kanji`). `@base_path` and `@asset_base` at the top of the migration
    set the URL prefix; `@base_path` must match `BASE_PATH` in
@@ -51,8 +51,8 @@ ids stay stable and participants already mid-study are unaffected.
 
 > **The shipped `v1.0.0.sql` is a reduced test build: 5 trials per block, 23 in
 > total.** It is meant for walking the chain end to end, not for data
-> collection. The full study is 93 trials — ask the study owner for a
-> production build.
+> collection. The full study is 93 trials — ask the dev responsible for a
+> production build when ready.
 
 ## Pages
 
