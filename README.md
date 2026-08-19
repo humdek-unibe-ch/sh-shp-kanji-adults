@@ -8,13 +8,14 @@ Qualtrics.
 
 | Layer | Value |
 |---|---|
-| Folder | `sh-shp-kanji-adults` |
+| Repository | `sh-shp-kanji-adults` |
+| Local folder | `kanji_adults` (any name works; globals load from the real folder) |
 | `plugins.name` | `kanji-adults` |
 
 ## What this plugin does
 
-It creates the four pages that make up the study, wires them together, and
-ships the study content itself.
+It creates the ten pages that make up the study, wires them together with
+`redirect_at_end`, and ships the study content itself.
 
 It contains **no rendering code**. The questionnaires are rendered by the
 **surveyjs** plugin's `surveyJS` style and the memory task by the **lab_js**
@@ -92,7 +93,8 @@ user row every page renders "Kein Zugriff".
 
 1. Install `sh-shp-survey_js` and `sh-shp-lab_js` and run their migrations.
 2. Place this plugin under `server/plugins/kanji_adults`.
-3. Upload the 169 study images to a served folder (default `/assets/kanji`).
+3. Upload the study images (173 files) to a served folder (default
+   `/assets/kanji`).
    `@base_path` and `@asset_base` at the top of the migration set the URL
    prefix; `@base_path` must match `BASE_PATH` in `globals_untracked.php`.
 4. Execute `server/db/v1.0.0.sql` — **with an explicit UTF-8 charset**:
@@ -118,59 +120,39 @@ The surveys ship with `de`, `en`, `fr`, `it` already populated.
 
 ## Content
 
-The study is generated from a `content/` folder that is **not part of this
-repository**. It holds the survey JSON, the trial item CSVs, the instruction
-texts, the task stylesheet and the two build scripts. Nothing in it is read at
-runtime — it exists only to produce `server/db/v1.0.0.sql`, and the database is
-what the application serves.
-
-`server/db/v1.0.0.sql` is **generated** — most of its ~350 KB is embedded JSON.
-Do not edit it by hand.
-
-| Source | Becomes |
-|---|---|
-| `kanji_part1.surveyjs.json` | `surveys` row, bound to `kanji-survey-part1` |
-| `kanji_part2.surveyjs.json` | `surveys` row (device + closing code), bound to `kanji-survey-part2` |
-| `kanji_pause{1..3}.surveyjs.json` | `surveys` rows, bound to `kanji-pause-{1..3}` |
-| `kanji_labjs.seg{1..4}.study.json` | four `labjs` rows, bound to `kanji-task-labjs-{1..4}` |
-| `instructions.json` | the instruction / orientation screens, all four languages |
-| `kanji_labjs.css` | `text_md` on `kanji-task-style`, wrapped in a `<style>` tag |
-| `_structure.sql.part` | the pages, sections and ACL half of the migration |
-| `items_learn.csv`, `items_recall.csv` | the trial item tables |
+`server/db/v1.0.0.sql` carries the whole study: the pages, the five SurveyJS
+questionnaires, the four lab.js task segments, the task stylesheet and the
+instruction screens for all four languages. Most of its ~350 KB is embedded
+JSON.
 
 All five questionnaires and all four task segments share the generated id
 `Kanji_Data`, so they write into one data table; the hooks below merge them
 into one row per participant.
 
-Two generators sit above those:
+Everyday changes belong in the CMS, not in the SQL: the questionnaires are
+editable under Module SurveyJS and the task under Module LabJS, and an edit
+there takes effect immediately. Re-running the migration will not undo it —
+surveys and studies are matched on their title or name, inserted only when
+absent and otherwise updated in place, so ids stay stable and sessions already
+holding them keep working. Renaming one in the CMS breaks that match, and the
+next migration then seeds a second copy alongside it.
 
-| Script | Reads | Writes |
-|---|---|---|
-| `build_labjs.php` | the item CSVs, `instructions.json` | `kanji_labjs.seg{1..4}.study.json` |
-| `build_migration.php` | everything in the folder | `server/db/v1.0.0.sql` |
-
-To change the trial items, edit the CSVs and run both; to change survey wording
-or the page structure, `build_migration.php` alone is enough. `build_labjs.php`
-honours `KANJI_MAX_TRIALS` to cap trials for testing — **a build made with it
-set is not for data collection.**
-
-Re-running the migration is safe: surveys and studies are matched on their
-title (surveys) or name (labjs), inserted only when absent and otherwise
-updated in place, so ids stay stable and sessions already holding them keep
-working. Renaming one in the CMS breaks the match, and the next migration then
-seeds a second copy alongside it.
+The migration was produced from a set of source files — the Qualtrics-derived
+survey JSON, the trial item tables and two generator scripts — which are kept
+outside this repository. Ask the study owner for them if the study ever has to
+be rebuilt from scratch rather than edited in the CMS.
 
 ### Recorded data
 
 One row per participant in `Kanji_Data`. Questionnaire answers are collapsed
 into one JSON column each (`survey_teil1`, `survey_pause{1..3}`,
 `survey_teil2`); the task writes `kanji_lernen_{a,b}` for the learning phase
-and `kanji_{a,b}` for recall. The practice round is not stored. The full field
-reference for researchers is `DATENFELDER.md` in the content folder.
+and `kanji_{a,b}` for recall. The practice round is not stored. The columns are
+described in full under **Data** below.
 ### Study format
 
-`kanji_labjs.study.json` is in lab.js **Builder** format, not a runtime
-component tree. The plugin's loader calls
+The `labjs.config` the plugin stores is in lab.js **Builder** format, not a
+runtime component tree. The plugin's loader calls
 `makeComponentTree(exp.components, 'root')`, so the file needs a flat
 `components` map keyed by id with the entry node keyed exactly `root`,
 `children` as arrays of ids, `templateParameters` as a typed grid, and
@@ -179,7 +161,7 @@ screen with `Cannot read properties of undefined (reading 'root')`.
 
 ### Task styling
 
-`kanji_labjs.css` is served by the `kanji-task-style` section — a `markdown`
+`kanji_labjs.css` is served by the `kanji-task-style-{1..4}` sections — a `markdown`
 style at position 0 on the task page, holding the file wrapped in a `<style>`
 tag. The labJS section sits after it at position 10.
 
@@ -239,10 +221,9 @@ to German when unset.
 
 ### Instruction screens
 
-The 12 instruction, orientation and closing pages come from the `.qsf` and live
-in `instructions.json`, keyed by block and page with one entry per language.
-`build_labjs.php` turns each page into a self-paced `lab.html.Screen` with a
-Weiter / Next / Suivant / Avanti button.
+The 12 instruction, orientation and closing pages come from the `.qsf`, one
+entry per language, and are stored as self-paced `lab.html.Screen` components
+with a Weiter / Next / Suivant / Avanti button.
 
 Text and images are chosen at run time from `window.KANJI_LANG`, the same global
 the confidence scale uses, so one build serves all four languages. Images are
@@ -399,17 +380,17 @@ concern rather than a bug.
 `_raw_data` still carries the untouched lab.js records — every screen, including
 fixation, with lab.js' own timing fields — for anything the columns do not cover.
 
-The field reference written for researchers is `DATENFELDER.md`, in the content
-folder.
+A field reference written for researchers (`DATA_FIELDS.md`) ships with the
+study sources; ask the study owner for a copy.
 ## Deviations from the Qualtrics original
 
 1. **Correct-answer side is randomised per trial.** The original fixed it per
    trial and blocked it (list A: trials 1–7 left, 8–15 right), which is
    exploitable. `orig_pos` is retained so the old wave stays comparable.
    The side is drawn when the study is generated and stored per row as
-   `left_img` / `right_img` / `correct_side`, so re-running
-   `build_labjs.php` reshuffles it. Draw once and commit the result if a
-   fixed assignment is wanted across participants.
+   `left_img` / `right_img` / `correct_side`, so rebuilding the study
+   reshuffles it. The assignment in the shipped migration is fixed; keep it
+   if a constant assignment across participants is wanted.
 2. **`correct` is recorded at runtime** instead of being reconstructed in
    analysis by joining against the learning list.
 3. **Demographic gating.** The original showed all 26 questions to everyone

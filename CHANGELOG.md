@@ -16,7 +16,7 @@
  - questionnaire answers collapse into one JSON column each (`survey_teil1`, `survey_pause{1..3}`, `survey_teil2`) instead of ~55 flat columns
  - task columns renamed via a `UserInput::save_data` hook — the last hookable point before the columns are created, and the only way to drop lab_js' `extra_data_` prefix without touching core
  - practice trials, per-block totals and internal plumbing columns are no longer stored
- - `DATENFELDER.md` documents every field for the research team
+ - a field reference for the research team (`DATA_FIELDS.md`) ships with the study sources
 
 ### Changed: re-running the migration no longer breaks running sessions
  - surveys and studies were `DELETE`d and re-`INSERT`ed on every deploy, which changed their ids; pages already open in a participant's browser kept the old ids and every later save was silently rejected
@@ -36,7 +36,7 @@
  - page access for unauthenticated participants: group grants plus a direct `acl_users` row for the guest user, which core requires because the guest belongs to no group
  - welcome page added to the site header
  - `@base_path` / `@asset_base` at the top of the migration set the study image path
- - `content/build_labjs.php` generates the lab.js study from the item tables; `content/build_migration.php` embeds everything into `v1.0.0.sql`
+ - the migration is generated from the Qualtrics-derived sources by two build scripts kept outside this repository
  - requires `sh-shp-survey_js` and `sh-shp-lab_js`
 
 ### Ported from Qualtrics
@@ -107,7 +107,7 @@
 ### Instruction and orientation screens
  - the 12 instruction / orientation / closing pages from the original are now in the study: 4 before practice learning, 3 before practice recall (including the confidence scale), one before each of the four learn/recall blocks, and the closing screen
  - block order follows the `.qsf` survey flow exactly
- - wording and images for all four languages live in `content/instructions.json`; the right one is chosen at run time from `window.KANJI_LANG`
+ - wording and images for all four languages are embedded in the study; the right one is chosen at run time from `window.KANJI_LANG`
  - each page is self-paced with a Weiter / Next / Suivant / Avanti button
  - the 23 previously unreferenced assets are now used: the bear kanji example, the recall worked example, the 12 localised confidence-scale images, and the three Start / closing illustrations
  - instruction screens carry only the images they name, which keeps the study JSON at ~200 KB rather than ~340 KB
