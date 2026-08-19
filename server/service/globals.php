@@ -23,6 +23,13 @@
         define('KANJI_PAGE_QUESTIONS', 'kanji-adults-questions');
     }
 
+    // Every questionnaire in the study shares this generated id, so they all
+    // write into one data table; KanjiAdultsHooks::save_survey then pins
+    // response_id so they merge into one row per participant.
+    if (!defined('KANJI_SURVEY_GENERATED_ID')) {
+        define('KANJI_SURVEY_GENERATED_ID', 'Kanji_Data');
+    }
+
     if (!defined('transactionBy_by_kanji_adults')) {
         define('transactionBy_by_kanji_adults', 'by_kanji_adults');
     }

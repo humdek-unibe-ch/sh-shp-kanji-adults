@@ -40,26 +40,54 @@ references the `surveyJS` and `labJS` styles by name.
 |---|---|---|
 | `kanji-adults` | `/kanji-adults` | Welcome / landing text |
 | `kanji-adults-survey` | `/kanji-adults-survey` | Part 1: consent, code, demographics |
-| `kanji-adults-task` | `/kanji-adults-task` | The lab.js memory task (headless) |
-| `kanji-adults-questions` | `/kanji-adults-questions` | Part 2: vignettes, device, closing code |
+| `kanji-adults-task-1` | `/kanji-adults-task-1` | Instructions, practice, learn A |
+| `kanji-adults-pause-1` | `/kanji-adults-pause-1` | Vignette: Französische Vokabeln |
+| `kanji-adults-task-2` | `/kanji-adults-task-2` | Recall A |
+| `kanji-adults-pause-2` | `/kanji-adults-pause-2` | Vignette: Geografie Quiz |
+| `kanji-adults-task-3` | `/kanji-adults-task-3` | Learn B |
+| `kanji-adults-pause-3` | `/kanji-adults-pause-3` | Vignettes: Mathematik, Aufsatz |
+| `kanji-adults-task-4` | `/kanji-adults-task-4` | Recall B, closing screen |
+| `kanji-adults-questions` | `/kanji-adults-questions` | Device, closing code |
 
 Flow, via each style's `redirect_at_end`:
 
 ```
-/kanji-adults → /kanji-adults-survey → /kanji-adults-task → /kanji-adults-questions
+/kanji-adults → /kanji-adults-survey
+  → task-1 → pause-1 → task-2 → pause-2
+  → task-3 → pause-3 → task-4 → /kanji-adults-questions
 ```
 
-The task page is `is_headless = 1` so the experiment gets the full viewport
-with no site chrome. The welcome page is the only one added to the site
-header; linking the others directly would let a participant skip into the
-task without consenting or entering their code.
+The task pages are `is_headless = 1` so the experiment gets the full viewport
+with no site chrome. The welcome page is the only one added to the site header;
+linking the others directly would let a participant skip into the task without
+consenting or entering their code.
+
+### Why the task is split across four pages
+
+The Qualtrics original interleaves the vignette pauses with the memory task —
+`Pause 1` after learning list A, `Pause 2` after recalling it, `Pause 3` after
+learning list B. The vignettes are SurveyJS Likert matrices and the task is
+lab.js, so they cannot share a page.
+
+Splitting keeps the original's retention interval: the delay between learning a
+list and recalling it is filled by a vignette, as it was in the original wave.
+
+**It is still one study and one result row.** All four task pages bind `labjs`
+rows carrying the same `labjs_generated_id`, so they write to one data table.
+The loader assigns a fresh `labjs_response_id` on every page load, which would
+produce four rows, so each segment opens with a `Resume` screen that pins the
+id in `sessionStorage`; `save_lab()` uses it as `updateBasedOn`, so every
+segment updates the same row.
+
+If `sessionStorage` is unavailable (private mode), the handler fails quietly and
+the segments save as separate rows — recoverable by joining on the participant
+code.
 
 Participants arrive from a letter without logging in, so the migration grants
 read access to all groups **and** adds a direct `acl_users` row for the guest
-user. The guest belongs to no group and core checks ACL against the session
-user, so group grants alone are not enough — without the user row every page
-renders "Kein Zugriff".
-
+user, for every page in the chain. The guest belongs to no group and core checks
+ACL against the session user, so group grants alone are not enough — without the
+user row every page renders "Kein Zugriff".
 ## Installation
 
 1. Install `sh-shp-survey_js` and `sh-shp-lab_js` and run their migrations.
@@ -90,35 +118,55 @@ The surveys ship with `de`, `en`, `fr`, `it` already populated.
 
 ## Content
 
-`server/db/v1.0.0.sql` is **generated** — roughly 100 KB of it is embedded
-JSON. Do not edit it by hand. The editable sources live in `content/`:
+The study is generated from a `content/` folder that is **not part of this
+repository**. It holds the survey JSON, the trial item CSVs, the instruction
+texts, the task stylesheet and the two build scripts. Nothing in it is read at
+runtime — it exists only to produce `server/db/v1.0.0.sql`, and the database is
+what the application serves.
+
+`server/db/v1.0.0.sql` is **generated** — most of its ~350 KB is embedded JSON.
+Do not edit it by hand.
 
 | Source | Becomes |
 |---|---|
-| `kanji_part1.surveyjs.json` | `surveys` row `SVJS_KANJIADULTS01`, bound to `kanji-survey-part1` |
-| `kanji_part2.surveyjs.json` | `surveys` row `SVJS_KANJIADULTS02`, bound to `kanji-survey-part2` |
-| `kanji_labjs.study.json` | `labjs` row `LABJS_KANJIADULT01`, bound to `kanji-task-labjs` |
-| `kanji_labjs.css` | `css` field on `kanji-task-labjs` |
+| `kanji_part1.surveyjs.json` | `surveys` row, bound to `kanji-survey-part1` |
+| `kanji_part2.surveyjs.json` | `surveys` row (device + closing code), bound to `kanji-survey-part2` |
+| `kanji_pause{1..3}.surveyjs.json` | `surveys` rows, bound to `kanji-pause-{1..3}` |
+| `kanji_labjs.seg{1..4}.study.json` | four `labjs` rows, bound to `kanji-task-labjs-{1..4}` |
+| `instructions.json` | the instruction / orientation screens, all four languages |
+| `kanji_labjs.css` | `text_md` on `kanji-task-style`, wrapped in a `<style>` tag |
 | `_structure.sql.part` | the pages, sections and ACL half of the migration |
 | `items_learn.csv`, `items_recall.csv` | the trial item tables |
+
+All five questionnaires and all four task segments share the generated id
+`Kanji_Data`, so they write into one data table; the hooks below merge them
+into one row per participant.
 
 Two generators sit above those:
 
 | Script | Reads | Writes |
 |---|---|---|
-| `content/build_labjs.php` | `items_learn.csv`, `items_recall.csv` | `kanji_labjs.study.json` |
-| `content/build_migration.php` | everything in `content/` | `server/db/v1.0.0.sql` |
+| `build_labjs.php` | the item CSVs, `instructions.json` | `kanji_labjs.seg{1..4}.study.json` |
+| `build_migration.php` | everything in the folder | `server/db/v1.0.0.sql` |
 
-To change the trial items, edit the CSVs and run both:
+To change the trial items, edit the CSVs and run both; to change survey wording
+or the page structure, `build_migration.php` alone is enough. `build_labjs.php`
+honours `KANJI_MAX_TRIALS` to cap trials for testing — **a build made with it
+set is not for data collection.**
 
-```
-php content/build_labjs.php
-php content/build_migration.php
-```
+Re-running the migration is safe: surveys and studies are matched on their
+title (surveys) or name (labjs), inserted only when absent and otherwise
+updated in place, so ids stay stable and sessions already holding them keep
+working. Renaming one in the CMS breaks the match, and the next migration then
+seeds a second copy alongside it.
 
-To change survey wording or the page structure, edit the relevant file in
-`content/` and run `build_migration.php` alone.
+### Recorded data
 
+One row per participant in `Kanji_Data`. Questionnaire answers are collapsed
+into one JSON column each (`survey_teil1`, `survey_pause{1..3}`,
+`survey_teil2`); the task writes `kanji_lernen_{a,b}` for the learning phase
+and `kanji_{a,b}` for recall. The practice round is not stored. The full field
+reference for researchers is `DATENFELDER.md` in the content folder.
 ### Study format
 
 `kanji_labjs.study.json` is in lab.js **Builder** format, not a runtime
@@ -129,13 +177,49 @@ component tree. The plugin's loader calls
 `files` as `{localPath, poolPath}` pairs. A nested tree loads to a white
 screen with `Cannot read properties of undefined (reading 'root')`.
 
+### Task styling
+
+`kanji_labjs.css` is served by the `kanji-task-style` section — a `markdown`
+style at position 0 on the task page, holding the file wrapped in a `<style>`
+tag. The labJS section sits after it at position 10.
+
+It has to live on the page, outside the experiment, because:
+
+- the section's **`css` field is a class-name list**, not a stylesheet. Core
+  appends `selfHelp-locale-*` and `style-section-*` and prints it inside
+  `class="…"`, so a stylesheet there is parsed as garbage class tokens. The
+  migration clears that field.
+- **a `<style>` inside the study does not survive.** Every `lab.html.Screen`
+  does `el.innerHTML = content` when it runs, so a style tag placed in one
+  screen is wiped by the next.
+
+`text_md` is a **translatable** field (`fields.display = 1`), so it is read for
+the page's active language, not the language-independent row `0000000001`.
+The migration writes it for every row in `languages`; writing only the
+independent row renders an empty section.
+
+Because the images are 2048x2048 squares, every rule bounds them by viewport
+*height* first (`max-height` in `vh`). A width-only cap lets a square image
+grow as tall as it is wide and push the recall options below the fold.
 ### Task structure
 
 ```
-practice learn (2)  → practice recall (1)
-learn A (30)        → recall A (15)
-learn B (30)        → recall B (15)
+page task-1  instructions: learning (4 pages)
+             practice learn (2)
+             instructions: recall + confidence scale (3 pages)
+             practice recall (1)
+             start learn A  → learn A (30)
+page pause-1 vignette: Französische Vokabeln
+page task-2  start recall A → recall A (15)
+page pause-2 vignette: Geografie Quiz
+page task-3  start learn B  → learn B (30)
+page pause-3 vignettes: Mathematik, Aufsatz
+page task-4  start recall B → recall B (15)
+             closing screen
 ```
+
+Block order taken from the `.qsf` survey flow (German branch; the other three
+are structurally identical).
 
 93 trials over 60 kanji, split 30/30 into lists A and B, with 15 of each list
 tested. Timings taken from the Qualtrics `QuestionJS`:
@@ -144,8 +228,7 @@ tested. Timings taken from the Qualtrics `QuestionJS`:
 |---|---|
 | Fixation cross | 500 ms, auto-advance |
 | Learn stimulus (kanji + meaning) | 5000 ms, auto-advance |
-| Recall 2AFC | self-paced |
-| Confidence (3-point) | self-paced |
+| Recall trial (choice + confidence) | self-paced |
 
 Trial order is shuffled within each block, matching Qualtrics'
 `Randomization: Subset`. Practice blocks are not shuffled.
@@ -154,39 +237,179 @@ The confidence scale is localised by the `window.KANJI_LANG` global
 (`de`/`en`/`fr`/`it`), which picks the matching `CJ_*` images. It falls back
 to German when unset.
 
+### Instruction screens
+
+The 12 instruction, orientation and closing pages come from the `.qsf` and live
+in `instructions.json`, keyed by block and page with one entry per language.
+`build_labjs.php` turns each page into a self-paced `lab.html.Screen` with a
+Weiter / Next / Suivant / Avanti button.
+
+Text and images are chosen at run time from `window.KANJI_LANG`, the same global
+the confidence scale uses, so one build serves all four languages. Images are
+written as `{{IMG:filename}}` placeholders and resolved against the screen's
+file pool.
+
+Each instruction screen carries only the images its own page names — attaching
+the full 153-file pool to all twelve doubled the study JSON. The confidence
+instruction page is the exception: it carries all 12 localised
+`Instruktion_CJ_*` variants, because the language is not known until run time.
+
+Unlike the trial screens these scroll if the content is long. There is no timing
+constraint on them, and the original was an ordinary scrollable survey page.
+
+### `state` is not per-trial scratch space
+
+In lab.js `this.state` proxies the experiment-wide **datastore**, and the
+template context is frozen when a component prepares. lab.js prepares
+components ahead of running them, so a `before:prepare` handler that writes
+`this.state.left_img` is overwritten by every later trial in the loop, and each
+screen renders whichever value happened to be written last.
+
+Anything that varies per trial therefore belongs in `templateParameters`,
+computed when the study is generated. Anything that varies at run time (the
+confidence images, which depend on `window.KANJI_LANG`) must be applied to the
+DOM in the `run` handler, not through `state`.
+
+`this.files` is safe in both templates and handlers — it is a proxy over the
+component's aggregated file pool, not shared mutable state.
+
+### The recall trial
+
+One screen holds both the 2AFC choice and the confidence scale, matching the
+Qualtrics original where `QID42` and `QID43` sat on the same page with a page
+break only after the fixation cross.
+
+Both groups use **select-then-confirm**: the first click selects an option
+(blue, `#2563eb`), a second click on the same option locks it (brown,
+`#8b5e3c`) and freezes the group. The confidence row is `hidden` until the
+answer locks. After the confidence lock the screen waits 300 ms, then advances
+— the same delay the original used.
+
+This is deliberate, not decorative: the original instruction tells participants
+they may change their answer before confirming it. A single-click implementation
+removes that option and measures a different event.
+
+Because `responses` cannot express a two-stage click, the interaction runs in a
+`run` message handler that calls `respond()` itself.
+
+Three reaction times are recorded per trial, mirroring the original's
+`Reaktionszeit_*` embedded data:
+
+| Field | Original | Measures |
+|---|---|---|
+| `rt_choice` | `Reaktionszeit_Q42_ms` | screen shown → answer locked |
+| `rt_confidence` | `Reaktionszeit_Q43_ms` | screen shown → confidence locked |
+| `rt_conf_from_choice` | `Reaktionszeit_Q43_ab_Q42_ms` | answer locked → confidence locked |
+
+lab.js also records its own `duration` for the screen; it is not equivalent to
+any of the three and should not be used as a response time.
 ## Data
 
-Two dataTables, created on first response by the respective plugins:
+Everything the study collects lands in **one data table, `Kanji_Data`, as one
+row per participant**.
 
-- the surveyjs tables, one row per response, one column per question
-- the lab.js table, with per-block `extra_data_*` columns and full
-  trial-level data in `_raw_data` as JSON
+That works because the table is named after the `*_generated_id` of whatever
+writes to it, so all five questionnaires and all four task segments carry the
+same id. Three hooks in `KanjiAdultsHooks` then shape what is written:
 
-Join on the participant code (`ID_1` / `ID_2`).
+| Hook | Wraps | Does |
+|---|---|---|
+| `kanji-adults-merge-survey-row` | `SurveyJSModel::save_survey` | pins `response_id` (and `labjs_response_id`), collapses answers to one JSON column |
+| `kanji-adults-merge-task-row` | `LabJSModel::save_lab` | pins `labjs_response_id` inside `metadata` |
+| `kanji-adults-rename-columns` | `UserInput::save_data` | renames the task columns and drops internal plumbing |
 
-`saveDataToSelfHelp()` fires after each block — `updated` for practice,
-`learn_A`, `recall_A` and `learn_B`, then `finished` after `recall_B`.
+The two save paths do **not** receive the same shape: surveyjs passes a flat
+array, lab_js passes the raw POST body with its fields under `metadata`. A
+hook reading `labjs_generated_id` at the top level silently never matches.
+The survey hook also stamps `labjs_response_id` because lab_js matches rows
+on that column, and `save_row()` returns `false` — after logging the
+transaction — when `updateBasedOn` names a column that does not exist yet.
 
-Per recall trial:
+Both plugins locate an existing row through `save_data()`'s `updateBasedOn`, so
+with the id pinned each save updates the participant's row instead of inserting
+its own. lab_js matches on `labjs_response_id` and surveyjs on `response_id`,
+which is why the task hook writes both.
 
-| Field | Meaning |
+The pinned id is derived from the session (`RJS_KANJI_<sha1 of session id>`);
+participants are not logged in, so the session is what identifies a run, and it
+survives the whole chain of task and pause pages.
+
+Only this study is affected — other surveys on the installation keep surveyjs'
+own per-response ids.
+
+### Columns
+
+**Questionnaires.** One JSON column per questionnaire, not one per question.
+surveyjs writes a column per question and explodes every matrix into one column
+per row, which came to ~55 columns across the five questionnaires — and SelfHelp
+stores each as a `dataCells` row with a `dataCols` entry per name.
+
+| Column | Contents |
 |---|---|
-| `list`, `trial`, `concept` | item identity |
-| `correct_side` | which side held the correct answer |
-| `chosen_side`, `chosen_img` | what the participant clicked |
-| `correct` | 1 / 0 |
-| `confidence` | 1 = unsicher, 2 = mittel, 3 = sicher |
-| `duration` | lab.js response time, ms |
-| `orig_pos` | the fixed position Qualtrics used, for cross-wave comparison |
+| `survey_teil1` | consent, personal code, demographics |
+| `survey_pause{1,2,3}` | the vignette ratings from each break |
+| `survey_teil2` | device, closing code |
 
-Unpacking `_raw_data` into one row per trial is not implemented — it needs a
-real response to write against. That is the natural content of `v1.1.0`.
+**Memory task.** One JSON column per block, for the same reason.
 
+| Column | Contents |
+|---|---|
+| `kanji_lernen_a`, `kanji_lernen_b` | learning phase: item shown and actual on-screen duration |
+| `kanji_a`, `kanji_b` | recall: choice, confidence, reaction times, accuracy |
+
+The practice round is not stored. Per-block totals are not stored either — they
+are derivable from the JSON.
+
+Each recall trial keeps the Qualtrics field names, so the two waves still line
+up — the mapping just lives inside the JSON instead of across column headers:
+
+```json
+{
+  "trial": 1,
+  "item": "Herbst",
+  "Auswahl_Q42": "Herbst.jpg",
+  "Auswahl_Q43": 3,
+  "Reaktionszeit_Q42_ms": 2412,
+  "Reaktionszeit_Q43_ms": 3980,
+  "Reaktionszeit_Q43_ab_Q42_ms": 1568,
+  "korrekt": 1,
+  "korrekt_seite": "left",
+  "gewaehlt": "left",
+  "orig_pos": "1"
+}
+```
+
+Recall A uses `Q42` / `Q43` and recall B `Q2` / `Q3` — the same numbering the
+original wave used. `orig_pos` is `1` throughout in the source CSV and carries
+no information; the side actually shown is `korrekt_seite`.
+
+A learning trial is just the item and how long it was really on screen:
+
+```json
+{ "trial": 1, "item": "Herbst", "dauer_ms": 4983 }
+```
+
+The duration comes from lab.js' own `time_show` / `time_end` on the committed
+row. A message handler cannot supply it: the row is assembled from `this.data`
+*before* `commit` is triggered, so anything written in a `commit` or `end`
+handler is discarded. Reaction times have no upper bound — a participant who
+walks away mid-trial produces a genuinely large value, which is an analysis
+concern rather than a bug.
+
+`_raw_data` still carries the untouched lab.js records — every screen, including
+fixation, with lab.js' own timing fields — for anything the columns do not cover.
+
+The field reference written for researchers is `DATENFELDER.md`, in the content
+folder.
 ## Deviations from the Qualtrics original
 
 1. **Correct-answer side is randomised per trial.** The original fixed it per
    trial and blocked it (list A: trials 1–7 left, 8–15 right), which is
    exploitable. `orig_pos` is retained so the old wave stays comparable.
+   The side is drawn when the study is generated and stored per row as
+   `left_img` / `right_img` / `correct_side`, so re-running
+   `build_labjs.php` reshuffles it. Draw once and commit the result if a
+   fixed assignment is wanted across participants.
 2. **`correct` is recorded at runtime** instead of being reconstructed in
    analysis by joining against the learning list.
 3. **Demographic gating.** The original showed all 26 questions to everyone
@@ -195,11 +418,45 @@ real response to write against. That is the natural content of `v1.1.0`.
    follows the question wording. *Confirm with the study owner.*
 4. **Demo_7–12 → one dynamic panel**, sized from Demo_6. Same data.
 5. **Input sanitising → validators.** The Qualtrics keydown/paste JS became
-   regex validators with localised messages.
+   regex validators with localised messages. The numeric questions gained
+   validators the original did not have: `Demo_25` and `Demo_26` (birth
+   year) and `Demo_3_other` (household size) carried `Validation.Type:
+   "None"` in the `.qsf`, so a birth year of `2` was accepted. They are now
+   constrained to 1930–2012 and to 7–99 respectively.
+
+   Validators must use survey-core's registered class names —
+   `regexvalidator`, `textvalidator`, `numericvalidator`. The short forms
+   (`regex`, `text`) are property names in the registration, not aliases, and
+   a validator declared with one is silently dropped.
+
+   These are `regexvalidator` rather than `min`/`max`, because SurveyJS
+   passes `min`/`max` through as HTML input attributes — the browser applies
+   them to the spinner arrows but not to typed input, so they never rejected
+   anything. For the same reason those fields are `text` with
+   `inputMode: numeric` rather than `inputType: number`: a number input
+   coerces its value before the validator sees it.
 6. **Two scale typos fixed** in `P3_Vignette_Deut` (EN "Verly unlikely",
    IT lowercase "improbabile"), normalised to the other three vignettes.
 7. **Four language branches → one survey** with `de`/`en`/`fr`/`it` locales.
 
+## Coverage
+
+All 20 blocks of the original per-language flow are ported, in the original
+order, including the three vignette pauses interleaved with the memory task.
+
+`Anfang` and `Demographisch` are deliberately in the part 1 survey rather than
+the lab.js study, since SurveyJS handles consent, the ID code and the 28
+demographic questions better than a lab.js screen would. The order a participant
+sees is unchanged.
+
+**Awaiting the study owner's confirmation:**
+
+1. **Demographic gating.** The original showed all 26 questions to everyone with
+   no display logic; gating now follows the question wording.
+2. **Interleaved vignettes.** Restoring the original's block order changes the
+   retention interval relative to the previous SelfHelp build (where all four
+   vignettes came after the whole task). This now matches Qualtrics, but any
+   data already collected with the old order is not comparable.
 ## Notes on the source data
 
 - `Gefaehrlich.jpg` was uploaded to Qualtrics twice under two ids
