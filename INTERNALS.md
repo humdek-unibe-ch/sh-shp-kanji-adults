@@ -245,9 +245,19 @@ with the id pinned each save updates the participant's row instead of inserting
 its own. lab_js matches on `labjs_response_id` and surveyjs on `response_id`,
 which is why the task hook writes both.
 
-The pinned id is derived from the session (`RJS_KANJI_<sha1 of session id>`);
-participants are not logged in, so the session is what identifies a run, and it
-survives the whole chain of task and pause pages.
+The pinned id is derived from the session and the current user's id
+(`RJS_KANJI_<sha1 of session id|user id>`); participants are not logged in, so
+the session is what identifies a run, and it survives the whole chain of task
+and pause pages.
+
+The user id is part of that key because rows are owned by whoever wrote them and
+the surveys save with `own_entries_only`. Keyed on the session alone, logging in
+mid-session would keep pointing at the row written as guest, which the scoped
+lookup can no longer see: `updateBasedOn` matches nothing and `save_row()`
+returns `false`, which the survey surfaces as a bare "Data not saved!" modal.
+Mixing the user in keeps the pinned id and the row owner in step, so a change of
+user starts a new row rather than colliding with one it cannot reach. This only
+arises while testing — participants run as guest throughout.
 
 Only this study is affected — other surveys on the installation keep surveyjs'
 own per-response ids.

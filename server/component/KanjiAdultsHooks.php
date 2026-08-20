@@ -314,6 +314,13 @@ class KanjiAdultsHooks extends BaseHooks
      * whole chain of task and pause pages, which is exactly the span that has to
      * land in one row.
      *
+     * The user id is mixed in because rows are owned by the user who wrote them,
+     * and the surveys are saved with own_entries_only. Keying on the session
+     * alone means logging in mid-session keeps pointing at the guest's row, which
+     * the scoped lookup can no longer see - save_row() then returns false and the
+     * survey reports "Data not saved!". Including the user keeps the pinned id
+     * and the row owner in step, so a change of user simply starts a new row.
+     *
      * @return string|null
      *  The pinned id, or null if there is no session to key on.
      */
@@ -322,7 +329,8 @@ class KanjiAdultsHooks extends BaseHooks
         if (session_status() !== PHP_SESSION_ACTIVE || session_id() === '') {
             return null;
         }
-        return 'RJS_KANJI_' . substr(sha1(session_id()), 0, 16);
+        $id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : 1;
+        return 'RJS_KANJI_' . substr(sha1(session_id() . '|' . $id_user), 0, 16);
     }
 }
 ?>
