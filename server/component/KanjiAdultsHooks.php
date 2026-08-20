@@ -78,9 +78,41 @@ class KanjiAdultsHooks extends BaseHooks
             && isset($data['survey_generated_id'])
             && $data['survey_generated_id'] === KANJI_SURVEY_GENERATED_ID
         ) {
+            // The id in force before this payload: if the code arrives now, the
+            // row already opened under the session id has to be carried over
+            // rather than left behind.
+            $previous = $this->get_kanji_response_id();
+
+            // The letter code identifies the participant, so remember it the
+            // moment it arrives. ID_1 is asked on the first page, ID_2 on the
+            // last; either pins the run.
+            foreach (array('ID_1', 'ID_2') as $field) {
+                if (!empty($data[$field]) && is_string($data[$field])) {
+                    $_SESSION['kanji_code'] = trim($data[$field]);
+                    break;
+                }
+            }
+
+            // Entering the code switches the key, so move any row opened under
+            // the old one across; otherwise the consent answer is stranded.
             $pinned = $this->get_kanji_response_id();
+            if ($previous !== null && $pinned !== null && $previous !== $pinned
+                && $this->kanji_row_exists($previous) && !$this->kanji_row_exists($pinned)
+            ) {
+                $this->kanji_rekey_row($previous, $pinned);
+            }
             if ($pinned !== null) {
                 $data['response_id'] = $pinned;
+                // Pin the owner too. save_row() defaults id_users to whoever is
+                // logged in *now*, while its update lookup is scoped to that same
+                // value — so logging in mid-run leaves the existing row
+                // unreachable and save_row() returns false, which surveyjs shows
+                // as "Data not saved!". Reusing the owner already on the row
+                // keeps it addressable whoever is logged in.
+                $owner = $this->kanji_row_owner($pinned);
+                if ($owner !== null) {
+                    $data['id_users'] = $owner;
+                }
                 // lab_js matches rows on `labjs_response_id`, and that column
                 // only exists if a survey writes it first. Stamp it here so the
                 // task's updateBasedOn resolves to this same row.
@@ -99,7 +131,6 @@ class KanjiAdultsHooks extends BaseHooks
                     $data['trigger_type'] = actionTriggerTypes_updated;
                 }
 
-                $data = $this->collapse_answers($data);
                 $args['data'] = $data;
             }
         }
@@ -216,75 +247,6 @@ class KanjiAdultsHooks extends BaseHooks
         return $out;
     }
     /**
-     * Collapse a survey's answers into one JSON column.
-     *
-     * surveyjs writes one column per question, and explodes every matrix into
-     * one column per row (`P1_Vignette_Franz_1`, `_2`, …). Across the five
-     * questionnaires of this study that is ~55 columns, and SelfHelp stores each
-     * as a `dataCells` row with a `dataCols` entry per name.
-     *
-     * The answers are therefore moved into a single `antworten_<page>` column
-     * holding a JSON object of question => answer. The bookkeeping fields
-     * surveyjs and SelfHelp need (`response_id`, `trigger_type`, the `_meta`
-     * block, …) stay as real columns, since the save path matches rows on them.
-     *
-     * @param array $data
-     *  The payload surveyjs is about to save.
-     * @return array
-     *  The payload with question answers collapsed into one JSON field.
-     */
-    private function collapse_answers($data)
-    {
-        // Everything the plugin or core needs to keep addressable.
-        $keep = array(
-            'response_id', 'trigger_type', 'survey_generated_id',
-            'labjs_response_id', 'labjs_generated_id',
-            'pageNo', '_json', '_meta',
-        );
-
-        $answers = array();
-        foreach ($data as $key => $value) {
-            if (in_array($key, $keep, true) || strpos($key, '_meta') === 0) {
-                continue;
-            }
-            $answers[$key] = $value;
-            unset($data[$key]);
-        }
-
-        if (!empty($answers)) {
-            // Name the column after the page so the five questionnaires do not
-            // overwrite one another in the participant's row.
-            $page = isset($answers['ID_1']) ? 'survey_teil1'
-                  : (isset($answers['ID_2']) ? 'survey_teil2'
-                  : $this->answers_page_name($answers));
-            $data[$page] = json_encode(
-                $answers,
-                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
-            );
-        }
-
-        return $data;
-    }
-
-    /**
-     * Which questionnaire a set of answers came from, taken from its question
-     * names, so each survey lands in its own JSON column.
-     *
-     * @param array $answers
-     * @return string
-     */
-    private function answers_page_name($answers)
-    {
-        foreach (array_keys($answers) as $name) {
-            if (strpos($name, 'P1_') === 0) return 'survey_pause1';
-            if (strpos($name, 'P2_') === 0) return 'survey_pause2';
-            if (strpos($name, 'P3_') === 0) return 'survey_pause3';
-            if (strpos($name, 'Demo_') === 0 || $name === 'EV') return 'survey_teil1';
-        }
-        return 'survey_sonstige';
-    }
-
-    /**
      * Does the participant already have a row in the study's data table?
      *
      * @param string $response_id
@@ -307,30 +269,89 @@ class KanjiAdultsHooks extends BaseHooks
     }
 
     /**
+     * Re-key a row onto the code-derived id.
+     *
+     * The consent page is answered before the code is entered, so that first
+     * save opens a row under the session id. Rewriting both id columns moves it
+     * onto the code, which is what every later save looks for.
+     *
+     * @param string $from
+     *  The id the row currently carries.
+     * @param string $to
+     *  The code-derived id it should carry.
+     * @return void
+     */
+    private function kanji_rekey_row($from, $to)
+    {
+        $db = $this->services->get_db();
+        $sql = 'UPDATE dataCells c'
+             . ' JOIN dataCols col ON col.id = c.id_dataCols'
+             . ' JOIN dataRows r ON r.id = c.id_dataRows'
+             . ' JOIN dataTables t ON t.id = r.id_dataTables'
+             . ' SET c.value = :to'
+             . ' WHERE t.name = :table'
+             . '   AND col.name IN ("response_id", "labjs_response_id")'
+             . '   AND c.value = :from';
+        $db->execute_update_db($sql, array(
+            ':to'    => $to,
+            ':from'  => $from,
+            ':table' => KANJI_SURVEY_GENERATED_ID,
+        ));
+    }
+
+    /**
+     * Which user owns the participant's row, if it exists.
+     *
+     * @param string $response_id
+     *  The pinned response id.
+     * @return int|null
+     *  The owning user id, or null when there is no row yet.
+     */
+    private function kanji_row_owner($response_id)
+    {
+        $user_input = $this->services->get_user_input();
+        $id_table = $user_input->get_dataTable_id(KANJI_SURVEY_GENERATED_ID);
+        if (!$id_table) {
+            return null;
+        }
+        // own_entries_only = false: the row may have been written as guest and
+        // the participant may since have logged in (or the reverse), so this
+        // lookup must not be scoped to the current user.
+        $filter = ' AND response_id = "' . $response_id . '"';
+        $record = $user_input->get_data($id_table, $filter, false, null, true);
+        return empty($record['id_users']) ? null : (int) $record['id_users'];
+    }
+
+    /**
      * A response id that is stable for one participant.
      *
-     * Participants are not logged in — they arrive from a letter and run as the
-     * guest user — so the session id is what identifies a run. It survives the
-     * whole chain of task and pause pages, which is exactly the span that has to
-     * land in one row.
+     * The letter code identifies the participant: it is printed on their letter,
+     * entered on the first page and re-entered on the last. Keying on it means
+     * the run survives whatever the browser does - a new tab, a dropped session,
+     * a login part-way through, or returning later on another device. Entering
+     * the same code again resumes the same row.
      *
-     * The user id is mixed in because rows are owned by the user who wrote them,
-     * and the surveys are saved with own_entries_only. Keying on the session
-     * alone means logging in mid-session keeps pointing at the guest's row, which
-     * the scoped lookup can no longer see - save_row() then returns false and the
-     * survey reports "Data not saved!". Including the user keeps the pinned id
-     * and the row owner in step, so a change of user simply starts a new row.
+     * Before the code is known (the consent question precedes it) the session id
+     * stands in; the row is adopted as soon as the code is submitted.
+     *
+     * Two participants entering the same code share a row. That is intended: the
+     * code is the identity, and the study would rather merge than refuse data.
      *
      * @return string|null
-     *  The pinned id, or null if there is no session to key on.
+     *  The pinned id, or null if there is nothing to key on.
      */
     private function get_kanji_response_id()
     {
+        if (!empty($_SESSION['kanji_code'])) {
+            // Normalised so trivial differences in typing do not split one
+            // participant across two rows.
+            $code = strtoupper(preg_replace('/\s+/', '', $_SESSION['kanji_code']));
+            return 'RJS_KANJI_' . substr(sha1('code|' . $code), 0, 16);
+        }
         if (session_status() !== PHP_SESSION_ACTIVE || session_id() === '') {
             return null;
         }
-        $id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : 1;
-        return 'RJS_KANJI_' . substr(sha1(session_id() . '|' . $id_user), 0, 16);
+        return 'RJS_KANJI_' . substr(sha1('sess|' . session_id()), 0, 16);
     }
 }
 ?>

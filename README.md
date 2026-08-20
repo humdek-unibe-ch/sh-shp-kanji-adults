@@ -103,14 +103,19 @@ table.
 
 | Column | Contents |
 |---|---|
-| `survey_teil1` | Consent, personal code, demographics |
-| `survey_pause{1,2,3}` | The vignette ratings from each break |
-| `survey_teil2` | Device, closing code |
+| `EV`, `ID_1`, `Demo_*` | Consent, personal code, demographics |
+| `P1_*`, `P2_*`, `P3_*` | The vignette ratings from each break |
+| `Device`, `ID_2` | Device, closing code |
 | `kanji_lernen_a`, `kanji_lernen_b` | Learning phase: item shown, actual on-screen duration |
 | `kanji_a`, `kanji_b` | Recall: choice, confidence, reaction times, accuracy |
 
-Each column holds JSON. The practice round is not stored, and per-block totals
-are derivable from the trial data rather than stored separately.
+The questionnaire columns carry the same names as the Qualtrics export, minus
+its per-language suffix (`Demo_2` here, `Demo_2_DE` there), so the two waves line
+up. The two memory-task blocks stay as JSON — one object per trial, keeping the
+original `Auswahl_Q42` / `Reaktionszeit_Q42_ms` field names inside.
+
+The practice round is not stored, and per-block totals are derivable from the
+trial data rather than stored separately.
 
 `DATA_FIELDS.md`, shipped with the study sources, describes every field for the
 research team.

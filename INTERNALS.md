@@ -229,7 +229,7 @@ same id. Three hooks in `KanjiAdultsHooks` then shape what is written:
 
 | Hook | Wraps | Does |
 |---|---|---|
-| `kanji-adults-merge-survey-row` | `SurveyJSModel::save_survey` | pins `response_id` (and `labjs_response_id`), collapses answers to one JSON column |
+| `kanji-adults-merge-survey-row` | `SurveyJSModel::save_survey` | pins `response_id` (and `labjs_response_id`) so every questionnaire updates one row |
 | `kanji-adults-merge-task-row` | `LabJSModel::save_lab` | pins `labjs_response_id` inside `metadata` |
 | `kanji-adults-rename-columns` | `UserInput::save_data` | renames the task columns and drops internal plumbing |
 
@@ -265,18 +265,20 @@ own per-response ids.
 
 ## Columns
 
-**Questionnaires.** One JSON column per questionnaire, not one per question.
-surveyjs writes a column per question and explodes every matrix into one column
-per row, which came to ~55 columns across the five questionnaires — and SelfHelp
-stores each as a `dataCells` row with a `dataCols` entry per name.
+**Questionnaires.** One column per question, carrying the same names the
+Qualtrics `.qsf` used — `EV`, `ID_1`, `Demo_2`, `P1_Vignette_Franz_1` … — so the two
+waves line up column for column. That is surveyjs' own output: it writes a
+column per question and explodes each matrix into one column per row
+(`prepare_data`), ~55 columns across the five questionnaires.
 
-| Column | Contents |
-|---|---|
-| `survey_teil1` | consent, personal code, demographics |
-| `survey_pause{1,2,3}` | the vignette ratings from each break |
-| `survey_teil2` | device, closing code |
+The one difference from the Qualtrics export is the language suffix. Qualtrics
+carried a separate block per language (`Demo_2_DE`, `Demo_2_EN`, …), so about
+two thirds of its 1037 columns sat empty for any given participant. Here one
+set of columns serves all four languages.
 
-**Memory task.** One JSON column per block, for the same reason.
+**Memory task.** One JSON column per block: flattening the recall trials the
+way Qualtrics did (`Auswahl_Q42_L1` … `_L15`) would add 155 columns for data
+that is read as a set anyway.
 
 | Column | Contents |
 |---|---|
