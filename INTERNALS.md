@@ -76,9 +76,9 @@ tested. Timings taken from the Qualtrics `QuestionJS`:
 Trial order is shuffled within each block, matching Qualtrics'
 `Randomization: Subset`. Practice blocks are not shuffled.
 
-The confidence scale is localised by the `window.KANJI_LANG` global
-(`de`/`en`/`fr`/`it`), which picks the matching `CJ_*` images. It falls back
-to German when unset.
+The confidence scale is localised by the participant's language, which picks
+the matching `CJ_*` images. It falls back to German when unset. See
+[How the task learns the language](#how-the-task-learns-the-language).
 
 
 ## The recall trial
@@ -118,10 +118,10 @@ The 12 instruction, orientation and closing pages come from the `.qsf`, one
 entry per language, and are stored as self-paced `lab.html.Screen` components
 with a Weiter / Next / Suivant / Avanti button.
 
-Text and images are chosen at run time from `window.KANJI_LANG`, the same global
-the confidence scale uses, so one build serves all four languages. Images are
-written as `{{IMG:filename}}` placeholders and resolved against the screen's
-file pool.
+Text and images are chosen at run time from the participant's language, the
+same source the confidence scale uses, so one build serves all four languages.
+Images are written as `{{IMG:filename}}` placeholders and resolved against the
+screen's file pool.
 
 Each instruction screen carries only the images its own page names — attaching
 the full 153-file pool to all twelve doubled the study JSON. The confidence
@@ -130,6 +130,50 @@ instruction page is the exception: it carries all 12 localised
 
 Unlike the trial screens these scroll if the content is long. There is no timing
 constraint on them, and the original was an ordinary scrollable survey page.
+
+
+## How the task learns the language
+
+SelfHelp keeps the chosen language in the session, and core stamps it onto every
+section it renders as a CSS class:
+
+```html
+<div class=" selfHelp-locale-fr-CH style-section-689">
+```
+
+The task reads the two-letter code straight off that class:
+
+```js
+const lang = (window.KANJI_LANG ||
+  (((document.querySelector('[class*=selfHelp-locale-]') || {}).className || '')
+    .match(/selfHelp-locale-([a-z]{2})/) || [])[1] || 'de');
+```
+
+The surveys need no equivalent: the surveyjs plugin reads the same class and sets
+`survey.locale` itself, and SurveyJS falls back from `fr-CH` to `fr` on its own.
+
+### Why not an inline script
+
+The obvious approach — having the migration write
+`<script>window.KANJI_LANG = "fr";</script>` into the per-language section — looks
+right and silently does nothing. Core builds a CSP that pins a hash for its own
+`BASE_PATH` snippet:
+
+```
+script-src 'self' 'unsafe-inline' 'unsafe-eval' 'sha256-KbpLpBgfBK+...'
+```
+
+Once a hash or nonce is present, the CSP spec has the browser **ignore
+`unsafe-inline`** — so every inline `<script>` except that one hash is blocked. The
+stylesheet in the same section still applies, because `style-src` carries no hash;
+that combination makes the failure look like a task bug rather than a CSP one.
+
+Handler code inside the study is unaffected: lab.js compiles it with
+`new Function`, which `unsafe-eval` permits. Reading the DOM class from there is
+therefore the one route that works without touching core or the page CSP.
+
+`window.KANJI_LANG` is still honoured if something sets it, which is what makes the
+language overridable in a console when testing.
 
 
 ## Task styling
@@ -167,8 +211,8 @@ screen renders whichever value happened to be written last.
 
 Anything that varies per trial therefore belongs in `templateParameters`,
 computed when the study is generated. Anything that varies at run time (the
-confidence images, which depend on `window.KANJI_LANG`) must be applied to the
-DOM in the `run` handler, not through `state`.
+confidence images, which depend on the participant's language) must be applied
+to the DOM in the `run` handler, not through `state`.
 
 `this.files` is safe in both templates and handlers — it is a proxy over the
 component's aggregated file pool, not shared mutable state.
