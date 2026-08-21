@@ -275,7 +275,7 @@ matters on a shared machine: without it the next participant inherits the
 previous one's identity and their consent answer is written into that row. It is
 read from the section name, so renaming `kanji-survey-part1` or
 `kanji-survey-part2` in the CMS silently switches this off along with the
-`Finished` stamp below.
+`Finished_Study` stamp below.
 
 ### Reusing a code
 
@@ -285,7 +285,7 @@ letter addressed to a child ("um Ihre Antworten anonym Ihrem Kind zuordnen zu
 können"), so two adults in one household can hold the same one, and a second run
 would otherwise overwrite the first cell by cell.
 
-Once a run is marked `Finished`, the next one under that code is given a row of
+Once a run is marked `Finished_Study`, the next one under that code is given a row of
 its own — run 1 hashes `code|CODE`, run 2 `code|CODE#2`, and so on up to
 `KANJI_MAX_RUNS`. Both rows carry the code in `ID_1`, so they still group during
 analysis. Nothing is refused and nothing is overwritten.
@@ -347,9 +347,9 @@ there is no original to match; worth a study-owner decision.
 | Column | Contents |
 |---|---|
 | `UserLanguage` | `DE` / `EN` / `FR` / `IT`, from the session language at save time |
-| `Finished` | `1` once part 2 has been completed, `0` while a run is still in progress |
+| `Finished_Study` | `1` once part 2 has been completed, `0` while a run is still in progress |
 
-`Finished` exists because the row's own trigger type cannot answer the question:
+`Finished_Study` exists because the row's own trigger type cannot answer the question:
 `UserInput::update_data()` rewrites `id_actionTriggerTypes` on *every* save, so a
 participant who stops after the first vignette also leaves the row on
 `finished`. The column is stamped only by part 2, which is the last thing

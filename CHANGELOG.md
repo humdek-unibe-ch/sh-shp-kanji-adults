@@ -20,7 +20,7 @@
  - the welcome page itself was rewritten: it now says what the task actually is, and lifts the three conditions that decide whether a run is usable — 30 minutes, one sitting, code to hand — out of the prose into their own cards
  - `kanji-adults` had labels only in German and English, so French and Italian participants read an English header
 
-### Changed: `Finished` is an explicit 0/1
+### Changed: `Finished_Study` is an explicit 0/1
  - stamped only on completion, the column could not be told apart from one that was never asked — the ambiguity it exists to resolve
  - `0` from the first save that carries an answer, `1` when part 2 completes. Not stamped on `started`: that save is the row's INSERT, and `save_row()` writes `$col_val ? $col_val : ''`, so a falsy `0` would be flattened to an empty string
 
@@ -32,7 +32,7 @@
  - `ID_2`, the code re-entered on the closing page, was allowed to set the key as well as `ID_1`; a typo there re-keyed the whole finished run onto a code nobody had been given. Only `ID_1` keys a run now, and `ID_2` is kept as an ordinary column so the two can be compared
  - the code stayed in the session after a run ended, so a second participant on the same browser wrote their consent into the first one's row and then dragged that row onto their own code. Opening part 1 now starts a new run
  - the re-key can only ever move a row that is still keyed on the session, which is what makes both of the above structurally impossible rather than merely guarded against
- - reusing a code no longer overwrites: the letter is addressed to a child, so two adults in one household can hold the same one. A code whose run is already `Finished` opens a second row, and both carry the code in `ID_1`
+ - reusing a code no longer overwrites: the letter is addressed to a child, so two adults in one household can hold the same one. A code whose run is already `Finished_Study` opens a second row, and both carry the code in `ID_1`
  - resuming a run from a new session no longer leaves the pre-code row behind as an unattributable stray
 
 ### Fixed: the memory task could still open a row of its own
@@ -42,7 +42,7 @@
 
 ### New: the language and the completion state are recorded
  - `UserLanguage` (`DE`/`EN`/`FR`/`IT`) is written on every questionnaire save. Qualtrics carried the language in every column name (`Demo_2_DE`); collapsing the four branches into one set of columns had dropped it out of the data entirely
- - `Finished` is stamped when part 2 completes. The row's own trigger type cannot answer that question — `UserInput::update_data()` rewrites it on every save, so a participant who stops after the first vignette also leaves the row on `finished`
+ - `Finished_Study` is stamped when part 2 completes. The row's own trigger type cannot answer that question — `UserInput::update_data()` rewrites it on every save, so a participant who stops after the first vignette also leaves the row on `finished`
 
 ### Changed: no site chrome from the first questionnaire onwards
  - the five questionnaire pages join the four task pages as `is_headless = 1`, which suppresses both header and footer, as the Qualtrics original had it: once a run starts there is nothing to navigate to, and the chrome invites participants to wander off mid-task

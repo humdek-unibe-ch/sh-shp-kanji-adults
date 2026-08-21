@@ -118,7 +118,7 @@ table.
 | `Device`, `ID_2` | Device, closing code |
 | `kanji_lernen_a`, `kanji_lernen_b` | Learning phase: item shown, actual on-screen duration |
 | `kanji_a`, `kanji_b` | Recall: choice, confidence, reaction times, accuracy |
-| `UserLanguage`, `Finished` | Language answered in, and whether the run reached the end |
+| `UserLanguage`, `Finished_Study` | Language answered in, and whether the run reached the end |
 
 The questionnaire columns carry the same names as the Qualtrics export, minus
 its per-language suffix (`Demo_2` here, `Demo_2_DE` there), so the two waves line
