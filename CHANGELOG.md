@@ -91,7 +91,7 @@
  - page access for unauthenticated participants: group grants plus a direct `acl_users` row for the guest user, which core requires because the guest belongs to no group
  - welcome page added to the site header
  - `@base_path` / `@asset_base` at the top of the migration set the study image path
- - the migration is generated from the Qualtrics-derived sources by two build scripts kept outside this repository
+ - the migration is generated from the Qualtrics-derived sources by two build scripts kept outside this repository, if you need access to them ask the developer of the plugin.
  - requires `sh-shp-survey_js` and `sh-shp-lab_js`
 
 ### Ported from Qualtrics

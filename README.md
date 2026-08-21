@@ -101,11 +101,6 @@ immediately. Re-running the migration will not undo it.
 Renaming a questionnaire or task segment in the CMS breaks the match the
 migration uses, and the next run then seeds a second copy alongside it.
 
-The migration was generated from a set of source files — the Qualtrics-derived
-survey JSON, the trial item tables and two build scripts — kept outside this
-repository. Ask the responsible dev for them if the study has to be rebuilt from
-scratch rather than edited in the CMS.
-
 ## Recorded data
 
 Everything one participant produces lands in **one row** of the `Kanji_Data`
@@ -127,9 +122,6 @@ original `Auswahl_Q42` / `Reaktionszeit_Q42_ms` field names inside.
 
 The practice round is not stored, and per-block totals are derivable from the
 trial data rather than stored separately.
-
-`DATA_FIELDS.md`, shipped with the study sources, describes every field for the
-research team.
 
 The row is keyed on the letter code, so a run survives a dropped session, a new
 tab or a return the next day, and a login part-way through does not strand it.
