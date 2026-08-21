@@ -24,9 +24,11 @@ produce four rows, so each segment opens with a `Resume` screen that pins the
 id in `sessionStorage`; `save_lab()` uses it as `updateBasedOn`, so every
 segment updates the same row.
 
-If `sessionStorage` is unavailable (private mode), the handler fails quietly and
-the segments save as separate rows — recoverable by joining on the participant
-code.
+That `Resume` screen no longer decides anything on its own: `save_lab()` is
+hooked and overwrites `labjs_response_id` with the id derived from the letter
+code before lab_js sees it, so the segments merge whether or not
+`sessionStorage` is available. It is left in place as the client-side half of
+the same answer.
 
 ## Study format
 
@@ -229,9 +231,9 @@ same id. Three hooks in `KanjiAdultsHooks` then shape what is written:
 
 | Hook | Wraps | Does |
 |---|---|---|
-| `kanji-adults-merge-survey-row` | `SurveyJSModel::save_survey` | pins `response_id` (and `labjs_response_id`) so every questionnaire updates one row |
+| `kanji-adults-merge-survey-row` | `SurveyJSModel::save_survey` | keys the run on the letter code, pins `response_id` and `labjs_response_id`, records the language, marks a finished run |
 | `kanji-adults-merge-task-row` | `LabJSModel::save_lab` | pins `labjs_response_id` inside `metadata` |
-| `kanji-adults-rename-columns` | `UserInput::save_data` | renames the task columns and drops internal plumbing |
+| `kanji-adults-rename-columns` | `UserInput::save_data` | renames the task columns, drops internal plumbing, and makes every write reach the participant's row whoever is logged in |
 
 The two save paths do **not** receive the same shape: surveyjs passes a flat
 array, lab_js passes the raw POST body with its fields under `metadata`. A
@@ -245,22 +247,73 @@ with the id pinned each save updates the participant's row instead of inserting
 its own. lab_js matches on `labjs_response_id` and surveyjs on `response_id`,
 which is why the task hook writes both.
 
-The pinned id is derived from the session and the current user's id
-(`RJS_KANJI_<sha1 of session id|user id>`); participants are not logged in, so
-the session is what identifies a run, and it survives the whole chain of task
-and pause pages.
-
-The user id is part of that key because rows are owned by whoever wrote them and
-the surveys save with `own_entries_only`. Keyed on the session alone, logging in
-mid-session would keep pointing at the row written as guest, which the scoped
-lookup can no longer see: `updateBasedOn` matches nothing and `save_row()`
-returns `false`, which the survey surfaces as a bare "Data not saved!" modal.
-Mixing the user in keeps the pinned id and the row owner in step, so a change of
-user starts a new row rather than colliding with one it cannot reach. This only
-arises while testing — participants run as guest throughout.
-
 Only this study is affected — other surveys on the installation keep surveyjs'
 own per-response ids.
+
+### What the row is keyed on
+
+The pinned id comes from the **letter code**, not from the session:
+`RJS_KANJI_<sha1 of "code|" + code>`, the code upper-cased with whitespace
+stripped. It is printed on the participant's letter, entered on the first page
+as `ID_1` and re-entered at the end as `ID_2`. Keying on it means a run survives
+whatever the browser does — a new tab, a dropped session, a login part-way
+through, a return the next day on another device. Entering the same code again
+resumes the same row.
+
+The consent question comes before the code page, so the first save has nothing
+to key on yet and opens a row under the session id instead. When the code
+arrives, that row is carried over: re-keyed onto the code if the code has no row
+yet, and otherwise discarded — surveyjs posts the whole survey on every save, so
+everything answered before the code page is in the payload that carries it.
+
+Only `ID_1` sets the key. `ID_2` is stored as an ordinary column so the two can
+be compared during analysis. If it also set the key, a typo on the closing page
+would move a finished run onto a code nobody was ever given.
+
+**A new run is declared by part 1 opening**, not by the browser being new. That
+matters on a shared machine: without it the next participant inherits the
+previous one's identity and their consent answer is written into that row. It is
+read from the section name, so renaming `kanji-survey-part1` or
+`kanji-survey-part2` in the CMS silently switches this off along with the
+`Finished` stamp below.
+
+### Reusing a code
+
+A code identifies a participant, so entering it again resumes their row. It does
+not follow that a *finished* run should be reopened: the code is printed on a
+letter addressed to a child ("um Ihre Antworten anonym Ihrem Kind zuordnen zu
+können"), so two adults in one household can hold the same one, and a second run
+would otherwise overwrite the first cell by cell.
+
+Once a run is marked `Finished`, the next one under that code is given a row of
+its own — run 1 hashes `code|CODE`, run 2 `code|CODE#2`, and so on up to
+`KANJI_MAX_RUNS`. Both rows carry the code in `ID_1`, so they still group during
+analysis. Nothing is refused and nothing is overwritten.
+
+### Ownership
+
+`save_row()` defaults `id_users` to whoever is logged in *now*, and scopes its
+`updateBasedOn` lookup to that same value. A run that starts as guest and
+continues after a login therefore points at a row the lookup can no longer see:
+surveyjs surfaces a bare "Data not saved!" modal, and lab_js quietly opens a
+second row instead.
+
+The row belongs to the participant, not to the session, so the `save_data` hook
+widens the lookup (`own_entries_only = false`) and keeps whichever user id is
+already on the row. It sits on `UserInput::save_data` because that is the one
+call both plugins pass through; fixing it in either plugin alone leaves the
+other one broken.
+
+Two things to know before changing that hook:
+
+- **`updateBasedOn` and `own_entries_only` have to be set together.** `Hooks.php`
+  packs only the arguments the caller actually passed, and
+  `BaseHooks::execute_private_method` re-expands them positionally — so adding
+  `own_entries_only` to a three-argument call hands the boolean to `save_data()`
+  as its `updateBasedOn`.
+- **`LabJSModel::save_lab` drops `updateBasedOn`** on its `started` save when its
+  own user-scoped lookup comes up empty, which inserts a task row of its own.
+  The hook restores it whenever the participant's row is already there.
 
 
 ## Columns
@@ -274,7 +327,34 @@ column per question and explodes each matrix into one column per row
 The one difference from the Qualtrics export is the language suffix. Qualtrics
 carried a separate block per language (`Demo_2_DE`, `Demo_2_EN`, …), so about
 two thirds of its 1037 columns sat empty for any given participant. Here one
-set of columns serves all four languages.
+set of columns serves all four languages — which is why `UserLanguage` is
+written explicitly on every questionnaire save. Dropping the suffix would
+otherwise drop the language out of the data altogether.
+
+**Dates that go stale.** The `jahrgang` dropdown lists the birth years of other
+children in the household, and its question scopes itself to children aged 0–17.
+A literal list rots every January — the ported one still ended at 2024, so a
+child born in 2025 could not be entered while 2007 was still offered. It is
+generated by `build_migration.php` from the year the migration is built, current
+year back seventeen. Rebuild if the study is still recruiting a year on.
+
+`Demo_25` / `Demo_26` (the two adult birth years) are still a hardcoded
+1930–2012, which accepts a parent born in 2012. Qualtrics validated neither, so
+there is no original to match; worth a study-owner decision.
+
+**Run state.** Two more columns carry their Qualtrics names:
+
+| Column | Contents |
+|---|---|
+| `UserLanguage` | `DE` / `EN` / `FR` / `IT`, from the session language at save time |
+| `Finished` | `1` once part 2 has been completed, `0` while a run is still in progress |
+
+`Finished` exists because the row's own trigger type cannot answer the question:
+`UserInput::update_data()` rewrites `id_actionTriggerTypes` on *every* save, so a
+participant who stops after the first vignette also leaves the row on
+`finished`. The column is stamped only by part 2, which is the last thing
+anybody does, and is what decides whether a reused code resumes or opens a new
+row.
 
 **Memory task.** One JSON column per block: flattening the recall trials the
 way Qualtrics did (`Auswahl_Q42_L1` … `_L15`) would add 155 columns for data

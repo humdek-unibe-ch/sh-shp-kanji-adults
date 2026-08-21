@@ -58,7 +58,7 @@ ids stay stable and participants already mid-study are unaffected.
 
 | Keyword | Contents |
 |---|---|
-| `kanji-adults` | Welcome / landing text |
+| `home` / `kanji-adults` | Welcome / landing text — one section, two URLs |
 | `kanji-adults-survey` | Part 1: consent, code, demographics |
 | `kanji-adults-task-1` | Instructions, practice, learn A |
 | `kanji-adults-pause-1` | Vignette: Französische Vokabeln |
@@ -78,8 +78,18 @@ access to all groups **and** carries a direct `acl_users` row for the guest
 user. The guest belongs to no group and core checks ACL against the session
 user, so group grants alone would render "Kein Zugriff" on every page.
 
-The four task pages are `is_headless = 1` so the experiment gets the full
-viewport. Only the welcome page is in the site header — linking the others
+The site's start page **is** the welcome page: the same container section is
+attached to both `home` and `kanji-adults`, so there is one piece of content
+behind two URLs — `/` for anyone arriving at the site, `/kanji-adults` so a link
+already printed on a letter keeps working. `kanji-adults` is not in the header,
+which leaves a single entry named after the study. This is the one place the
+plugin touches a core page, and re-running the migration re-applies it.
+
+Every page except the welcome page is `is_headless = 1`, so the study runs
+without the site header and footer, as the Qualtrics original did: once a run
+starts there is nothing to navigate to, and the chrome invites participants to
+wander off mid-task. The welcome page keeps both, and with them the language
+picker. Only the welcome page is in the site header — linking the others
 directly would let a participant skip into the task without consenting.
 
 ## Editing the study
@@ -108,6 +118,7 @@ table.
 | `Device`, `ID_2` | Device, closing code |
 | `kanji_lernen_a`, `kanji_lernen_b` | Learning phase: item shown, actual on-screen duration |
 | `kanji_a`, `kanji_b` | Recall: choice, confidence, reaction times, accuracy |
+| `UserLanguage`, `Finished` | Language answered in, and whether the run reached the end |
 
 The questionnaire columns carry the same names as the Qualtrics export, minus
 its per-language suffix (`Demo_2` here, `Demo_2_DE` there), so the two waves line
@@ -120,9 +131,15 @@ trial data rather than stored separately.
 `DATA_FIELDS.md`, shipped with the study sources, describes every field for the
 research team.
 
+The row is keyed on the letter code, so a run survives a dropped session, a new
+tab or a return the next day, and a login part-way through does not strand it.
+Entering a code whose run is already finished opens a second row rather than
+overwriting the first — both carry the code in `ID_1`.
+
 Three hooks in `KanjiAdultsHooks` make this work: two pin a per-participant
 `response_id` so all nine components write to the same row, and one renames the
-task columns. See [INTERNALS.md](INTERNALS.md) for why each is needed.
+task columns and keeps every write reaching that row. See
+[INTERNALS.md](INTERNALS.md) for why each is needed.
 
 ## Migrations
 

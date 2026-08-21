@@ -1,5 +1,60 @@
 # v1.0.0
 
+### Fixed: "No Entries" instead of the household-children questions
+ - the panel used `panelCountExpression`, which does not exist in the bundled survey-core: unknown properties are dropped silently when the JSON is parsed, so the panel kept its default count of 0 and rendered its title above an empty box
+ - this version drives `panelCount` through `bindings`, which takes a question name rather than an expression, so a hidden `Demo_6_count` converts Qualtrics' answer id (`9` means "3 children") into a real count first
+ - verified 1→1, 2→2, 9→3, 10→4, 11→5, 12→6 panels against the JSON the live page serves
+
+### Fixed: validation only complained after the participant had moved on
+ - the Qualtrics original blocked bad characters on keydown/paste, so a bad value never survived the field. Porting that to validators moved enforcement to the Next button, and the field sat there accepting `1` as a year with no reaction
+ - `checkErrorsMode: onValueChanged` on all five questionnaires restores immediate feedback, for every validated field in the study rather than just the years
+ - `maxLength: 4` on both birth-year questions
+
+### Fixed: the child birth-year dropdown had gone stale
+ - the list was copied literally from Qualtrics and ended at 2024, so a child born in 2025 or later could not be entered at all, while 2007 and 2008 were still offered for children who are now adults
+ - the question scopes itself to children aged 0–17, so the range is now generated at build time from the current year back seventeen
+
+### Changed: the site's start page is the study's welcome page
+ - `home` was an empty core page sitting in the header beside `Kanji Learning Task`, which gave a participant arriving from a letter a choice that meant nothing
+ - the same container section is attached to both pages, so one piece of content serves `/` and `/kanji-adults`; the latter stays reachable so a link already printed on a letter keeps working, but leaves the header
+ - the welcome page itself was rewritten: it now says what the task actually is, and lifts the three conditions that decide whether a run is usable — 30 minutes, one sitting, code to hand — out of the prose into their own cards
+ - `kanji-adults` had labels only in German and English, so French and Italian participants read an English header
+
+### Changed: `Finished` is an explicit 0/1
+ - stamped only on completion, the column could not be told apart from one that was never asked — the ambiguity it exists to resolve
+ - `0` from the first save that carries an answer, `1` when part 2 completes. Not stamped on `started`: that save is the row's INSERT, and `save_row()` writes `$col_val ? $col_val : ''`, so a falsy `0` would be flattened to an empty string
+
+### Fixed: the fixation cross was a speck
+ - the asset was an 80x80 cross centred in a 1280x720 white frame, so only 6% of the width was ink and every CSS width was effectively divided by sixteen — two rounds of enlarging the frame moved the visible cross from 4px to 9px
+ - cropped square to the cross and upscaled, so the CSS width is now the cross
+
+### Fixed: a run could be filed under the wrong code, or overwrite another one
+ - `ID_2`, the code re-entered on the closing page, was allowed to set the key as well as `ID_1`; a typo there re-keyed the whole finished run onto a code nobody had been given. Only `ID_1` keys a run now, and `ID_2` is kept as an ordinary column so the two can be compared
+ - the code stayed in the session after a run ended, so a second participant on the same browser wrote their consent into the first one's row and then dragged that row onto their own code. Opening part 1 now starts a new run
+ - the re-key can only ever move a row that is still keyed on the session, which is what makes both of the above structurally impossible rather than merely guarded against
+ - reusing a code no longer overwrites: the letter is addressed to a child, so two adults in one household can hold the same one. A code whose run is already `Finished` opens a second row, and both carry the code in `ID_1`
+ - resuming a run from a new session no longer leaves the pre-code row behind as an unattributable stray
+
+### Fixed: the memory task could still open a row of its own
+ - the ownership fix reached only the surveyjs path. `LabJSModel::save_lab` scopes its own lookup to the session user and drops `updateBasedOn` when it misses, so a login part-way through a run made the task insert a second row
+ - ownership now sits in the `UserInput::save_data` hook, the one call both plugins pass through: the lookup is widened (`own_entries_only = false`) and the user id already on the row is kept
+ - `updateBasedOn` and `own_entries_only` have to be set together — `Hooks.php` packs only the arguments the caller passed and `BaseHooks` re-expands them positionally, so setting one without the other hands the boolean to `save_data()` as its `updateBasedOn`
+
+### New: the language and the completion state are recorded
+ - `UserLanguage` (`DE`/`EN`/`FR`/`IT`) is written on every questionnaire save. Qualtrics carried the language in every column name (`Demo_2_DE`); collapsing the four branches into one set of columns had dropped it out of the data entirely
+ - `Finished` is stamped when part 2 completes. The row's own trigger type cannot answer that question — `UserInput::update_data()` rewrites it on every save, so a participant who stops after the first vignette also leaves the row on `finished`
+
+### Changed: no site chrome from the first questionnaire onwards
+ - the five questionnaire pages join the four task pages as `is_headless = 1`, which suppresses both header and footer, as the Qualtrics original had it: once a run starts there is nothing to navigate to, and the chrome invites participants to wander off mid-task
+ - the welcome page keeps both, and with them the language picker — participants choose their language before starting
+ - the floating CMS box is hidden by CSS on the study pages: `SectionPage` renders `.cms-edit` on every page and guards only its contents, leaving participants an empty bordered box that overlaps the stimuli during a timed trial
+
+### Fixed: the task ran in German whatever the participant chose
+ - the migration wrote `<script>window.KANJI_LANG = "fr"</script>` into the per-language section, and the browser refused to run it: core pins a hash for its own `BASE_PATH` snippet, and per the CSP spec a hash makes `unsafe-inline` be ignored, so every other inline script is blocked
+ - the stylesheet in the same section still applied — `style-src` carries no hash — which made it look like a task bug rather than a CSP one
+ - the task now reads the two-letter code off the `selfHelp-locale-*` class core stamps on every section, from inside a handler, which lab.js compiles with `new Function` and `unsafe-eval` permits
+ - the welcome page was seeded only in German; it now has one row per language
+
 ### Fixed: the memory task never reached the participant's row
  - `save_lab()` receives the raw POST body, so its fields sit under `metadata`; the hook read `labjs_generated_id` at the top level, never matched, and the task saved under lab.js' own `R_LABJS_…` id
  - `updateBasedOn` then filtered on `labjs_response_id`, a column no survey had ever created, and `save_row()` returned `false` — after the transaction was already logged, so the failure was invisible
@@ -12,8 +67,8 @@
  - Qualtrics recorded per-block timing here, so the per-trial form is a superset
 
 ### Changed: one row per participant, researcher-readable columns
- - all five questionnaires and all four task segments write into `Kanji_Data` and merge into a single row, keyed on a session-derived `response_id`
- - questionnaire answers collapse into one JSON column each (`survey_teil1`, `survey_pause{1..3}`, `survey_teil2`) instead of ~55 flat columns
+ - all five questionnaires and all four task segments write into `Kanji_Data` and merge into a single row, keyed on a pinned `response_id`
+ - questionnaire answers stay as one column per question, carrying the Qualtrics names minus the language suffix (`Demo_2` here, `Demo_2_DE` there), so the two waves line up column for column. An interim build collapsed them into one JSON column per questionnaire; that traded away both the readability and the comparison, and was reverted
  - task columns renamed via a `UserInput::save_data` hook — the last hookable point before the columns are created, and the only way to drop lab_js' `extra_data_` prefix without touching core
  - practice trials, per-block totals and internal plumbing columns are no longer stored
  - a field reference for the research team (`DATA_FIELDS.md`) ships with the study sources
