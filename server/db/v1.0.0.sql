@@ -1,7 +1,7 @@
 -- Kanji Adults — full install (v1.0.0)
 --
--- Single self-contained migration. Creates the four study pages, imports and
--- publishes both SurveyJS surveys and the lab.js study, and binds them to
+-- Single self-contained migration. Creates the ten study pages, imports and
+-- publishes the five SurveyJS surveys and the lab.js study, and binds them to
 -- their sections. After this runs the study is complete — no CMS import or
 -- section configuration is required.
 --
@@ -11,8 +11,7 @@
 -- Idempotent — safe to re-run.
 -- After running: clear the CMS cache (pages/sections).
 --
--- GENERATED FILE — do not edit by hand. Edit the sources in content/ and
--- re-run `php content/build_migration.php`.
+-- GENERATED FILE — do not edit by hand; it is rebuilt from the study sources.
 
 -- -----------------------------------------------------------------------
 -- Asset base URL. Every image path in the lab.js study is built from this.
@@ -25,11 +24,11 @@ SET @asset_base = CONCAT(@base_path, '/assets/kanji');
 -- -----------------------------------------------------------------------
 -- Study identity
 --
--- Each component saves into its own data table and every table carries the
--- participants code, so the parts are joined on the code after export.
+-- All nine components save into one data table, Kanji_Data, and key their row
+-- on the participant code, so a run is a single row and needs no join.
 --
--- The code is collected once, in part 1, and travels from page to page in the
--- query string: each component declares `url_params`, which stores the
+-- The code is collected once, in part 1, and travels from page to page as a
+-- path segment: each component declares `url_params`, which stores the
 -- parameters it received alongside its own data, and hands them on through a
 -- `redirect_at_end` template. Nothing is kept in the session, so a run is
 -- resumable from the link alone and is unaffected by logging in part way.
@@ -87,8 +86,13 @@ UPDATE `pages` SET `is_headless` = 1
  WHERE `keyword` IN ('kanji-adults-survey', 'kanji-adults-pause-1',
                      'kanji-adults-pause-2', 'kanji-adults-pause-3',
                      'kanji-adults-questions',
-                     'kanji-adults-task-1', 'kanji-adults-task-2',
+                     'kanji-adults-task-2',
                      'kanji-adults-task-3', 'kanji-adults-task-4');
+
+-- kanji-adults-task-1 is the exception: it is the one study page a run can be
+-- stopped on (a finished code), and headless would leave no way out. The task
+-- CSS hides the chrome while the experiment is actually on the page.
+UPDATE `pages` SET `is_headless` = 0 WHERE `keyword` = 'kanji-adults-task-1';
 
 -- Show the study entry point in the site header. Only the welcome page is
 -- listed: the survey/task/questions pages are reached by redirect, and a nav
@@ -106,104 +110,15 @@ VALUES
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
     VALUES (get_style_id('container'), 'kanji-welcome-container', NULL);
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
-    VALUES (get_style_id('markdown'), 'kanji-welcome-style', NULL);
-INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
     VALUES (get_style_id('markdown'), 'kanji-welcome-text', NULL);
 
 SET @kw_container = (SELECT id FROM sections WHERE name = 'kanji-welcome-container');
-SET @kw_style     = (SELECT id FROM sections WHERE name = 'kanji-welcome-style');
 SET @kw_text      = (SELECT id FROM sections WHERE name = 'kanji-welcome-text');
 
 INSERT IGNORE INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
     (@kw_container, get_field_id('css'),      '0000000001', '0000000001', 'px-3'),
     (@kw_container, get_field_id('is_fluid'), '0000000001', '0000000001', '0');
-
--- Welcome styling. Delivered as a markdown section for the same reason the task
--- stylesheet is: the section's `css` field is a class-name list, not a place for
--- a stylesheet. Everything is scoped under .kanji-welcome so nothing here can
--- reach another page.
-SET @welcome_css = '<style>
-.kanji-welcome {
-  max-width: 40rem;
-  margin: 0 auto;
-  padding: 3rem 0 4rem;
-}
-.kanji-welcome__eyebrow {
-  font-size: .8125rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: #6b7280;
-  margin: 0 0 .5rem;
-}
-.kanji-welcome__title {
-  font-size: 2rem;
-  line-height: 1.2;
-  margin: 0 0 1rem;
-  text-wrap: balance;
-}
-.kanji-welcome__lead {
-  font-size: 1.0625rem;
-  line-height: 1.6;
-  color: #374151;
-  margin: 0 0 2rem;
-}
-.kanji-welcome__facts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: .75rem;
-  margin: 0 0 2rem;
-  padding: 0;
-  list-style: none;
-}
-.kanji-welcome__fact {
-  border: 1px solid #e5e7eb;
-  border-radius: .5rem;
-  padding: .875rem 1rem;
-  background: #fff;
-}
-.kanji-welcome__fact b {
-  display: block;
-  font-size: .9375rem;
-  margin-bottom: .125rem;
-}
-.kanji-welcome__fact span {
-  font-size: .8125rem;
-  line-height: 1.4;
-  color: #6b7280;
-}
-.kanji-welcome__start {
-  display: inline-block;
-  background: #8b5e3c;
-  color: #fff;
-  font-size: 1.0625rem;
-  font-weight: 600;
-  padding: .75rem 1.75rem;
-  border-radius: .5rem;
-  text-decoration: none;
-}
-.kanji-welcome__start:hover,
-.kanji-welcome__start:focus {
-  background: #744d31;
-  color: #fff;
-  text-decoration: none;
-}
-.kanji-welcome__note {
-  font-size: .8125rem;
-  color: #6b7280;
-  margin: 1.25rem 0 0;
-}
-@media (max-width: 30rem) {
-  .kanji-welcome { padding: 2rem 0 3rem; }
-  .kanji-welcome__title { font-size: 1.625rem; }
-  .kanji-welcome__start { display: block; text-align: center; }
-}
-</style>';
-
-INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
-SELECT @kw_style, get_field_id('text_md'), l.id, '0000000001', @welcome_css
-  FROM languages l WHERE l.locale <> 'all'
-ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 -- The welcome page is written for this port, so it has no counterpart in the
 -- .qsf and carries its own translations. `text_md` is translatable, so one
@@ -221,104 +136,29 @@ INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_langu
 VALUES
     (@kw_text, get_field_id('text_md'),
      (SELECT id FROM languages WHERE locale = 'de-CH'), '0000000001',
-CONCAT('<div class="kanji-welcome" markdown="1">
-
-<p class="kanji-welcome__eyebrow">Studie zum Lernen</p>
-
-<h1 class="kanji-welcome__title">Kanji Lernaufgabe</h1>
-
-<p class="kanji-welcome__lead">Vielen Dank für Ihr Interesse an unserer Studie.
-Sie lernen gleich japanische Schriftzeichen kennen und prüfen anschliessend,
-woran Sie sich erinnern. Vorkenntnisse brauchen Sie keine.</p>
-
-<ul class="kanji-welcome__facts">
-<li class="kanji-welcome__fact"><b>Rund 30 Minuten</b><span>Planen Sie die Zeit am Stück ein</span></li>
-<li class="kanji-welcome__fact"><b>In einem Zug</b><span>Ein Unterbrechen und späteres Fortsetzen ist nicht möglich</span></li>
-<li class="kanji-welcome__fact"><b>Code bereithalten</b><span>Sie finden ihn in dem Brief, den Sie erhalten haben</span></li>
-</ul>
-
-<a class="kanji-welcome__start" href="', @base_path, '/kanji-adults-survey">Aufgabe starten</a>
-
-<p class="kanji-welcome__note">Bitte bearbeiten Sie die Aufgabe an einem ruhigen Ort.
-Die Sprache können Sie unten auf dieser Seite wechseln — später nicht mehr.</p>
-
-</div>')),
+CONCAT('<div class="row justify-content-center"><div class="col-12 col-md-10 col-lg-8 py-5"><p class="text-uppercase text-muted small mb-2">Studie zum Lernen</p><h1 class="mb-3">Kanji Lernaufgabe</h1><p class="lead mb-4">Vielen Dank für Ihr Interesse an unserer Studie. Sie lernen gleich japanische Schriftzeichen kennen und prüfen anschliessend, woran Sie sich erinnern. Vorkenntnisse brauchen Sie keine.</p><div class="card-deck flex-column flex-md-row mb-4"><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">Rund 30 Minuten</h2><p class="small text-muted mb-0">Planen Sie die Zeit am Stück ein</p></div></div><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">In einem Zug</h2><p class="small text-muted mb-0">Ein Unterbrechen und späteres Fortsetzen ist nicht möglich</p></div></div><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">Code bereithalten</h2><p class="small text-muted mb-0">Sie finden ihn in dem Brief, den Sie erhalten haben</p></div></div></div><a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Aufgabe starten</a><p class="small text-muted mt-3 mb-0">Bitte bearbeiten Sie die Aufgabe an einem ruhigen Ort. Die Sprache können Sie unten auf dieser Seite wechseln — später nicht mehr.</p></div></div>')),
     (@kw_text, get_field_id('text_md'),
      (SELECT id FROM languages WHERE locale = 'en-GB'), '0000000001',
-CONCAT('<div class="kanji-welcome" markdown="1">
-
-<p class="kanji-welcome__eyebrow">A study on learning</p>
-
-<h1 class="kanji-welcome__title">Kanji Learning Task</h1>
-
-<p class="kanji-welcome__lead">Thank you for your interest in our study.
-You are about to learn some Japanese characters and then see how many you
-remember. No prior knowledge is needed.</p>
-
-<ul class="kanji-welcome__facts">
-<li class="kanji-welcome__fact"><b>About 30 minutes</b><span>Set the time aside in one block</span></li>
-<li class="kanji-welcome__fact"><b>In one sitting</b><span>You cannot pause and continue later</span></li>
-<li class="kanji-welcome__fact"><b>Have your code ready</b><span>It is in the letter you received</span></li>
-</ul>
-
-<a class="kanji-welcome__start" href="', @base_path, '/kanji-adults-survey">Start the task</a>
-
-<p class="kanji-welcome__note">Please work somewhere quiet.
-You can change the language at the bottom of this page — but not once you have started.</p>
-
-</div>')),
+CONCAT('<div class="row justify-content-center"><div class="col-12 col-md-10 col-lg-8 py-5"><p class="text-uppercase text-muted small mb-2">A study on learning</p><h1 class="mb-3">Kanji Learning Task</h1><p class="lead mb-4">Thank you for your interest in our study. You are about to learn some Japanese characters and then see how many you remember. No prior knowledge is needed.</p><div class="card-deck flex-column flex-md-row mb-4"><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">About 30 minutes</h2><p class="small text-muted mb-0">Set the time aside in one block</p></div></div><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">In one sitting</h2><p class="small text-muted mb-0">You cannot pause and continue later</p></div></div><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">Have your code ready</h2><p class="small text-muted mb-0">It is in the letter you received</p></div></div></div><a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Start the task</a><p class="small text-muted mt-3 mb-0">Please work somewhere quiet. You can change the language at the bottom of this page — but not once you have started.</p></div></div>')),
     (@kw_text, get_field_id('text_md'),
      (SELECT id FROM languages WHERE locale = 'fr-CH'), '0000000001',
-CONCAT('<div class="kanji-welcome" markdown="1">
-
-<p class="kanji-welcome__eyebrow">Étude sur l’apprentissage</p>
-
-<h1 class="kanji-welcome__title">Tâche d’apprentissage Kanji</h1>
-
-<p class="kanji-welcome__lead">Merci de l’intérêt que vous portez à notre étude.
-Vous allez découvrir des caractères japonais, puis vérifier ce dont vous vous
-souvenez. Aucune connaissance préalable n’est nécessaire.</p>
-
-<ul class="kanji-welcome__facts">
-<li class="kanji-welcome__fact"><b>Environ 30 minutes</b><span>Prévoyez ce temps d’un seul tenant</span></li>
-<li class="kanji-welcome__fact"><b>En une seule fois</b><span>Vous ne pourrez pas interrompre puis reprendre plus tard</span></li>
-<li class="kanji-welcome__fact"><b>Gardez votre code</b><span>Il figure dans la lettre que vous avez reçue</span></li>
-</ul>
-
-<a class="kanji-welcome__start" href="', @base_path, '/kanji-adults-survey">Commencer l’exercice</a>
-
-<p class="kanji-welcome__note">Veuillez travailler dans un endroit calme.
-Vous pouvez changer de langue en bas de cette page — mais plus une fois commencé.</p>
-
-</div>')),
+CONCAT('<div class="row justify-content-center"><div class="col-12 col-md-10 col-lg-8 py-5"><p class="text-uppercase text-muted small mb-2">Étude sur l’apprentissage</p><h1 class="mb-3">Tâche d’apprentissage Kanji</h1><p class="lead mb-4">Merci de l’intérêt que vous portez à notre étude. Vous allez découvrir des caractères japonais, puis vérifier ce dont vous vous souvenez. Aucune connaissance préalable n’est nécessaire.</p><div class="card-deck flex-column flex-md-row mb-4"><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">Environ 30 minutes</h2><p class="small text-muted mb-0">Prévoyez ce temps d’un seul tenant</p></div></div><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">En une seule fois</h2><p class="small text-muted mb-0">Vous ne pourrez pas interrompre puis reprendre plus tard</p></div></div><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">Gardez votre code</h2><p class="small text-muted mb-0">Il figure dans la lettre que vous avez reçue</p></div></div></div><a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Commencer l’exercice</a><p class="small text-muted mt-3 mb-0">Veuillez travailler dans un endroit calme. Vous pouvez changer de langue en bas de cette page — mais plus une fois commencé.</p></div></div>')),
     (@kw_text, get_field_id('text_md'),
      (SELECT id FROM languages WHERE locale = 'it-CH'), '0000000001',
-CONCAT('<div class="kanji-welcome" markdown="1">
-
-<p class="kanji-welcome__eyebrow">Studio sull’apprendimento</p>
-
-<h1 class="kanji-welcome__title">Compito di apprendimento Kanji</h1>
-
-<p class="kanji-welcome__lead">La ringraziamo per l’interesse dimostrato verso il
-nostro studio. Imparerà alcuni caratteri giapponesi e verificherà poi quanti ne
-ricorda. Non sono richieste conoscenze pregresse.</p>
-
-<ul class="kanji-welcome__facts">
-<li class="kanji-welcome__fact"><b>Circa 30 minuti</b><span>Prenda questo tempo senza interruzioni</span></li>
-<li class="kanji-welcome__fact"><b>In un’unica sessione</b><span>Non potrà interrompere e riprendere più tardi</span></li>
-<li class="kanji-welcome__fact"><b>Tenga a portata il codice</b><span>Lo trova nella lettera che ha ricevuto</span></li>
-</ul>
-
-<a class="kanji-welcome__start" href="', @base_path, '/kanji-adults-survey">Inizia il compito</a>
-
-<p class="kanji-welcome__note">La preghiamo di svolgerlo in un luogo tranquillo.
-Può cambiare lingua in fondo a questa pagina — ma non dopo aver iniziato.</p>
-
-</div>'))
+CONCAT('<div class="row justify-content-center"><div class="col-12 col-md-10 col-lg-8 py-5"><p class="text-uppercase text-muted small mb-2">Studio sull’apprendimento</p><h1 class="mb-3">Compito di apprendimento Kanji</h1><p class="lead mb-4">La ringraziamo per l’interesse dimostrato verso il nostro studio. Imparerà alcuni caratteri giapponesi e verificherà poi quanti ne ricorda. Non sono richieste conoscenze pregresse.</p><div class="card-deck flex-column flex-md-row mb-4"><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">Circa 30 minuti</h2><p class="small text-muted mb-0">Prenda questo tempo senza interruzioni</p></div></div><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">In un’unica sessione</h2><p class="small text-muted mb-0">Non potrà interrompere e riprendere più tardi</p></div></div><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">Tenga a portata il codice</h2><p class="small text-muted mb-0">Lo trova nella lettera che ha ricevuto</p></div></div></div><a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Inizia il compito</a><p class="small text-muted mt-3 mb-0">La preghiamo di svolgerlo in un luogo tranquillo. Può cambiare lingua in fondo a questa pagina — ma non dopo aver iniziato.</p></div></div>'))
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
+-- The welcome page is Bootstrap-only, so its stylesheet section is dropped.
+-- INSERT IGNORE above cannot remove it from an install that already has it.
+DELETE sh FROM `sections_hierarchy` sh
+  JOIN `sections` s ON s.id = sh.child
+ WHERE s.name = 'kanji-welcome-style';
+DELETE ps FROM `pages_sections` ps
+  JOIN `sections` s ON s.id = ps.id_sections
+ WHERE s.name = 'kanji-welcome-style';
+DELETE FROM `sections` WHERE name = 'kanji-welcome-style';
+
 INSERT INTO `sections_hierarchy` (`parent`, `child`, `position`) VALUES
-    (@kw_container, @kw_style, 0),
     (@kw_container, @kw_text, 10)
 ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
 
@@ -361,8 +201,8 @@ UPDATE `pages` SET `nav_position` = NULL WHERE `keyword` = 'kanji-adults';
 
 -- -----------------------------------------------------------------------
 -- Page 2: part 1 questionnaire (consent, code, demographics)
--- Renders the surveyjs survey. Select the published survey in the CMS after
--- importing kanji_part1.surveyjs.json in Module SurveyJS.
+-- Renders the surveyjs survey. The survey is imported, published and bound to
+-- this section further down, so no CMS step is needed.
 -- -----------------------------------------------------------------------
 
 INSERT IGNORE INTO `pages` (
@@ -392,9 +232,8 @@ SET @ks_part1 = (SELECT id FROM sections WHERE name = 'kanji-survey-part1');
 
 
 -- redirect_at_end sends the participant into the timed task once part 1 is
--- submitted. The survey `survey-js` field must be set in the CMS to the
--- published "Kanji Part 1" survey — it references a surveys row id that does
--- not exist until the JSON is imported, so it cannot be set here.
+-- submitted, carrying the code as a path segment. The `survey-js` field is set
+-- further down, once the import has created the surveys row it points at.
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
     (@ks_part1, get_field_id('redirect_at_end'),   '0000000001', '0000000001', 'kanji-adults-task-1/{{ID_1}}')
@@ -411,7 +250,8 @@ ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
 
 -- -----------------------------------------------------------------------
 -- Page 3: the lab.js memory task
--- Headless: the task takes the full viewport, no site chrome.
+-- Headless from task-2 on, so the task takes the full viewport. task-1 keeps
+-- the chrome (see above) and hides it from CSS while the experiment runs.
 --
 -- The Qualtrics original interleaves the vignette pauses with the memory task,
 -- so the task is split into four pages with a pause survey between each:
@@ -509,14 +349,20 @@ SET @kt1_done_text = (SELECT id FROM sections WHERE name = 'kanji-task-1-done-te
 
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
-    (@kt1_done_text, get_field_id('text_md'), '0000000002', '0000000001', '<div class="kanji-done"><h1>Diese Aufgabe wurde bereits abgeschlossen</h1><p>Unter diesem Code wurde die Aufgabe bereits vollständig bearbeitet. Sie kann nur einmal durchgeführt werden.<br><br>Wenn Sie glauben, dass das nicht stimmt, wenden Sie sich bitte an das Studienteam.</p></div>'),
-    (@kt1_done_text, get_field_id('text_md'), '0000000003', '0000000001', '<div class="kanji-done"><h1>This task has already been completed</h1><p>The task has already been completed in full under this code. It can only be done once.<br><br>If you think this is not correct, please contact the study team.</p></div>'),
-    (@kt1_done_text, get_field_id('text_md'), '0000000016', '0000000001', '<div class="kanji-done"><h1>Cette tâche a déjà été effectuée</h1><p>La tâche a déjà été entièrement effectuée avec ce code. Elle ne peut être réalisée qu’une seule fois.<br><br>Si vous pensez que ce n’est pas correct, veuillez contacter l’équipe de l’étude.</p></div>'),
-    (@kt1_done_text, get_field_id('text_md'), '0000000017', '0000000001', '<div class="kanji-done"><h1>Questo compito è già stato completato</h1><p>Con questo codice il compito è già stato completato interamente. Può essere svolto una sola volta.<br><br>Se ritiene che non sia corretto, contatti il team dello studio.</p></div>')
+    (@kt1_done_text, get_field_id('text_md'), '0000000002', '0000000001', '<div class="row justify-content-center text-center"><div class="col-12 col-md-8 col-lg-6 py-5"><span class="d-inline-block rounded-circle border border-success text-success display-4 px-3 py-2 mb-4">&#10003;</span><p class="text-uppercase text-muted small mb-2">Geschafft</p><h1 class="h3 mb-3">Diese Aufgabe wurde bereits abgeschlossen</h1><p class="lead mb-4">Unter Ihrem Code wurde die Aufgabe bereits vollständig bearbeitet. Vielen Dank für Ihre Teilnahme — sie ist nur einmal möglich.</p><p class="small text-muted border-top pt-3 mb-0">Sollte das nicht stimmen, wenden Sie sich bitte an das Studienteam.</p></div></div>'),
+    (@kt1_done_text, get_field_id('text_md'), '0000000003', '0000000001', '<div class="row justify-content-center text-center"><div class="col-12 col-md-8 col-lg-6 py-5"><span class="d-inline-block rounded-circle border border-success text-success display-4 px-3 py-2 mb-4">&#10003;</span><p class="text-uppercase text-muted small mb-2">All done</p><h1 class="h3 mb-3">This task has already been completed</h1><p class="lead mb-4">The task has already been completed in full under your code. Thank you for taking part — it can only be done once.</p><p class="small text-muted border-top pt-3 mb-0">If you think this is not correct, please contact the study team.</p></div></div>'),
+    (@kt1_done_text, get_field_id('text_md'), '0000000016', '0000000001', '<div class="row justify-content-center text-center"><div class="col-12 col-md-8 col-lg-6 py-5"><span class="d-inline-block rounded-circle border border-success text-success display-4 px-3 py-2 mb-4">&#10003;</span><p class="text-uppercase text-muted small mb-2">Terminé</p><h1 class="h3 mb-3">Cette tâche a déjà été effectuée</h1><p class="lead mb-4">La tâche a déjà été entièrement effectuée avec votre code. Merci de votre participation — elle ne peut être réalisée qu’une seule fois.</p><p class="small text-muted border-top pt-3 mb-0">Si vous pensez que ce n’est pas correct, veuillez contacter l’équipe de l’étude.</p></div></div>'),
+    (@kt1_done_text, get_field_id('text_md'), '0000000017', '0000000001', '<div class="row justify-content-center text-center"><div class="col-12 col-md-8 col-lg-6 py-5"><span class="d-inline-block rounded-circle border border-success text-success display-4 px-3 py-2 mb-4">&#10003;</span><p class="text-uppercase text-muted small mb-2">Completato</p><h1 class="h3 mb-3">Questo compito è già stato completato</h1><p class="lead mb-4">Con il suo codice il compito è già stato completato interamente. Grazie per la partecipazione — può essere svolto una sola volta.</p><p class="small text-muted border-top pt-3 mb-0">Se ritiene che non sia corretto, contatti il team dello studio.</p></div></div>')
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
 VALUES (@kt1_done, @kt1_done_text, 0);
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES (@kt1_done_text, get_field_id('css'), '0000000001', '0000000001', 'container')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+
 
 DELETE FROM `pages_sections` WHERE `id_pages` = @kanji_task_1 AND `id_sections` = @kt_labjs_1;
 INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
@@ -807,8 +653,8 @@ VALUES (@kanji_questions, @ks_part2, 0);
 -- -----------------------------------------------------------------------
 -- Carry the code from page to page
 --
--- Every component after part 1 reads the query string of the page it was
--- opened with, saves the parameters it received alongside its own data, and
+-- Every component after part 1 reads the route parameters of the page it was
+-- opened with, saves them alongside its own data, and
 -- hands them on through its redirect_at_end template. Part 1 is the only one
 -- that does not read them: it collects the code rather than receiving it.
 --
@@ -1101,7 +947,7 @@ VALUES (@sec_pause3, get_field_id('survey-js'), '0000000001', '0000000001', @sur
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 -- Task styling, one stylesheet section per task page.
-SET @task_css = '<style>\n/* Kanji Adults — lab.js task styling.\n\n   Shipped by the `kanji-task-style` markdown section, which sits on the task\n   page ahead of the experiment and renders this file inside a <style> tag.\n\n   It cannot live anywhere inside the study: every lab.html.Screen does\n   `el.innerHTML = content` on run, so a <style> in a screen is wiped by the\n   next one. Nor in the section\'s `css` field — that is a class-name list\n   rendered inside class="…", so a stylesheet there never applies.\n\n   Sizing note: the stimulus images are 2048x2048, so every image is bounded\n   here by viewport *height* first. Width-only limits (e.g. max-width: 45%)\n   let a square image grow as tall as it is wide and push the options below\n   the fold on a laptop screen. */\n\n/* Full-bleed task.\n   The labJS style wraps the experiment in `.container.fullscreen`, which the\n   plugin\'s own lab.css gives a 24px margin, a 1px border, a rounded corner and\n   a 900px width variable, and pads `main` by another 24px. For a timed task\n   that chrome is only wasted viewport, so the page overrides it here rather\n   than by patching the lab plugin. */\n.selfHelp-lab-js-holder {\n  width: 100%;\n  margin: 0;\n  padding: 0;\n}\n.selfHelp-lab-js-holder .container,\n.selfHelp-lab-js-holder .container.fullscreen {\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  max-width: none;\n  min-height: 100vh;\n  border: none;\n  border-radius: 0;\n}\n.selfHelp-lab-js-holder main,\n.selfHelp-lab-js-holder header,\n.selfHelp-lab-js-holder footer {\n  padding: 0;\n  border: none;\n}\n\n.kanji-stage {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  /* The container chrome is stripped above, so the stage is the viewport. */\n  min-height: 100vh;\n  box-sizing: border-box;\n  padding: 1vh 1vw;\n  gap: 3vh;\n  overflow: hidden;\n}\n\n/* Fixation cross — centred, and large enough to actually hold the eye.\n   Sized against the stimulus that follows (max-height: 68vh), not as an\n   afterthought: the cross marks the spot the kanji is about to occupy.\n\n   The asset used to be an 80px cross floating in a 1280x720 white frame, so\n   only 6% of the width was ink — every CSS width here was effectively divided\n   by sixteen, which is why earlier attempts to enlarge it did nothing visible.\n   It is now cropped square to the cross, so this width is the cross. */\n.kanji-fix { width: clamp(80px, 12vh, 160px); height: auto; }\n\n/* Learning trial: kanji and meaning side by side.\n   Matches the Qualtrics LA2 layout, but capped by height so the pair always\n   fits on one screen. */\n.kanji-pair {\n  flex-direction: row;\n  flex-wrap: nowrap;\n  gap: 4vw;\n}\n.kanji-pair .kanji-item {\n  max-height: 68vh;\n  max-width: 44vw;\n  width: auto;\n  height: auto;\n  object-fit: contain;\n}\n\n/* Recall trial: cue, the two options, and the confidence row all share one\n   screen (as in the Qualtrics original), so each band gets a smaller slice. */\n.kanji-cue {\n  max-height: 24vh;\n  max-width: 28vw;\n  width: auto;\n  height: auto;\n  object-fit: contain;\n}\n\n.kanji-choices {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 5vw;\n  flex-wrap: nowrap;\n}\n\n.kanji-opt {\n  border: 2px solid #000;\n  border-radius: 12px;\n  background: #fff;\n  padding: 6px;\n  cursor: pointer;\n  transition: border-color .2s ease, transform .1s ease;\n  line-height: 0;\n}\n.kanji-opt img {\n  max-height: 36vh;\n  max-width: 32vw;\n  width: auto;\n  height: auto;\n  object-fit: contain;\n  border-radius: 10px;\n  display: block;\n}\n.kanji-opt:hover { border-color: #2563eb; }\n.kanji-opt:active { transform: scale(.98); }\n\n/* Select-then-confirm. First click selects (blue), second click locks it\n   (brown) and freezes the group — the same two-stage interaction and the same\n   colours as the Qualtrics original. */\n.kanji-opt.selected {\n  border: 4px solid #2563eb;\n  padding: 4px;\n}\n.kanji-opt.locked {\n  border: 4px solid #8b5e3c;\n  padding: 4px;\n  opacity: .9;\n  pointer-events: none;\n}\n.kanji-choices.is-locked .kanji-opt:not(.locked) {\n  pointer-events: none;\n  opacity: .55;\n}\n\n/* The confidence row is revealed only after the answer locks. */\n#kanjiConfidence[hidden] { display: none; }\n\n/* Confidence scale. The original fixes each tile at 100px wide, which also\n   keeps the three identical despite uneven source images (421x390, 423x390,\n   422x389 in DE; different again per language). */\n.kanji-cj {\n  gap: 30px;\n  margin-top: 2vh;\n}\n.kanji-cj .kanji-opt {\n  width: clamp(84px, 9vw, 116px);\n  flex: 0 0 auto;\n}\n.kanji-cj .kanji-opt img {\n  width: 100%;\n  max-height: none;\n  max-width: none;\n}\n\n/* Instruction / orientation screens.\n   Self-paced text pages with a Weiter button. These scroll if the content is\n   long — unlike the trial screens, there is no timing reason to force them\n   into the fold, and the original was an ordinary scrollable survey page. */\n.kanji-instr {\n  justify-content: flex-start;\n  gap: 1.5rem;\n  overflow-y: auto;\n  padding: 4vh 2vw;\n}\n.kanji-instr-body {\n  max-width: 60ch;\n  font-size: clamp(1rem, 1.5vh + .5rem, 1.35rem);\n  line-height: 1.5;\n  text-align: center;\n}\n.kanji-instr-body ul {\n  text-align: left;\n  display: inline-block;\n  margin: .5em 0;\n  padding-left: 1.4em;\n}\n\n/* The closing `<b>` is inline, so it wraps onto the last bullet\'s line. */\n.kanji-instr-body ul + b {\n  display: block;\n  margin-top: 1em;\n}\n.kanji-instr-body li { margin-bottom: .4em; }\n.kanji-instr-body p { margin: .6em 0; }\n.kanji-instr-img {\n  max-width: 100%;\n  max-height: 34vh;\n  height: auto;\n  object-fit: contain;\n  margin: .5em auto;\n  display: block;\n}\n\n/* Two images in one paragraph are a kanji/meaning pair: side by side, as the\n   learning trial shows them. */\n.kanji-instr-body p:has(img + img) {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: center;\n  gap: 2vw;\n}\n.kanji-instr-body p:has(img + img) .kanji-instr-img {\n  margin: 0;\n  max-width: 40%;\n}\n\n.kanji-next {\n  font: inherit;\n  font-size: 1.05rem;\n  padding: .6em 2.4em;\n  border: 2px solid #000;\n  border-radius: 10px;\n  background: #fff;\n  cursor: pointer;\n  transition: background-color .15s ease, transform .1s ease;\n}\n.kanji-next:hover { background: #f0f4ff; border-color: #2563eb; }\n.kanji-next:active { transform: scale(.98); }\n.kanji-next:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }\n\n.kanji-wait { color: #999; font-size: 2rem; }\n\n/* Portrait / small screens: stack the learn pair and give the options\n   width-driven sizing, since height is the scarcer axis only in landscape. */\n@media (max-width: 768px) {\n  .kanji-pair { flex-wrap: wrap; }\n  .kanji-pair .kanji-item { max-width: 80vw; max-height: 36vh; }\n  .kanji-cue { max-width: 46vw; max-height: 18vh; }\n  .kanji-opt img { max-width: 38vw; max-height: 26vh; }\n  .kanji-cj .kanji-opt { width: clamp(64px, 18vw, 96px); }\n}\n\n/* Respect a reduced-motion preference: the transforms here are decorative. */\n@media (prefers-reduced-motion: reduce) {\n  .kanji-opt, .kanji-next { transition: none; }\n  .kanji-opt:active, .kanji-next:active { transform: none; }\n}\n\n/* Hide the floating CMS box.\n   SectionPage renders `.cms-edit` on every page and only guards its contents,\n   so a participant still gets an empty bordered box pinned to the bottom of\n   the viewport holding a back-to-top arrow. On a study page that is clutter,\n   and during a timed task it overlaps the stimuli. Hidden here rather than in\n   core, which would affect every installation. Editors reach the CMS through\n   the admin area; the box is not the only route. */\n.cms-edit {\n  display: none;\n}\n\n</style>';
+SET @task_css = '<style>\n/* Kanji Adults — lab.js task styling.\n\n   Shipped by the `kanji-task-style` markdown section, which sits on the task\n   page ahead of the experiment and renders this file inside a <style> tag.\n\n   It cannot live anywhere inside the study: every lab.html.Screen does\n   `el.innerHTML = content` on run, so a <style> in a screen is wiped by the\n   next one. Nor in the section\'s `css` field — that is a class-name list\n   rendered inside class="…", so a stylesheet there never applies.\n\n   Sizing note: the stimulus images are 2048x2048, so every image is bounded\n   here by viewport *height* first. Width-only limits (e.g. max-width: 45%)\n   let a square image grow as tall as it is wide and push the options below\n   the fold on a laptop screen. */\n\n/* Full-bleed task.\n   The labJS style wraps the experiment in `.container.fullscreen`, which the\n   plugin\'s own lab.css gives a 24px margin, a 1px border, a rounded corner and\n   a 900px width variable, and pads `main` by another 24px. For a timed task\n   that chrome is only wasted viewport, so the page overrides it here rather\n   than by patching the lab plugin. */\n.selfHelp-lab-js-holder {\n  width: 100%;\n  margin: 0;\n  padding: 0;\n}\n.selfHelp-lab-js-holder .container,\n.selfHelp-lab-js-holder .container.fullscreen {\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  max-width: none;\n  min-height: 100vh;\n  border: none;\n  border-radius: 0;\n}\n.selfHelp-lab-js-holder main,\n.selfHelp-lab-js-holder header,\n.selfHelp-lab-js-holder footer {\n  padding: 0;\n  border: none;\n}\n\n.kanji-stage {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  /* The container chrome is stripped above, so the stage is the viewport. */\n  min-height: 100vh;\n  box-sizing: border-box;\n  padding: 1vh 1vw;\n  gap: 3vh;\n  overflow: hidden;\n}\n\n/* Fixation cross — centred, and large enough to actually hold the eye.\n   Sized against the stimulus that follows (max-height: 68vh), not as an\n   afterthought: the cross marks the spot the kanji is about to occupy.\n\n   The asset used to be an 80px cross floating in a 1280x720 white frame, so\n   only 6% of the width was ink — every CSS width here was effectively divided\n   by sixteen, which is why earlier attempts to enlarge it did nothing visible.\n   It is now cropped square to the cross, so this width is the cross. */\n.kanji-fix { width: clamp(80px, 12vh, 160px); height: auto; }\n\n/* Learning trial: kanji and meaning side by side.\n   Matches the Qualtrics LA2 layout, but capped by height so the pair always\n   fits on one screen. */\n.kanji-pair {\n  flex-direction: row;\n  flex-wrap: nowrap;\n  gap: 4vw;\n}\n.kanji-pair .kanji-item {\n  max-height: 68vh;\n  max-width: 44vw;\n  width: auto;\n  height: auto;\n  object-fit: contain;\n}\n\n/* Recall trial: cue, the two options, and the confidence row all share one\n   screen (as in the Qualtrics original), so each band gets a smaller slice. */\n.kanji-cue {\n  max-height: 24vh;\n  max-width: 28vw;\n  width: auto;\n  height: auto;\n  object-fit: contain;\n}\n\n.kanji-choices {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 5vw;\n  flex-wrap: nowrap;\n}\n\n.kanji-opt {\n  border: 2px solid #000;\n  border-radius: 12px;\n  background: #fff;\n  padding: 6px;\n  cursor: pointer;\n  transition: border-color .2s ease, transform .1s ease;\n  line-height: 0;\n}\n.kanji-opt img {\n  max-height: 36vh;\n  max-width: 32vw;\n  width: auto;\n  height: auto;\n  object-fit: contain;\n  border-radius: 10px;\n  display: block;\n}\n.kanji-opt:hover { border-color: #2563eb; }\n.kanji-opt:active { transform: scale(.98); }\n\n/* Select-then-confirm. First click selects (blue), second click locks it\n   (brown) and freezes the group — the same two-stage interaction and the same\n   colours as the Qualtrics original. */\n.kanji-opt.selected {\n  border: 4px solid #2563eb;\n  padding: 4px;\n}\n.kanji-opt.locked {\n  border: 4px solid #8b5e3c;\n  padding: 4px;\n  opacity: .9;\n  pointer-events: none;\n}\n.kanji-choices.is-locked .kanji-opt:not(.locked) {\n  pointer-events: none;\n  opacity: .55;\n}\n\n/* The confidence row is revealed only after the answer locks. */\n#kanjiConfidence[hidden] { display: none; }\n\n/* Confidence scale. The original fixes each tile at 100px wide, which also\n   keeps the three identical despite uneven source images (421x390, 423x390,\n   422x389 in DE; different again per language). */\n.kanji-cj {\n  gap: 30px;\n  margin-top: 2vh;\n}\n.kanji-cj .kanji-opt {\n  width: clamp(84px, 9vw, 116px);\n  flex: 0 0 auto;\n}\n.kanji-cj .kanji-opt img {\n  width: 100%;\n  max-height: none;\n  max-width: none;\n}\n\n/* Instruction / orientation screens.\n   Self-paced text pages with a Weiter button. These scroll if the content is\n   long — unlike the trial screens, there is no timing reason to force them\n   into the fold, and the original was an ordinary scrollable survey page. */\n.kanji-instr {\n  justify-content: flex-start;\n  gap: 1.5rem;\n  overflow-y: auto;\n  padding: 4vh 2vw;\n}\n.kanji-instr-body {\n  max-width: 60ch;\n  font-size: clamp(1rem, 1.5vh + .5rem, 1.35rem);\n  line-height: 1.5;\n  text-align: center;\n}\n.kanji-instr-body ul {\n  text-align: left;\n  display: inline-block;\n  margin: .5em 0;\n  padding-left: 1.4em;\n}\n\n/* The closing `<b>` is inline, so it wraps onto the last bullet\'s line. */\n.kanji-instr-body ul + b {\n  display: block;\n  margin-top: 1em;\n}\n.kanji-instr-body li { margin-bottom: .4em; }\n.kanji-instr-body p { margin: .6em 0; }\n.kanji-instr-img {\n  max-width: 100%;\n  max-height: 34vh;\n  height: auto;\n  object-fit: contain;\n  margin: .5em auto;\n  display: block;\n}\n\n/* Two images in one paragraph are a kanji/meaning pair: side by side, as the\n   learning trial shows them. */\n.kanji-instr-body p:has(img + img) {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: center;\n  gap: 2vw;\n}\n.kanji-instr-body p:has(img + img) .kanji-instr-img {\n  margin: 0;\n  max-width: 40%;\n}\n\n.kanji-next {\n  font: inherit;\n  font-size: 1.05rem;\n  padding: .6em 2.4em;\n  border: 2px solid #000;\n  border-radius: 10px;\n  background: #fff;\n  cursor: pointer;\n  transition: background-color .15s ease, transform .1s ease;\n}\n.kanji-next:hover { background: #f0f4ff; border-color: #2563eb; }\n.kanji-next:active { transform: scale(.98); }\n.kanji-next:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }\n\n.kanji-wait { color: #999; font-size: 2rem; }\n\n/* Portrait / small screens: stack the learn pair and give the options\n   width-driven sizing, since height is the scarcer axis only in landscape. */\n@media (max-width: 768px) {\n  .kanji-pair { flex-wrap: wrap; }\n  .kanji-pair .kanji-item { max-width: 80vw; max-height: 36vh; }\n  .kanji-cue { max-width: 46vw; max-height: 18vh; }\n  .kanji-opt img { max-width: 38vw; max-height: 26vh; }\n  .kanji-cj .kanji-opt { width: clamp(64px, 18vw, 96px); }\n}\n\n/* Respect a reduced-motion preference: the transforms here are decorative. */\n@media (prefers-reduced-motion: reduce) {\n  .kanji-opt, .kanji-next { transition: none; }\n  .kanji-opt:active, .kanji-next:active { transform: none; }\n}\n\n/* Hide the floating CMS box.\n   SectionPage renders `.cms-edit` on every page and only guards its contents,\n   so a participant still gets an empty bordered box pinned to the bottom of\n   the viewport holding a back-to-top arrow. On a study page that is clutter,\n   and during a timed task it overlaps the stimuli. Hidden here rather than in\n   core, which would affect every installation. Editors reach the CMS through\n   the admin area; the box is not the only route. */\n.cms-edit {\n  display: none;\n}\n\n/* The page keeps the site header and footer so a run stopped here by a finished\n   code has somewhere to go. While the experiment is on the page it is a timed\n   task sized to the viewport, so the chrome is hidden for that case only. */\nbody:has(.selfHelp-lab-js-holder) #nav-menu,\nbody:has(.selfHelp-lab-js-holder) .footer-holder {\n  /* !important because the footer carries bootstrap d-flex. */\n  display: none !important;\n}\n\n</style>';
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 SELECT @kt_style_1, get_field_id('text_md'), l.id, '0000000001',
        @task_css
