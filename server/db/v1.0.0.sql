@@ -942,38 +942,23 @@ VALUES (@pg, @done, 5), (@pg, @open, 10)
 ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
 
 
+-- The closing page is not guarded. Finished_Study is set by the survey on
+-- this page, so a guard here would hide the survey from the very run that
+-- is completing it. There is nothing left to protect at the last step, and
+-- block_updates_when still refuses a write to a row finished earlier.
 SET @pg = (SELECT id FROM `pages` WHERE `keyword` = 'kanji-adults-questions');
 SET @cmp = (SELECT id FROM `sections` WHERE `name` = 'kanji-survey-part2');
 
-INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
-    VALUES (get_style_id('conditionalContainer'), 'kanji-questions-open', NULL);
-SET @open = (SELECT id FROM `sections` WHERE `name` = 'kanji-questions-open');
-
-INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
-VALUES
-    (@open, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
-    (@open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@finished_study","1"]}]}')
-ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
-
-INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
-    VALUES (get_style_id('conditionalContainer'), 'kanji-questions-done', NULL);
-SET @done = (SELECT id FROM `sections` WHERE `name` = 'kanji-questions-done');
-
-INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
-VALUES
-    (@done, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
-    (@done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@finished_study","1"]}]}')
-ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
-
-INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
-VALUES (@done, (SELECT id FROM `sections` WHERE `name` = 'kanji-task-1-done-text'), 0);
-
-DELETE FROM `pages_sections` WHERE `id_pages` = @pg AND `id_sections` = @cmp;
-INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
-VALUES (@open, @cmp, 0);
+DELETE sh FROM `sections_hierarchy` sh
+  JOIN `sections` s ON s.id = sh.parent
+ WHERE s.name IN ('kanji-questions-open', 'kanji-questions-done');
+DELETE ps FROM `pages_sections` ps
+  JOIN `sections` s ON s.id = ps.id_sections
+ WHERE s.name IN ('kanji-questions-open', 'kanji-questions-done');
+DELETE FROM `sections` WHERE name IN ('kanji-questions-open', 'kanji-questions-done');
 
 INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
-VALUES (@pg, @done, 5), (@pg, @open, 10)
+VALUES (@pg, @cmp, 10)
 ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
 
 
