@@ -16,7 +16,7 @@ no PHP and there are no hooks.
 
 Both must be installed and migrated **before** this one runs. The versions
 matter: the study needs `url_params`, `{{name}}` templating in
-`redirect_at_end`, and `update_based_on` on both styles.
+`redirect_at_end`, `update_based_on` and `block_updates_when` on both styles.
 
 ## Install
 
@@ -49,7 +49,8 @@ stay stable and anyone mid-study is unaffected.
 | Keyword | Contents |
 |---|---|
 | `home` / `kanji-adults` | Welcome — one section, two URLs |
-| `kanji-adults-survey` | Part 1: consent, code, demographics |
+| `kanji-adults-survey` | Part 1: consent and code |
+| `kanji-adults-demographics` | Part 2: demographics |
 | `kanji-adults-task-1` | Instructions, practice, learn A |
 | `kanji-adults-pause-1` | Vignette: Französische Vokabeln |
 | `kanji-adults-task-2` | Recall A |
@@ -57,20 +58,22 @@ stay stable and anyone mid-study is unaffected.
 | `kanji-adults-task-3` | Learn B |
 | `kanji-adults-pause-3` | Vignettes: Mathematik, Aufsatz |
 | `kanji-adults-task-4` | Recall B, closing screen |
-| `kanji-adults-questions` | Device, closing code |
+| `kanji-adults-questions` | Part 3: device, closing code |
 
 The vignettes are interleaved with the memory task, as in the original: each
 fills the retention interval between learning a list and recalling it.
 
 Participants arrive from a letter without logging in, so every page grants
 access to all groups and carries an `acl_users` row for the guest user. Every
-page except the welcome page is headless, so the study runs without the site
-header and footer.
+page except the welcome page and the first task page is headless, so the study
+runs without the site header and footer. The first task page keeps the chrome
+because a finished code can stop a participant there, and a headless page would
+leave no way out; the task CSS hides it again while the experiment is running.
 
 ## How a run holds together
 
 The code is collected once, in part 1, and travels from page to page as a path
-segment: part 1 redirects to `kanji-adults-task-1/{{ID_1}}`, and every component
+segment: part 1 redirects to `kanji-adults-demographics/{{ID_1}}`, and every component
 after it has `url_params` on, so it saves the code it was opened with as
 `extra_param_code` and passes it to the next page. It is a path segment rather
 than a query parameter because only route parameters reach a style, which is
@@ -83,24 +86,34 @@ carrying that code. One participant is **one row**.
 Nothing is kept in the session, so a run survives a dropped session, a new tab,
 a different device, and a login part-way through.
 
-A resumed run writes into its existing row: a participant who stops and comes
-back replaces their earlier answers where the attempts overlap, and keeps the
-first attempt where the second did not reach.
+An unfinished run can be resumed and writes into its existing row: a participant
+who stops and comes back replaces their earlier answers where the attempts
+overlap, and keeps the first attempt where the second did not reach. Once
+`Finished_Study` is set the row is read-only and no later save can change it.
 
 ## A code is used once
 
-`kanji-adults-task-1` holds two conditional containers — one with the
-experiment, one with an "already completed" message in all four languages. Both
-read the row for the code in the URL and test `Finished_Study` from opposite
-sides.
-
 `Finished_Study` is a hidden question on the closing survey, so it is set only
-when a run reaches the end. An abandoned run leaves it unset and can be resumed;
-a completed one is refused. The check sits on the first page after the code is
-typed, so no task data has been written when it runs.
+when a run reaches the end. An abandoned run leaves it unset and can be
+resumed; a completed one is refused. Two layers enforce that.
 
-This is CMS configuration — `condition` and `data_config` on the containers —
-not code.
+**What renders.** Every page that carries the code holds two conditional
+containers — one with the component, one with an "already completed" message
+in all four languages. Both read the row for the code in the URL and test
+`Finished_Study` from opposite sides. This is CMS configuration, `condition`
+and `data_config` on the containers, not code.
+
+**What is written.** A save is a POST straight to the component's controller
+and never passes through a container, so the containers alone would not
+protect the data. Every component also sets `block_updates_when` to
+`Finished_Study`, which makes the model refuse to update a row that is
+already finished — whatever page the request came from.
+
+Part 1 has no container: it is where the code is typed, so there is no route
+parameter to filter on yet. It is deliberately short — consent and the code,
+seven questions — so a used code is caught on the very next page rather than
+after the demographics. `block_updates_when` covers part 1 itself, so a
+returning participant can open the form but cannot overwrite a finished row.
 
 ## Recorded data
 
@@ -108,7 +121,8 @@ One row per participant in `Kanji_Data`.
 
 | Column | Contents |
 |---|---|
-| `EV`, `ID_1`, `Demo_*` | Consent, code, demographics |
+| `EV`, `ID_1` | Consent and code (part 1) |
+| `Demo_*` | Demographics (part 2) |
 | `P1_*`, `P2_*`, `P3_*` | Vignette ratings from each break |
 | `Device`, `ID_2` | Device, closing code |
 | `extra_data_trials_learn_A/_B` | Learning: item shown, on-screen duration |

@@ -85,7 +85,7 @@ SET @kanji_welcome = (SELECT id FROM pages WHERE keyword = 'kanji-adults');
 UPDATE `pages` SET `is_headless` = 1
  WHERE `keyword` IN ('kanji-adults-survey', 'kanji-adults-pause-1',
                      'kanji-adults-pause-2', 'kanji-adults-pause-3',
-                     'kanji-adults-questions',
+                     'kanji-adults-questions', 'kanji-adults-demographics',
                      'kanji-adults-task-2',
                      'kanji-adults-task-3', 'kanji-adults-task-4');
 
@@ -200,7 +200,7 @@ ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 UPDATE `pages` SET `nav_position` = NULL WHERE `keyword` = 'kanji-adults';
 
 -- -----------------------------------------------------------------------
--- Page 2: part 1 questionnaire (consent, code, demographics)
+-- Page 2: part 1 questionnaire (consent and code)
 -- Renders the surveyjs survey. The survey is imported, published and bound to
 -- this section further down, so no CMS step is needed.
 -- -----------------------------------------------------------------------
@@ -236,7 +236,7 @@ SET @ks_part1 = (SELECT id FROM sections WHERE name = 'kanji-survey-part1');
 -- further down, once the import has created the surveys row it points at.
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
-    (@ks_part1, get_field_id('redirect_at_end'),   '0000000001', '0000000001', 'kanji-adults-task-1/{{ID_1}}')
+    (@ks_part1, get_field_id('redirect_at_end'),   '0000000001', '0000000001', 'kanji-adults-demographics/{{ID_1}}')
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 INSERT IGNORE INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
@@ -247,6 +247,76 @@ VALUES
 INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
 VALUES (@kanji_survey, @ks_part1, 0)
 ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
+
+-- -----------------------------------------------------------------------
+-- Page 2b: demographics
+--
+-- Split from part 1 so the used-code check runs after three questions
+-- rather than after thirty-five. It carries the code as a path segment and
+-- is guarded like every other code-bearing page.
+-- -----------------------------------------------------------------------
+
+INSERT IGNORE INTO `pages` (
+    `id`, `keyword`, `url`, `protocol`,
+    `id_actions`, `id_navigation_section`, `parent`,
+    `is_headless`, `nav_position`, `footer_position`,
+    `id_type`, `id_pageAccessTypes`
+) VALUES (
+    NULL, 'kanji-adults-demographics', '/kanji-adults-demographics/[*:code]?', 'GET|POST',
+    '0000000003', NULL, NULL,
+    '1', NULL, NULL,
+    (SELECT id FROM pageType WHERE name = 'experiment'),
+    (SELECT id FROM lookups WHERE type_code = 'pageAccessTypes' AND lookup_code = 'web')
+);
+
+SET @kanji_demo = (SELECT id FROM pages WHERE keyword = 'kanji-adults-demographics');
+
+INSERT IGNORE INTO `pages_fields_translation` (`id_pages`, `id_fields`, `id_languages`, `content`)
+VALUES
+    (@kanji_demo, get_field_id('label'), '0000000002', 'Kanji — Angaben'),
+    (@kanji_demo, get_field_id('title'), '0000000002', 'Kanji — Angaben');
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('surveyJS'), 'kanji-survey-demo', NULL);
+
+SET @ks_demo = (SELECT id FROM sections WHERE name = 'kanji-survey-demo');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@ks_demo, get_field_id('url_params'),        '0000000001', '0000000001', '1'),
+    (@ks_demo, get_field_id('update_based_on'),   '0000000001', '0000000001', 'extra_param_code'),
+    (@ks_demo, get_field_id('redirect_at_end'),   '0000000001', '0000000001', 'kanji-adults-task-1/{{extra_param_code}}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+-- Guard: same open/done pair as every other code-bearing page.
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-demo-open', NULL);
+SET @kd_open = (SELECT id FROM sections WHERE name = 'kanji-demo-open');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@kd_open, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@kd_open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-demo-done', NULL);
+SET @kd_done = (SELECT id FROM sections WHERE name = 'kanji-demo-done');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@kd_done, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@kd_done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@kd_open, @ks_demo, 0),
+       (@kd_done, (SELECT id FROM `sections` WHERE `name` = 'kanji-task-1-done-text'), 0);
+
+INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
+VALUES (@kanji_demo, @kd_done, 5), (@kanji_demo, @kd_open, 10)
+ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
+
 
 -- -----------------------------------------------------------------------
 -- Page 3: the lab.js memory task
@@ -310,14 +380,15 @@ ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
 -- -----------------------------------------------------------------------
 -- A finished code is not run twice
 --
--- This is the first page after the code is typed, so it is the earliest
--- point the code is known, and nothing of the task has been written yet.
---
--- Both containers read the same row through data_config, filtered by the
+-- Two containers read the same row through data_config, filtered by the
 -- code in the URL, and test `Finished_Study` from opposite sides. That
 -- column is set only by the closing survey, so it means the run reached
 -- the end — an abandoned run leaves it unset and can be resumed, which is
 -- what the study wants.
+--
+-- The same pair is applied to the other code-bearing pages further down.
+-- Containers only decide what renders; `block_updates_when` is what stops
+-- a write, because a save is a POST and never passes through them.
 --
 -- `current_user` is false: participants are not logged in, so the row
 -- belongs to the guest user rather than to whoever is visiting.
@@ -651,6 +722,262 @@ INSERT IGNORE INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
 VALUES (@kanji_questions, @ks_part2, 0);
 
 -- -----------------------------------------------------------------------
+-- A finished code shows the message on every page, not just task 1
+--
+-- `block_updates_when` already refuses the write, so the data is safe
+-- either way. This stops a finished code from rendering a task out of
+-- order when the URL is typed by hand.
+--
+-- Part 1 is not guarded: it is where the code is typed, so there is no
+-- route parameter to filter on yet.
+-- -----------------------------------------------------------------------
+
+SET @pg = (SELECT id FROM `pages` WHERE `keyword` = 'kanji-adults-pause-1');
+SET @cmp = (SELECT id FROM `sections` WHERE `name` = 'kanji-pause-1');
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-pause-1-open', NULL);
+SET @open = (SELECT id FROM `sections` WHERE `name` = 'kanji-pause-1-open');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@open, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-pause-1-done', NULL);
+SET @done = (SELECT id FROM `sections` WHERE `name` = 'kanji-pause-1-done');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@done, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@done, (SELECT id FROM `sections` WHERE `name` = 'kanji-task-1-done-text'), 0);
+
+DELETE FROM `pages_sections` WHERE `id_pages` = @pg AND `id_sections` = @cmp;
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@open, @cmp, 0);
+
+INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
+VALUES (@pg, @done, 5), (@pg, @open, 10)
+ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
+
+
+SET @pg = (SELECT id FROM `pages` WHERE `keyword` = 'kanji-adults-pause-2');
+SET @cmp = (SELECT id FROM `sections` WHERE `name` = 'kanji-pause-2');
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-pause-2-open', NULL);
+SET @open = (SELECT id FROM `sections` WHERE `name` = 'kanji-pause-2-open');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@open, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-pause-2-done', NULL);
+SET @done = (SELECT id FROM `sections` WHERE `name` = 'kanji-pause-2-done');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@done, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@done, (SELECT id FROM `sections` WHERE `name` = 'kanji-task-1-done-text'), 0);
+
+DELETE FROM `pages_sections` WHERE `id_pages` = @pg AND `id_sections` = @cmp;
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@open, @cmp, 0);
+
+INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
+VALUES (@pg, @done, 5), (@pg, @open, 10)
+ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
+
+
+SET @pg = (SELECT id FROM `pages` WHERE `keyword` = 'kanji-adults-pause-3');
+SET @cmp = (SELECT id FROM `sections` WHERE `name` = 'kanji-pause-3');
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-pause-3-open', NULL);
+SET @open = (SELECT id FROM `sections` WHERE `name` = 'kanji-pause-3-open');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@open, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-pause-3-done', NULL);
+SET @done = (SELECT id FROM `sections` WHERE `name` = 'kanji-pause-3-done');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@done, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@done, (SELECT id FROM `sections` WHERE `name` = 'kanji-task-1-done-text'), 0);
+
+DELETE FROM `pages_sections` WHERE `id_pages` = @pg AND `id_sections` = @cmp;
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@open, @cmp, 0);
+
+INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
+VALUES (@pg, @done, 5), (@pg, @open, 10)
+ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
+
+
+SET @pg = (SELECT id FROM `pages` WHERE `keyword` = 'kanji-adults-task-2');
+SET @cmp = (SELECT id FROM `sections` WHERE `name` = 'kanji-task-labjs-2');
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-task-2-open', NULL);
+SET @open = (SELECT id FROM `sections` WHERE `name` = 'kanji-task-2-open');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@open, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-task-2-done', NULL);
+SET @done = (SELECT id FROM `sections` WHERE `name` = 'kanji-task-2-done');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@done, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@done, (SELECT id FROM `sections` WHERE `name` = 'kanji-task-1-done-text'), 0);
+
+DELETE FROM `pages_sections` WHERE `id_pages` = @pg AND `id_sections` = @cmp;
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@open, @cmp, 0);
+
+INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
+VALUES (@pg, @done, 5), (@pg, @open, 10)
+ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
+
+
+SET @pg = (SELECT id FROM `pages` WHERE `keyword` = 'kanji-adults-task-3');
+SET @cmp = (SELECT id FROM `sections` WHERE `name` = 'kanji-task-labjs-3');
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-task-3-open', NULL);
+SET @open = (SELECT id FROM `sections` WHERE `name` = 'kanji-task-3-open');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@open, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-task-3-done', NULL);
+SET @done = (SELECT id FROM `sections` WHERE `name` = 'kanji-task-3-done');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@done, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@done, (SELECT id FROM `sections` WHERE `name` = 'kanji-task-1-done-text'), 0);
+
+DELETE FROM `pages_sections` WHERE `id_pages` = @pg AND `id_sections` = @cmp;
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@open, @cmp, 0);
+
+INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
+VALUES (@pg, @done, 5), (@pg, @open, 10)
+ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
+
+
+SET @pg = (SELECT id FROM `pages` WHERE `keyword` = 'kanji-adults-task-4');
+SET @cmp = (SELECT id FROM `sections` WHERE `name` = 'kanji-task-labjs-4');
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-task-4-open', NULL);
+SET @open = (SELECT id FROM `sections` WHERE `name` = 'kanji-task-4-open');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@open, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-task-4-done', NULL);
+SET @done = (SELECT id FROM `sections` WHERE `name` = 'kanji-task-4-done');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@done, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@done, (SELECT id FROM `sections` WHERE `name` = 'kanji-task-1-done-text'), 0);
+
+DELETE FROM `pages_sections` WHERE `id_pages` = @pg AND `id_sections` = @cmp;
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@open, @cmp, 0);
+
+INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
+VALUES (@pg, @done, 5), (@pg, @open, 10)
+ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
+
+
+SET @pg = (SELECT id FROM `pages` WHERE `keyword` = 'kanji-adults-questions');
+SET @cmp = (SELECT id FROM `sections` WHERE `name` = 'kanji-survey-part2');
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-questions-open', NULL);
+SET @open = (SELECT id FROM `sections` WHERE `name` = 'kanji-questions-open');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@open, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('conditionalContainer'), 'kanji-questions-done', NULL);
+SET @done = (SELECT id FROM `sections` WHERE `name` = 'kanji-questions-done');
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@done, get_field_id('data_config'), '0000000001', '0000000001', '[{"type": "EXTERNAL", "table": "Kanji_Data", "retrieve": "first", "current_user": false, "filter": "AND extra_param_code = ''#code''", "fields": [{"field_name": "Finished_Study", "field_holder": "@finished_study", "not_found_text": "0"}]}]'),
+    (@done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@finished_study","1"]}]}')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@done, (SELECT id FROM `sections` WHERE `name` = 'kanji-task-1-done-text'), 0);
+
+DELETE FROM `pages_sections` WHERE `id_pages` = @pg AND `id_sections` = @cmp;
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+VALUES (@open, @cmp, 0);
+
+INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
+VALUES (@pg, @done, 5), (@pg, @open, 10)
+ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
+
+
+-- -----------------------------------------------------------------------
 -- Carry the code from page to page
 --
 -- Every component after part 1 reads the route parameters of the page it was
@@ -706,6 +1033,24 @@ ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 
 -- -----------------------------------------------------------------------
+-- A finished code is read-only
+--
+-- The containers on task 1 hide the experiment, but a save is a POST and
+-- never passes through them, so a resubmission under a finished code would
+-- still overwrite the row. `block_updates_when` refuses the write itself,
+-- whatever page it came from.
+-- -----------------------------------------------------------------------
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+SELECT s.id, get_field_id('block_updates_when'), '0000000001', '0000000001', 'Finished_Study'
+  FROM `sections` s
+  JOIN `styles` st ON st.id = s.id_styles
+ WHERE st.name IN ('surveyJS', 'labJS')
+   AND s.name LIKE 'kanji-%'
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+
+-- -----------------------------------------------------------------------
 -- The code travels as a path segment
 --
 -- A page keeps its url once created, so INSERT IGNORE above cannot add the
@@ -743,7 +1088,8 @@ INSERT IGNORE INTO `acl_groups` (`id_groups`, `id_pages`, `acl_select`, `acl_ins
                         'kanji-adults-task-1', 'kanji-adults-task-2',
                         'kanji-adults-task-3', 'kanji-adults-task-4',
                         'kanji-adults-pause-1', 'kanji-adults-pause-2',
-                        'kanji-adults-pause-3', 'kanji-adults-questions');
+                        'kanji-adults-pause-3', 'kanji-adults-questions',
+                        'kanji-adults-demographics');
 
 -- Guest access. Participants arrive from a letter without logging in, and the
 -- guest user (id 1) belongs to no group — core checks ACL against the session
@@ -757,7 +1103,8 @@ INSERT IGNORE INTO `acl_users` (`id_users`, `id_pages`, `acl_select`, `acl_inser
                         'kanji-adults-task-1', 'kanji-adults-task-2',
                         'kanji-adults-task-3', 'kanji-adults-task-4',
                         'kanji-adults-pause-1', 'kanji-adults-pause-2',
-                        'kanji-adults-pause-3', 'kanji-adults-questions');
+                        'kanji-adults-pause-3', 'kanji-adults-questions',
+                        'kanji-adults-demographics');
 
 
 -- -----------------------------------------------------------------------
@@ -767,8 +1114,8 @@ INSERT IGNORE INTO `acl_users` (`id_users`, `id_pages`, `acl_select`, `acl_inser
 -- from config.title.default.
 -- -----------------------------------------------------------------------
 
-SET @part1_json = '{"title":{"default":"Kanji – Teil 1: Einverständnis und Angaben","en":"Kanji – Part 1: Consent and Demographics","fr":"Kanji – Partie 1: consentement et données","it":"Kanji – Parte 1: consenso e dati"},"locale":"de","showQuestionNumbers":"off","showProgressBar":"top","progressBarType":"pages","pages":[{"name":"consent","elements":[{"type":"html","name":"Logo","html":"<div style=\\"text-align:left;\\"><img style=\\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/Logo_Universitaet_Bern.png\\" alt=\\"Universität Bern\\"></div>"},{"type":"html","name":"A1","html":{"default":"<p><strong>Liebe Eltern/ Liebe Erziehungsberechtigte</strong></p>\\n<p>Wir freuen uns, Ihnen im Rahmen unserer aktuellen Forschung eine Lernaufgabe vorlegen zu dürfen. Ihr Kind hat in der Schule bereits eine ähnliche Aufgabe lösen dürfen.</p>\\n<p>Das Lösen der Aufgabe und die Beantwortung der Fragen ist freiwillig und dauert etwa 30 Minuten.</p>\\n<p>Ihre Antworten sind pseudonymisiert, das bedeutet, Ihnen wird ein persönlicher Code zugewiesen. Dadurch wissen wir nicht, welche Daten zu welcher Familie gehören. Die erhobenen Daten werden nur für die Forschung genutzt und nicht an andere weitergegeben.</p>\\n<p>Ihre Teilnahme ist von grosser Bedeutung von uns!</p>\\n<p>Vielen Dank<br>Herzliche Grüsse,</p>\\n<p>Das Team der Abteilung Entwicklungspsychologie der Universität Bern</p>","en":"<p><strong>Dear Parents/Guardians</strong></p>\\n<p>We are pleased to present you with a learning task as part of our current research. Your child has already completed similar tasks at school.</p>\\n<p>Completing the task and answering the questions is voluntary and takes about 30 minutes.<br>Your answers are pseudonymized, which means that you will be assigned a personal code. This means that we do not know which data belongs to which family. The data collected will only be used for research purposes and will not be passed on to others.</p>\\n<p>Your participation is very important to us – Thank you very much!</p>\\n<p>Kind regards,</p>\\n<p>The Developmental Psychology Department team at the University of Bern</p>","fr":"<p><strong>Chers parents / Chers titulaires de l’autorité parentale</strong></p>\\n<p>Nous sommes heureux de pouvoir vous présenter, dans le cadre de notre recherche actuelle, une tâche d’apprentissage. Votre enfant a déjà effectué des tâches similaires à l’école.</p>\\n<p>La réalisation de l’activité et la réponse aux questions sont facultatives et prennent environ 30 minutes.<br>Vos réponses sont pseudonymisées, ce qui signifie qu’un code personnel vous sera attribué. Ainsi, nous ne savons pas quelles données appartiennent à quelle famille. Les données recueillies seront utilisées uniquement à des fins de recherche et ne seront pas transmises à des tiers.</p>\\n<p>Votre participation est très importante- Merci beaucoup!</p>\\n<p>Avec nos salutations les meilleures,</p>\\n<p>L’équipe du Département de psychologie du développement de l’Université de Berne</p>","it":"<p><strong>Cari genitori / cari tutori legali,</strong></p>\\n<p>Siamo lieti di potervi presentare un compito di apprendimento nell’ambito della nostra attuale ricerca.</p>\\n<p>Lo svolgimento dell’attività e la risposta alle domande sono volontari e richiedono circa 30 minuti.</p>\\n<p>Le Sue risposte sono pseudonimizzate, ciò significa che Le verrà assegnato un codice personale. In questo modo, non sappiamo quali dati appartengano a quale famiglia. I dati raccolti saranno utilizzati esclusivamente per la ricerca e non saranno trasmessi ad altri.</p>\\n<p>La vostra partecipazione è di grande importanza per noi – grazie di cuore!</p>\\n<p>Cordiali saluti,<br>Il team del dipartimento di psicologia dello sviluppo dell’università di Berna</p>"}},{"type":"radiogroup","name":"EV","title":{"default":"Sind Sie mit der Teilnahme an der Aufgabe einverstanden?","en":"Do you consent to participating in the learning task?","fr":"Acceptez-vous de participer à l\'exercice d\'apprentissage?","it":"Acconsente alla partecipazione al compito di apprendimento?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Ja","en":"Yes","fr":"Oui","it":"Si"}},{"value":"2","text":{"default":"Nein","en":"No","fr":"Non","it":"No"}}]}]},{"name":"consent_declined","visibleIf":"{EV} = \'2\'","elements":[{"type":"html","name":"declined_msg","html":{"default":"<p>Vielen Dank. Ohne Ihr Einverständnis können wir die Aufgabe nicht durchführen. Sie können das Fenster nun schliessen.</p>","en":"<p>Thank you. Without your consent we cannot proceed with the task. You may now close this window.</p>","fr":"<p>Merci. Sans votre consentement, nous ne pouvons pas poursuivre. Vous pouvez fermer cette fenêtre.</p>","it":"<p>Grazie. Senza il suo consenso non possiamo procedere. Può chiudere questa finestra.</p>"}}]},{"name":"code","visibleIf":"{EV} = \'1\'","elements":[{"type":"text","name":"ID_1","title":{"default":"Um Ihre Antworten anonym Ihrem Kind zuordnen zu können, haben Sie einen Code auf dem Brief erhalten. Bitte geben Sie diesen Code jetzt in das Textfeld ein:<div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>","en":"In order to assign your answers anonymously to your child, you have received a code on the letter. Please enter this code in the text field now:<div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>","fr":"  Pour pouvoir attribuer vos réponses de façon anonyme à votre enfant, vous avez reçu un code dans la lettre. Veuillez entrer ce code maintenant dans le champ de texte:<div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>","it":"Per poter attribuire le vostre risposte in modo anonimo a vostro figlio, avete ricevuto un codice sulla lettera. Inserite ora questo codice nel campo di testo:<div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>"},"isRequired":true,"validators":[{"type":"textvalidator","minLength":3,"text":{"default":"Bitte geben Sie den Code vom Brief ein.","en":"Please enter the code from the letter.","fr":"Veuillez saisir le code figurant sur la lettre.","it":"Inserisca il codice riportato nella lettera."}}]},{"type":"text","name":"extra_param_code","title":"extra_param_code","visible":false,"defaultValueExpression":"{ID_1}","clearIfInvisible":"none"},{"type":"html","name":"A2","html":{"default":"<p>Machen Sie die Aufgabe an einem <strong>ruhigen</strong> Ort.</p>\\n<p>So werden Sie nicht gestört.</p>","en":"<p>Complete the task in a <strong>quiet</strong> place.</p>\\n<p>That way, you won\'t be disturbed.</p>","fr":"<p>Faites la tâche dans un endroit <strong>calme</strong>.<br>Ainsi, vous ne serez pas dérangé(e).</p>","it":"<p>Svolga il compito in un luogo <strong>tranquillo</strong>.<br>In questo modo non verrà disturbato/a.</p>"}}]},{"name":"demographics","visibleIf":"{EV} = \'1\'","elements":[{"type":"html","name":"Demo_1","html":{"default":"<p><strong><br></strong></p>\\n<p><strong>Zu Beginn bitten wir Sie noch um ein paar Angaben zu Ihrer Familie.</strong></p>","en":"<p><strong>To begin with, we would like to ask you for some information about your family.</strong></p>","fr":"<p><strong>Au début, nous vous demandons quelques informations sur votre famille.</strong></p>","it":"<p><strong>Per cominciare, vi chiediamo alcune informazioni sulla vostra famiglia.</strong></p>"}},{"type":"radiogroup","name":"Demo_2","title":{"default":"In welchem Verhältnis stehen Sie zum Kind?","en":"What is your relationship to the child?","fr":"Quelle est votre relation avec l’enfant?","it":"Qual è la sua relazione con il bambino?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Mutter","en":"Mother","fr":"Mère","it":"Madre"}},{"value":"2","text":{"default":"Vater","en":"Father","fr":"Père","it":"Padre"}},{"value":"3","text":{"default":"Anderes:","en":"Other:","fr":"Autre:","it":"Altro:"}}]},{"type":"text","name":"Demo_2_other","startWithNewLine":false,"title":{"default":"Anderes","en":"Other","fr":"Autre","it":"Altro"},"visibleIf":"{Demo_2} = \'3\'","isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]},{"type":"text","name":"Demo_25","title":{"default":"In welchem Jahr sind Sie geboren?","en":"What year were you born in?","fr":"En quelle année êtes-vous né(e)?","it":"In che anno siete nati?"},"isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(19[3-9][0-9]|200[0-8])$","text":{"default":"Bitte geben Sie ein Jahr zwischen 1930 und 2008 ein (vierstellig).","en":"Please enter a year between 1930 and 2008 (four digits).","fr":"Veuillez saisir une année entre 1930 et 2008 (quatre chiffres).","it":"Inserisca un anno compreso tra il 1930 e il 2008 (quattro cifre)."}}],"inputMode":"numeric","maxLength":4},{"type":"radiogroup","name":"Demo_3","title":{"default":"Wie viele Personen leben in Ihrem Haushalt (mit Ihnen)?","en":"How many people live in your household (including yourself)?","fr":"Combien de personnes vivent dans votre ménage (avec vous)?","it":"Quante persone vivono nella sua famiglia (insieme a lei)?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"1","en":"1","fr":"1","it":"1"}},{"value":"2","text":{"default":"2","en":"2","fr":"2","it":"2"}},{"value":"3","text":{"default":"3","en":"3","fr":"3","it":"3"}},{"value":"4","text":{"default":"4","en":"4","fr":"4","it":"4"}},{"value":"5","text":{"default":"5","en":"5","fr":"5","it":"5"}},{"value":"6","text":{"default":"6","en":"6","fr":"6","it":"6"}},{"value":"8","text":{"default":"mehr als 6 Personen (bitte Anzahl Personen eingeben):","en":"more than 6 people (please specify):","fr":"Plus de 6 personnes (veuillez indiquer le nombre de personnes) :","it":"più di 6 persone (per favore indichi il numero di persone):"}}]},{"type":"text","name":"Demo_3_other","startWithNewLine":false,"title":{"default":"Anzahl Personen","en":"Number of people","fr":"Nombre de personnes","it":"Numero di persone"},"visibleIf":"{Demo_3} = \'8\'","isRequired":true,"validators":[{"type":"regexvalidator","regex":"^([7-9]|[1-9][0-9])$","text":{"default":"Bitte geben Sie eine Zahl ab 7 ein.","en":"Please enter a number of 7 or more.","fr":"Veuillez saisir un nombre égal ou supérieur à 7.","it":"Inserisca un numero uguale o superiore a 7."}}],"inputMode":"numeric"},{"type":"checkbox","name":"Demo_4","title":{"default":"Welche Sprache(n) sprechen Sie zuhause mit Ihrem Kind? (Mehrere Antworten möglich)","en":"Which language(s) do you speak with your child at home? (Multiple answers possible)","fr":"Quelle(s) langue(s) parlez-vous à la maison avec votre enfant? (Plusieurs réponses possibles)","it":"Quale lingua o quali lingue parlata a casa con vostro figlio? (Sono possibili più risposte)"},"isRequired":true,"choices":[{"value":"37","text":{"default":"Schweizerdeutsch","en":"Swiss German","fr":"Suisse allemand","it":"Svizzero Tedesco"}},{"value":"1","text":{"default":"Deutsch","en":"German","fr":"Allemand","it":"Tedesco"}},{"value":"16","text":{"default":"Albanisch","en":"Albanian","fr":"Albanais","it":"Albanese"}},{"value":"19","text":{"default":"Arabisch","en":"Arabic","fr":"Arabe","it":"Arabo"}},{"value":"20","text":{"default":"Englisch","en":"English","fr":"Anglais","it":"Inglese"}},{"value":"26","text":{"default":"Finnisch","en":"Finnish","fr":"Finnois","it":"Finlandese"}},{"value":"2","text":{"default":"Französisch","en":"French","fr":"Français","it":"Francese"}},{"value":"3","text":{"default":"Italienisch","en":"Italian","fr":"Italien","it":"Italiano"}},{"value":"28","text":{"default":"Kroatisch","en":"Croatian","fr":"Croate","it":"Croato"}},{"value":"18","text":{"default":"Kurdisch","en":"Kurdish","fr":"Kurde","it":"Curdo"}},{"value":"21","text":{"default":"Mazedonisch","en":"Macedonian","fr":"Macédonien","it":"Macedone"}},{"value":"27","text":{"default":"Niederländisch","en":"Dutch","fr":"Néerlandais","it":"Olandese"}},{"value":"33","text":{"default":"Norwegisch","en":"Norwegian","fr":"Norvégien","it":"Norvegese"}},{"value":"24","text":{"default":"Persisch","en":"Persian","fr":"Persan","it":"Persiano"}},{"value":"29","text":{"default":"Portugiesisch","en":"Portuguese","fr":"Portugais","it":"Portoghese"}},{"value":"4","text":{"default":"Romanisch","en":"Romansh","fr":"Romanche","it":"Romancio"}},{"value":"22","text":{"default":"Russisch","en":"Russian","fr":"Russe","it":"Russo"}},{"value":"32","text":{"default":"Schwedisch","en":"Swedish","fr":"Suédois","it":"Svedese"}},{"value":"31","text":{"default":"Serbisch","en":"Serbian","fr":"Serbe","it":"Serbo"}},{"value":"30","text":{"default":"Spanisch","en":"Spanish","fr":"Espagnol","it":"Spagnolo"}},{"value":"36","text":{"default":"Tamil","en":"Tamil","fr":"Tamoul","it":"Tamil"}},{"value":"34","text":{"default":"Thailändisch","en":"Thai","fr":"Thaïlandais","it":"Thailandese"}},{"value":"35","text":{"default":"Tigrinya","en":"Tigrinya","fr":"Tigrinya","it":"Tigrino"}},{"value":"17","text":{"default":"Türkisch","en":"Turkish","fr":"Turc","it":"Turco"}},{"value":"25","text":{"default":"Ungarisch","en":"Hungarian","fr":"Hongrois","it":"Ungherese"}},{"value":"23","text":{"default":"Ukrainisch","en":"Ukrainian","fr":"Ukrainien","it":"Ucraino"}},{"value":"5","text":{"default":"Andere, und zwar (bitte das folgende Textfeld ausfüllen):","en":"Other (please specify):","fr":"Autre, à savoir (veuillez remplir le champ de texte suivant) :","it":"Altro, cioè (per favore compili il campo seguente):"}}]},{"type":"text","name":"Demo_4_other","startWithNewLine":false,"title":{"default":"Andere Sprache","en":"Other language","fr":"Autre langue","it":"Altra lingua"},"visibleIf":"{Demo_4} contains \'5\'","isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]},{"type":"radiogroup","name":"Demo_5","title":{"default":"Leben in Ihrem Haushalt noch andere Kinder (0-17 Jahre alt), z.B. Adoptiv-, Halb-, Stiefgeschwister, Pflegekinder?","en":"Are there other children (aged 0-17) living in your household, e.g. adopted children, half-siblings, step-siblings, foster children?","fr":"D’autres enfants (0–17 ans) vivent-ils dans votre ménage, p. ex. enfants adoptifs, demi-frères et sœurs, beaux-frères et sœurs, enfants placés?","it":"Nel suo nucleo familiare vivono anche altri bambini (0-17 anni), ad es. fratelli adottivi, fratellastri, fratelli acquisiti o bambini in affido?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Ja","en":"Yes","fr":"Oui","it":"Si"}},{"value":"2","text":{"default":"Nein","en":"No","fr":"Non","it":"No"}}]},{"type":"radiogroup","name":"Demo_6","title":{"default":"Wie viele andere Kinder leben in Ihrem Haushalt?","en":"How many other children live in your household?","fr":"Combien d’autres enfants vivent dans votre ménage?","it":"Quanti altri bambini vivono nel suo nucleo familiare?"},"isRequired":true,"visibleIf":"{Demo_5} = \'1\'","choices":[{"value":"1","text":{"default":"1","en":"1","fr":"1","it":"1"}},{"value":"2","text":{"default":"2","en":"2","fr":"2","it":"2"}},{"value":"9","text":{"default":"3","en":"3","fr":"3","it":"3"}},{"value":"10","text":{"default":"4","en":"4","fr":"4","it":"4"}},{"value":"11","text":{"default":"5","en":"5","fr":"5","it":"5"}},{"value":"12","text":{"default":"6","en":"6","fr":"6","it":"6"}},{"value":"13","text":{"default":"mehr als 6 Kinder (bitte Anzahl Kinder eingeben):","en":"more than 6 (please specify):","fr":"Plus de 6 enfants (veuillez indiquer le nombre d\'enfants):","it":"più di 6 bambini (per favore indichi il numero di bambini):"}}]},{"type":"text","name":"Demo_6_count","title":"Demo_6_count","visible":false,"defaultValueExpression":"iif({Demo_6} = \'1\', 1, iif({Demo_6} = \'2\', 2, iif({Demo_6} = \'9\', 3, iif({Demo_6} = \'10\', 4, iif({Demo_6} = \'11\', 5, iif({Demo_6} = \'12\', 6, 0))))))"},{"type":"paneldynamic","name":"Demo_children","title":{"default":"Geben Sie den Jahrgang und das Geschlecht der anderen im Haushalt lebenden Kindern an.","en":"What is the year of birth and gender of the other child?  ","fr":"Veuillez indiquer l’année de naissance et le sexe des autres enfants vivant dans votre ménage.","it":"Indichi l’anno di nascita e il sesso degli altri bambini che vivono nel suo nucleo familiare."},"visibleIf":"{Demo_5} = \'1\' and {Demo_6} notempty and {Demo_6} <> \'13\'","allowAddPanel":false,"allowRemovePanel":false,"templateTitle":{"default":"Kind {panelIndex}","en":"Child {panelIndex}","fr":"Enfant {panelIndex}","it":"Bambino {panelIndex}"},"templateElements":[{"type":"dropdown","name":"jahrgang","isRequired":true,"title":{"default":"Jahrgang","en":"Year of birth","fr":"Année de naissance","it":"Anno di nascita"},"choices":["2026","2025","2024","2023","2022","2021","2020","2019","2018","2017","2016","2015","2014","2013","2012","2011","2010","2009"]},{"type":"radiogroup","name":"geschlecht","isRequired":true,"colCount":0,"startWithNewLine":false,"title":{"default":"Geschlecht","en":"Sex","fr":"Sexe","it":"Sesso"},"choices":[{"value":"w","text":{"default":"weiblich","en":"female","fr":"féminin","it":"femminile"}},{"value":"m","text":{"default":"männlich","en":"male","fr":"masculin","it":"maschile"}},{"value":"d","text":{"default":"divers","en":"diverse","fr":"divers","it":"diverso"}},{"value":"a","text":{"default":"anders","en":"other","fr":"autre","it":"altro"}}]}],"bindings":{"panelCount":"Demo_6_count"}},{"type":"comment","name":"Demo_13","title":{"default":"Bitte geben Sie den Jahrgang und das Geschlecht der weiteren Kinder an. Nennen Sie das Geburtsjahr und das Geschlecht pro Kind, getrennt durch ein Komma, z. B. 2024 weiblich, 2022 männlich, 2020 divers, 2018 anders, ... .","en":"What are the birth years and genders of the other children? List the birth year and gender for each child, separated by a comma, e.g. 2024 female, 2022 male, 2020 diverse, 2018 other, ... .","fr":"Veuillez indiquer l’année de naissance et le sexe des autres enfants. Indiquez l’année de naissance et le sexe pour chaque enfant, séparés par une virgule, par exemple : 2024 féminin, 2022 masculin, 2020 divers, 2018 autre, …","it":"Per favore indichi l’anno di nascita e il sesso degli altri bambini. Scriva l’anno di nascita e il sesso per ogni bambino, separati da una virgola, ad esempio: 2024 femminile, 2022 maschile, 2020 diverso, 2018 altro, …"},"visibleIf":"{Demo_6} = \'13\'","isRequired":true},{"type":"radiogroup","name":"Demo_14","title":{"default":"Was ist Ihr höchster Ausbildungsabschluss (mit Zeugnis, Fähigkeitsausweis oder Diplom)?","en":"What is your highest educational qualification (with certificate, proficiency certificate or diploma)?","fr":"Quel est votre plus haut diplôme de formation (avec certificat, attestation de compétences ou diplôme)?","it":"Qual è il suo più alto titolo di studio (con attestato, certificato di competenza o diploma)?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Keine abgeschlossene Ausbildung (z.B. keine formale schulische oder berufliche Ausbildung abgeschlossen)","en":"No completed vocational training","fr":"Pas de formation professionnelle achevée","it":"Nessuna formazione professionale completata"}},{"value":"2","text":{"default":"Unternehmensinterne Ausbildung","en":"In-house training","fr":"Formation en entreprise","it":"Formazione interna all\'azienda"}},{"value":"3","text":{"default":"Abgeschlossene Berufsausbildung","en":"Completed vocational training","fr":"Formation professionnelle achevée","it":"Formazione professionale completata"}},{"value":"4","text":{"default":"Matura","en":"Matura","fr":"Maturité","it":"Maturità"}},{"value":"5","text":{"default":"Lehrdiplom","en":"Teaching Certificate","fr":"Diplôme d\'enseignement","it":"Diploma di insegnamento"}},{"value":"6","text":{"default":"Höhere Berufsausbildung, Fachschule","en":"Higher vocational education, technical college","fr":"Formation professionnelle supérieure, école spécialisée","it":"Formazione professionale superiore, scuola professionale"}},{"value":"7","text":{"default":"Fachhochschule (FH), Pädagogische Hochschule (PH)","en":"University of applied sciences (FH), teacher training college (PH)","fr":"Haute école spécialisée (HES), haute école pédagogique (PH)","it":"Scuola universitaria professionale (SUP), scuola universitaria di pedagogiga (SUP)"}},{"value":"8","text":{"default":"Universitäre Hochschule (Uni, ETH)","en":"University (UNI, ETH)","fr":"Université (Uni, ETH)","it":"Università (Uni, ETH)"}}]},{"type":"radiogroup","name":"Demo_15","title":{"default":"Wie viel arbeiten Sie durchschnittlich pro Woche?","en":"How much do you work on average per week?","fr":"Combien d’heures travaillez-vous en moyenne par semaine?","it":"Quante ore lavora in media alla settimana?"},"isRequired":true,"colCount":0,"choices":[{"value":"7","text":{"default":"0%","en":"0%","fr":"0%","it":"0%"}},{"value":"1","text":{"default":"bis 20%","en":"up to 20%","fr":"jusqu’à 20 %","it":"Fino al 20%"}},{"value":"2","text":{"default":"21-40%","en":"21-40%","fr":"21-40%","it":"21-40%"}},{"value":"3","text":{"default":"41-60%","en":"41-60%","fr":"41-60%","it":"41-60%"}},{"value":"4","text":{"default":"61-80%","en":"61-80%","fr":"61-80%","it":"61-80%"}},{"value":"5","text":{"default":"81-100%","en":"81-100%","fr":"81-100%","it":"81-100%"}}]},{"type":"text","name":"Demo_16","title":{"default":"Welchen Beruf haben Sie?","en":"What is your current occupation?","fr":"Quelle est votre profession?","it":"Qual è la sua professione?"},"isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]},{"type":"checkbox","name":"Demo_17","title":{"default":"Welche Sprache(n) sprechen Sie? (Mehrere Antworten möglich)","en":"Which language(s) do you speak? (Multiple answers possible)","fr":"Quelle(s) langue(s) parlez-vous? (Plusieurs réponses possibles)","it":"Quale/i lingua/e parla? (Sono possibili più risposte)"},"isRequired":true,"choices":[{"value":"37","text":{"default":"Schweizerdeutsch","en":"Swiss German","fr":"Suisse allemand","it":"Svizzero Tedesco"}},{"value":"1","text":{"default":"Deutsch","en":"German","fr":"Allemand","it":"Tedesco"}},{"value":"16","text":{"default":"Albanisch","en":"Albanian","fr":"Albanais","it":"Albanese"}},{"value":"19","text":{"default":"Arabisch","en":"Arabic","fr":"Arabe","it":"Arabo"}},{"value":"20","text":{"default":"Englisch","en":"English","fr":"Anglais","it":"Inglese"}},{"value":"26","text":{"default":"Finnisch","en":"Finnish","fr":"Finnois","it":"Finlandese"}},{"value":"2","text":{"default":"Französisch","en":"French","fr":"Français","it":"Francese"}},{"value":"3","text":{"default":"Italienisch","en":"Italian","fr":"Italien","it":"Italiano"}},{"value":"28","text":{"default":"Kroatisch","en":"Croatian","fr":"Croate","it":"Croato"}},{"value":"18","text":{"default":"Kurdisch","en":"Kurdish","fr":"Kurde","it":"Curdo"}},{"value":"21","text":{"default":"Mazedonisch","en":"Macedonian","fr":"Macédonien","it":"Macedone"}},{"value":"27","text":{"default":"Niederländisch","en":"Dutch","fr":"Néerlandais","it":"Olandese"}},{"value":"33","text":{"default":"Norwegisch","en":"Norwegian","fr":"Norvégien","it":"Norvegese"}},{"value":"24","text":{"default":"Persisch","en":"Persian","fr":"Persan","it":"Persiano"}},{"value":"29","text":{"default":"Portugiesisch","en":"Portuguese","fr":"Portugais","it":"Portoghese"}},{"value":"4","text":{"default":"Romanisch","en":"Romansh","fr":"Romanche","it":"Romancio"}},{"value":"22","text":{"default":"Russisch","en":"Russian","fr":"Russe","it":"Russo"}},{"value":"32","text":{"default":"Schwedisch","en":"Swedish","fr":"Suédois","it":"Svedese"}},{"value":"31","text":{"default":"Serbisch","en":"Serbian","fr":"Serbe","it":"Serbo"}},{"value":"30","text":{"default":"Spanisch","en":"Spanish","fr":"Espagnol","it":"Spagnolo"}},{"value":"36","text":{"default":"Tamil","en":"Tamil","fr":"Tamoul","it":"Tamil"}},{"value":"34","text":{"default":"Thailändisch","en":"Thai","fr":"Thaïlandais","it":"Thailandese"}},{"value":"35","text":{"default":"Tigrinya","en":"Tigrinya","fr":"Tigrinya","it":"Tigrino"}},{"value":"17","text":{"default":"Türkisch","en":"Turkish","fr":"Turc","it":"Turco"}},{"value":"25","text":{"default":"Ungarisch","en":"Hungarian","fr":"Hongrois","it":"Ungherese"}},{"value":"23","text":{"default":"Ukrainisch","en":"Ukrainian","fr":"Ukrainien","it":"Ucraino"}},{"value":"5","text":{"default":"Andere, und zwar (bitte das folgende Textfeld ausfüllen):","en":"Other (please specify):","fr":"Autre, à savoir (veuillez remplir le champ de texte suivant) :","it":"Altro, cioè (per favore compili il campo seguente):"}}]},{"type":"text","name":"Demo_17_other","startWithNewLine":false,"title":{"default":"Andere Sprache","en":"Other language","fr":"Autre langue","it":"Altra lingua"},"visibleIf":"{Demo_17} contains \'5\'","isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]}]},{"name":"second_parent","visibleIf":"{EV} = \'1\'","elements":[{"type":"html","name":"Demo_18","html":{"default":"<p><strong>Wir bitten Sie nun um Informationen zum zweiten Elternteil/Erziehungsberechtigten.</strong></p>","en":"<p><strong>We now ask you for information about the second parent or legal guardian.</strong></p>","fr":"<p><strong>Nous vous demandons maintenant quelques informations sur le deuxième parent ou le tuteur légal.</strong></p>","it":"<p><strong><br></strong></p>\\n<p><strong>Ora le chiediamo alcune informazioni sul secondo genitore o tutore legale del bambino.</strong></p>\\n<p><strong><br></strong></p>"}},{"type":"radiogroup","name":"Demo_19","title":{"default":"Können Sie Angaben zum zweiten Elternteil/Erziehungsberechtigten des Kindes machen? ","en":"Can you provide information about the child\'s second parent/legal guardian?","fr":"Pouvez-vous donner des informations sur le deuxième parent ou le tuteur légal de l’enfant ?","it":"Può fornire informazioni sul secondo genitore o tutore legale del bambino?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Ja","en":"Yes ","fr":"Oui","it":"Si"}},{"value":"4","text":{"default":"Nein","en":"No","fr":"Non","it":"No"}}]}]},{"name":"second_parent_details","visibleIf":"{EV} = \'1\' and {Demo_19} = \'1\'","elements":[{"type":"radiogroup","name":"Demo_20","title":{"default":"Was ist das Verhältnis zum Kind? (Vom zweiten Elternteil/Erziehungsberechtigen)","en":"What is the relationship with the child?","fr":"Quelle est la relation avec l\'enfant?","it":"Qual è il suo rapporto con il bambino?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Mutter","en":"Mother","fr":"Mère","it":"Madre"}},{"value":"2","text":{"default":"Vater","en":"Father","fr":"Père","it":"Padre"}},{"value":"3","text":{"default":"Anderes:","en":"Other:","fr":"Autre:","it":"Altro:"}}]},{"type":"text","name":"Demo_20_other","startWithNewLine":false,"title":{"default":"Anderes","en":"Other","fr":"Autre","it":"Altro"},"visibleIf":"{Demo_20} = \'3\'","isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]},{"type":"text","name":"Demo_26","title":{"default":"In welchem Jahr wurde das zweite Elternteil/Erziehungsberechtiger geboren?","en":"In what year was the other parent born?","fr":"En quelle année le deuxième parent est-il né ?","it":"In che anno è nato il secondo genitore?"},"isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(19[3-9][0-9]|200[0-8])$","text":{"default":"Bitte geben Sie ein Jahr zwischen 1930 und 2008 ein (vierstellig).","en":"Please enter a year between 1930 and 2008 (four digits).","fr":"Veuillez saisir une année entre 1930 et 2008 (quatre chiffres).","it":"Inserisca un anno compreso tra il 1930 e il 2008 (quattro cifre)."}}],"inputMode":"numeric","maxLength":4},{"type":"radiogroup","name":"Demo_21","title":{"default":"Was ist der höchste Ausbildungabschluss des zweiten Elternteils/Erziehungsberechtigtens (mit Zeugnis, Fähigkeitsausweis oder Diplom)?","en":"What is the highest educational qualification of the second parent (with certificate, certificate of proficiency or diploma)?","fr":"Quel est le plus haut diplôme de formation du deuxième parent (avec certificat, attestation de compétences ou diplôme)?","it":"Qual è il più alto titolo di studio del secondo genitore (con attestato, certificato di competenza o diploma)?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Keine abgeschlossene Ausbildung (z.B. keine formale schulische oder berufliche Ausbildung abgeschlossen)","en":"No completed vocational training","fr":"Pas de formation professionnelle achevée","it":"Nessuna formazione professionale completata"}},{"value":"2","text":{"default":"Unternehmensinterne Ausbildung","en":"In-house training","fr":"Formation en entreprise","it":"Formazione interna all\'azienda"}},{"value":"3","text":{"default":"Abgeschlossene Berufsausbildung","en":"Completed vocational training","fr":"Formation professionnelle achevée","it":"Formazione professionale completata"}},{"value":"4","text":{"default":"Matura","en":"Matura","fr":"Maturité","it":"Maturità"}},{"value":"5","text":{"default":"Lehrdiplom","en":"Teaching Certificate","fr":"Diplôme d\'enseignement","it":"Diploma di insegnamento"}},{"value":"6","text":{"default":"Höhere Berufsausbildung, Fachschule","en":"High vocational education, technical college","fr":"Formation professionnelle supérieure, école spécialisée","it":"Formazione professionale superiore, scuola professionale "}},{"value":"7","text":{"default":"Fachhochschule (FH), Pädagogische Hochschule (PH)","en":"University of applied sciences (FH), teacher training college (PH)","fr":"Haute école spécialisée (HES), haute école pédagogique (PH)","it":"Scuola universitaria professionale (SUP), scuola universitaria di pedagogiga (SUP)"}},{"value":"8","text":{"default":"Universitäre Hochschule (Uni, ETH)","en":"University (Uni, ETH)","fr":"Univeristé (Uni, ETH)","it":"Università (Uni, ETH)"}}]},{"type":"radiogroup","name":"Demo_22","title":{"default":"Wie viel arbeitet das zweite Elternteil/Erziehungsberechtiger durchschnittlich pro Woche?","en":"How much does the second parent work on average per week?","fr":"Combien le deuxième parent travaille-t-il en moyenne par semaine?","it":"Quante ore lavora in media alla settimana il secondo genitore?"},"isRequired":true,"colCount":0,"choices":[{"value":"7","text":{"default":"0%","en":"0%","fr":"0%","it":"0%"}},{"value":"1","text":{"default":"bis 20%","en":"Up to 20%","fr":"jusqu’à 20 %","it":"Fino al 20%"}},{"value":"2","text":{"default":"21-40%","en":"21-40%","fr":"21-40%","it":"21-40%"}},{"value":"3","text":{"default":"41-60%","en":"41-60%","fr":"41-60%","it":"41-60%"}},{"value":"4","text":{"default":"61-80%","en":"61-80%","fr":"61-80%","it":"61-80%"}},{"value":"5","text":{"default":"81-100%","en":"81-100%","fr":"81-100%","it":"81-100%"}}]},{"type":"text","name":"Demo_23","title":{"default":"Welchen Beruf hat das zweite Elternteil/Erziehungsberechtigter?","en":"What is the current occupation of the other parent?","fr":"Quelle est la profession du deuxième parent?","it":"Qual è la professione del secondo genitore?"},"isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]},{"type":"checkbox","name":"Demo_24","title":{"default":"Welche Sprache(n) spricht das zweite Elternteil/Erziehungsberechtigter? (Mehrere Antworten möglich)","en":"What language(s) does the other parent speak? (Multiple answers possible)","fr":"Quelle(s) langue(s) le deuxième parent parle-t-il? (Plusieurs réponses possibles)","it":"Quale/i lingua/e parla il secondo genitore? (Sono possibili più risposte)"},"isRequired":true,"choices":[{"value":"37","text":{"default":"Schweizerdeutsch","en":"Swiss German","fr":"Suisse allemand","it":"Svizzero Tedesco"}},{"value":"1","text":{"default":"Deutsch","en":"German","fr":"Allemand","it":"Tedesco"}},{"value":"16","text":{"default":"Albanisch","en":"Albanian","fr":"Albanais","it":"Albanese"}},{"value":"19","text":{"default":"Arabisch","en":"Arabic","fr":"Arabe","it":"Arabo"}},{"value":"20","text":{"default":"Englisch","en":"English","fr":"Anglais","it":"Inglese"}},{"value":"26","text":{"default":"Finnisch","en":"Finnish","fr":"Finnois","it":"Finlandese"}},{"value":"2","text":{"default":"Französisch","en":"French","fr":"Français","it":"Francese"}},{"value":"3","text":{"default":"Italienisch","en":"Italian","fr":"Italien","it":"Italiano"}},{"value":"28","text":{"default":"Kroatisch","en":"Croatian","fr":"Croate","it":"Croato"}},{"value":"18","text":{"default":"Kurdisch","en":"Kurdish","fr":"Kurde","it":"Curdo"}},{"value":"21","text":{"default":"Mazedonisch","en":"Macedonian","fr":"Macédonien","it":"Macedone"}},{"value":"27","text":{"default":"Niederländisch","en":"Dutch","fr":"Néerlandais","it":"Olandese"}},{"value":"33","text":{"default":"Norwegisch","en":"Norwegian","fr":"Norvégien","it":"Norvegese"}},{"value":"24","text":{"default":"Persisch","en":"Persian","fr":"Persan","it":"Persiano"}},{"value":"29","text":{"default":"Portugiesisch","en":"Portuguese","fr":"Portugais","it":"Portoghese"}},{"value":"4","text":{"default":"Romanisch","en":"Romansh","fr":"Romanche","it":"Romancio"}},{"value":"22","text":{"default":"Russisch","en":"Russian","fr":"Russe","it":"Russo"}},{"value":"32","text":{"default":"Schwedisch","en":"Swedish","fr":"Suédois","it":"Svedese"}},{"value":"31","text":{"default":"Serbisch","en":"Serbian","fr":"Serbe","it":"Serbo"}},{"value":"30","text":{"default":"Spanisch","en":"Spanish","fr":"Espagnol","it":"Spagnolo"}},{"value":"36","text":{"default":"Tamil","en":"Tamil","fr":"Tamoul","it":"Tamil"}},{"value":"34","text":{"default":"Thailändisch","en":"Thai","fr":"Thaïlandais","it":"Thailandese"}},{"value":"35","text":{"default":"Tigrinya","en":"Tigrinya","fr":"Tigrinya","it":"Tigrino"}},{"value":"17","text":{"default":"Türkisch","en":"Turkish","fr":"Turc","it":"Turco"}},{"value":"25","text":{"default":"Ungarisch","en":"Hungarian","fr":"Hongrois","it":"Ungherese"}},{"value":"23","text":{"default":"Ukrainisch","en":"Ukrainian","fr":"Ukrainien","it":"Ucraino"}},{"value":"5","text":{"default":"Andere, und zwar (bitte das folgende Textfeld ausfüllen):","en":"Other (please specify):","fr":"Autre, à savoir (veuillez remplir le champ de texte suivant) :","it":"Altro, cioè (per favore compili il campo seguente):"}}]},{"type":"text","name":"Demo_24_other","startWithNewLine":false,"title":{"default":"Andere Sprache","en":"Other language","fr":"Autre langue","it":"Altra lingua"},"visibleIf":"{Demo_24} contains \'5\'","isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]}]}],"completedHtml":{"default":"<p>Vielen Dank! Die Lernaufgabe beginnt gleich.</p>","en":"<p>Thank you! The learning task will begin shortly.</p>","fr":"<p>Merci! L\'exercice va commencer.</p>","it":"<p>Grazie! Il compito inizierà a breve.</p>"},"checkErrorsMode":"onValueChanged"}';
-SET @part2_json = '{"title":{"default":"Kanji – Teil 2: Gerät und Abschlusscode","en":"Kanji – Part 2: Device and Closing Code","fr":"Kanji – Partie 2: appareil et code final","it":"Kanji – Parte 2: dispositivo e codice finale"},"locale":"de","showQuestionNumbers":"off","showProgressBar":"off","progressBarType":"pages","pages":[{"name":"closing","elements":[{"type":"html","name":"E1","html":{"default":"<p><strong><br></strong></p>\\n<p><strong>Sie haben nun alle Kanjis gelernt! Vielen Dank!</strong></p>\\n<p>Drücken Sie weiter, um zum Schluss der Lernaufgabe zu gelangen.</p>","en":"<p><strong><br></strong></p>\\n<p><strong>You have now learned all the kanji! Thank you very much!</strong></p>\\n<p>Press the button to proceed to the end of the learning task.</p>","fr":"<p><strong><br></strong></p>\\n<p><strong>Vous avez maintenant appris tous les kanjis! Merci beaucoup!</strong></p>\\n<p>Cliquez sur Continuer pour accéder à la fin de l’exercice d’apprentissage.</p>","it":"<p><strong><br></strong></p>\\n<p><strong>Ha imparato tutti i kanji! Grazie mille!</strong></p>\\n<p>Clicchi su Continua per arrivare alla fine del compito di apprendimento.</p>"}},{"type":"radiogroup","name":"Device","title":{"default":"Auf welchem Gerät haben Sie die Umfrage ausgefüllt?","en":"Which device did you use to complete the learning task?","fr":"Sur quel appareil avez-vous répondu au sondage?","it":"Su quale dispositivo ha compilato il sondaggio?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Laptop / Computer","en":"laptop / computer","fr":"Ordinateur portable / Ordinateur","it":"Laptop / Computer"}},{"value":"2","text":{"default":"Tablet","en":"tablet","fr":"Tablettes","it":"Tablet"}},{"value":"3","text":{"default":"Handy","en":"mobile phone","fr":"téléphone portable","it":"Smartphone"}}]},{"type":"text","name":"ID_2","title":{"default":"Um die Lernaufgabe abzuschliessen und Ihre Antworten eindeutig Ihrem Kind zuordnen zu können, geben Sie bitte erneut den Code in das Textfeld ein:<div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>","en":"To complete the learning task and ensure that your answers are clearly assigned to your child, please re-enter the code in the text field:  <div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>","fr":"Pour terminer le questionnaire et pouvoir attribuer clairement vos réponses à votre enfant, veuillez entrer à nouveau le code dans le champ de texte:  <div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>","it":"Per concludere il sondaggio e poter attribuire chiaramente le sue risposte a suo figlio/a, la preghiamo di inserire nuovamente il codice nel campo di testo:<div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>"},"isRequired":true,"validators":[{"type":"textvalidator","minLength":3,"text":{"default":"Bitte geben Sie den Code vom Brief ein.","en":"Please enter the code from the letter.","fr":"Veuillez saisir le code figurant sur la lettre.","it":"Inserisca il codice riportato nella lettera."}}]},{"type":"text","name":"Finished_Study","title":"Finished_Study","visible":false,"defaultValue":"1","clearIfInvisible":"none"}]}],"completedHtml":{"default":"<p><strong>Vielen Dank für Ihre Teilnahme!</strong></p><p>Die Lernaufgabe ist abgeschlossen. Sie können das Fenster jetzt schliessen.</p>","en":"<p><strong>Thank you for taking part!</strong></p><p>The learning task is complete. You may now close this window.</p>","fr":"<p><strong>Merci de votre participation!</strong></p><p>L\'exercice est terminé. Vous pouvez fermer cette fenêtre.</p>","it":"<p><strong>Grazie per la partecipazione!</strong></p><p>Il compito è terminato. Può chiudere questa finestra.</p>"},"checkErrorsMode":"onValueChanged"}';
+SET @part1_json = '{"title":{"default":"Kanji – Teil 1: Einverständnis und Code","en":"Kanji – Part 1: Consent and Code","fr":"Kanji – Partie 1: consentement et code","it":"Kanji – Parte 1: consenso e codice"},"locale":"de","showQuestionNumbers":"off","showProgressBar":"top","progressBarType":"pages","pages":[{"name":"consent","elements":[{"type":"html","name":"Logo","html":"<div style=\\"text-align:left;\\"><img style=\\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/Logo_Universitaet_Bern.png\\" alt=\\"Universität Bern\\"></div>"},{"type":"html","name":"A1","html":{"default":"<p><strong>Liebe Eltern/ Liebe Erziehungsberechtigte</strong></p>\\n<p>Wir freuen uns, Ihnen im Rahmen unserer aktuellen Forschung eine Lernaufgabe vorlegen zu dürfen. Ihr Kind hat in der Schule bereits eine ähnliche Aufgabe lösen dürfen.</p>\\n<p>Das Lösen der Aufgabe und die Beantwortung der Fragen ist freiwillig und dauert etwa 30 Minuten.</p>\\n<p>Ihre Antworten sind pseudonymisiert, das bedeutet, Ihnen wird ein persönlicher Code zugewiesen. Dadurch wissen wir nicht, welche Daten zu welcher Familie gehören. Die erhobenen Daten werden nur für die Forschung genutzt und nicht an andere weitergegeben.</p>\\n<p>Ihre Teilnahme ist von grosser Bedeutung von uns!</p>\\n<p>Vielen Dank<br>Herzliche Grüsse,</p>\\n<p>Das Team der Abteilung Entwicklungspsychologie der Universität Bern</p>","en":"<p><strong>Dear Parents/Guardians</strong></p>\\n<p>We are pleased to present you with a learning task as part of our current research. Your child has already completed similar tasks at school.</p>\\n<p>Completing the task and answering the questions is voluntary and takes about 30 minutes.<br>Your answers are pseudonymized, which means that you will be assigned a personal code. This means that we do not know which data belongs to which family. The data collected will only be used for research purposes and will not be passed on to others.</p>\\n<p>Your participation is very important to us – Thank you very much!</p>\\n<p>Kind regards,</p>\\n<p>The Developmental Psychology Department team at the University of Bern</p>","fr":"<p><strong>Chers parents / Chers titulaires de l’autorité parentale</strong></p>\\n<p>Nous sommes heureux de pouvoir vous présenter, dans le cadre de notre recherche actuelle, une tâche d’apprentissage. Votre enfant a déjà effectué des tâches similaires à l’école.</p>\\n<p>La réalisation de l’activité et la réponse aux questions sont facultatives et prennent environ 30 minutes.<br>Vos réponses sont pseudonymisées, ce qui signifie qu’un code personnel vous sera attribué. Ainsi, nous ne savons pas quelles données appartiennent à quelle famille. Les données recueillies seront utilisées uniquement à des fins de recherche et ne seront pas transmises à des tiers.</p>\\n<p>Votre participation est très importante- Merci beaucoup!</p>\\n<p>Avec nos salutations les meilleures,</p>\\n<p>L’équipe du Département de psychologie du développement de l’Université de Berne</p>","it":"<p><strong>Cari genitori / cari tutori legali,</strong></p>\\n<p>Siamo lieti di potervi presentare un compito di apprendimento nell’ambito della nostra attuale ricerca.</p>\\n<p>Lo svolgimento dell’attività e la risposta alle domande sono volontari e richiedono circa 30 minuti.</p>\\n<p>Le Sue risposte sono pseudonimizzate, ciò significa che Le verrà assegnato un codice personale. In questo modo, non sappiamo quali dati appartengano a quale famiglia. I dati raccolti saranno utilizzati esclusivamente per la ricerca e non saranno trasmessi ad altri.</p>\\n<p>La vostra partecipazione è di grande importanza per noi – grazie di cuore!</p>\\n<p>Cordiali saluti,<br>Il team del dipartimento di psicologia dello sviluppo dell’università di Berna</p>"}},{"type":"radiogroup","name":"EV","title":{"default":"Sind Sie mit der Teilnahme an der Aufgabe einverstanden?","en":"Do you consent to participating in the learning task?","fr":"Acceptez-vous de participer à l\'exercice d\'apprentissage?","it":"Acconsente alla partecipazione al compito di apprendimento?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Ja","en":"Yes","fr":"Oui","it":"Si"}},{"value":"2","text":{"default":"Nein","en":"No","fr":"Non","it":"No"}}]}]},{"name":"consent_declined","visibleIf":"{EV} = \'2\'","elements":[{"type":"html","name":"declined_msg","html":{"default":"<p>Vielen Dank. Ohne Ihr Einverständnis können wir die Aufgabe nicht durchführen. Sie können das Fenster nun schliessen.</p>","en":"<p>Thank you. Without your consent we cannot proceed with the task. You may now close this window.</p>","fr":"<p>Merci. Sans votre consentement, nous ne pouvons pas poursuivre. Vous pouvez fermer cette fenêtre.</p>","it":"<p>Grazie. Senza il suo consenso non possiamo procedere. Può chiudere questa finestra.</p>"}}]},{"name":"code","visibleIf":"{EV} = \'1\'","elements":[{"type":"text","name":"ID_1","title":{"default":"Um Ihre Antworten anonym Ihrem Kind zuordnen zu können, haben Sie einen Code auf dem Brief erhalten. Bitte geben Sie diesen Code jetzt in das Textfeld ein:<div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>","en":"In order to assign your answers anonymously to your child, you have received a code on the letter. Please enter this code in the text field now:<div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>","fr":"  Pour pouvoir attribuer vos réponses de façon anonyme à votre enfant, vous avez reçu un code dans la lettre. Veuillez entrer ce code maintenant dans le champ de texte:<div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>","it":"Per poter attribuire le vostre risposte in modo anonimo a vostro figlio, avete ricevuto un codice sulla lettera. Inserite ora questo codice nel campo di testo:<div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>"},"isRequired":true,"validators":[{"type":"textvalidator","minLength":3,"text":{"default":"Bitte geben Sie den Code vom Brief ein.","en":"Please enter the code from the letter.","fr":"Veuillez saisir le code figurant sur la lettre.","it":"Inserisca il codice riportato nella lettera."}}]},{"type":"text","name":"extra_param_code","title":"extra_param_code","visible":false,"defaultValueExpression":"{ID_1}","clearIfInvisible":"none"},{"type":"html","name":"A2","html":{"default":"<p>Machen Sie die Aufgabe an einem <strong>ruhigen</strong> Ort.</p>\\n<p>So werden Sie nicht gestört.</p>","en":"<p>Complete the task in a <strong>quiet</strong> place.</p>\\n<p>That way, you won\'t be disturbed.</p>","fr":"<p>Faites la tâche dans un endroit <strong>calme</strong>.<br>Ainsi, vous ne serez pas dérangé(e).</p>","it":"<p>Svolga il compito in un luogo <strong>tranquillo</strong>.<br>In questo modo non verrà disturbato/a.</p>"}}]},{"name":"demographics","visibleIf":"{EV} = \'1\'","elements":[{"type":"html","name":"Demo_1","html":{"default":"<p><strong><br></strong></p>\\n<p><strong>Zu Beginn bitten wir Sie noch um ein paar Angaben zu Ihrer Familie.</strong></p>","en":"<p><strong>To begin with, we would like to ask you for some information about your family.</strong></p>","fr":"<p><strong>Au début, nous vous demandons quelques informations sur votre famille.</strong></p>","it":"<p><strong>Per cominciare, vi chiediamo alcune informazioni sulla vostra famiglia.</strong></p>"}},{"type":"radiogroup","name":"Demo_2","title":{"default":"In welchem Verhältnis stehen Sie zum Kind?","en":"What is your relationship to the child?","fr":"Quelle est votre relation avec l’enfant?","it":"Qual è la sua relazione con il bambino?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Mutter","en":"Mother","fr":"Mère","it":"Madre"}},{"value":"2","text":{"default":"Vater","en":"Father","fr":"Père","it":"Padre"}},{"value":"3","text":{"default":"Anderes:","en":"Other:","fr":"Autre:","it":"Altro:"}}]},{"type":"text","name":"Demo_2_other","startWithNewLine":false,"title":{"default":"Anderes","en":"Other","fr":"Autre","it":"Altro"},"visibleIf":"{Demo_2} = \'3\'","isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]},{"type":"text","name":"Demo_25","title":{"default":"In welchem Jahr sind Sie geboren?","en":"What year were you born in?","fr":"En quelle année êtes-vous né(e)?","it":"In che anno siete nati?"},"isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(19[3-9][0-9]|200[0-8])$","text":{"default":"Bitte geben Sie ein Jahr zwischen 1930 und 2008 ein (vierstellig).","en":"Please enter a year between 1930 and 2008 (four digits).","fr":"Veuillez saisir une année entre 1930 et 2008 (quatre chiffres).","it":"Inserisca un anno compreso tra il 1930 e il 2008 (quattro cifre)."}}],"inputMode":"numeric","maxLength":4},{"type":"radiogroup","name":"Demo_3","title":{"default":"Wie viele Personen leben in Ihrem Haushalt (mit Ihnen)?","en":"How many people live in your household (including yourself)?","fr":"Combien de personnes vivent dans votre ménage (avec vous)?","it":"Quante persone vivono nella sua famiglia (insieme a lei)?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"1","en":"1","fr":"1","it":"1"}},{"value":"2","text":{"default":"2","en":"2","fr":"2","it":"2"}},{"value":"3","text":{"default":"3","en":"3","fr":"3","it":"3"}},{"value":"4","text":{"default":"4","en":"4","fr":"4","it":"4"}},{"value":"5","text":{"default":"5","en":"5","fr":"5","it":"5"}},{"value":"6","text":{"default":"6","en":"6","fr":"6","it":"6"}},{"value":"8","text":{"default":"mehr als 6 Personen (bitte Anzahl Personen eingeben):","en":"more than 6 people (please specify):","fr":"Plus de 6 personnes (veuillez indiquer le nombre de personnes) :","it":"più di 6 persone (per favore indichi il numero di persone):"}}]},{"type":"text","name":"Demo_3_other","startWithNewLine":false,"title":{"default":"Anzahl Personen","en":"Number of people","fr":"Nombre de personnes","it":"Numero di persone"},"visibleIf":"{Demo_3} = \'8\'","isRequired":true,"validators":[{"type":"regexvalidator","regex":"^([7-9]|[1-9][0-9])$","text":{"default":"Bitte geben Sie eine Zahl ab 7 ein.","en":"Please enter a number of 7 or more.","fr":"Veuillez saisir un nombre égal ou supérieur à 7.","it":"Inserisca un numero uguale o superiore a 7."}}],"inputMode":"numeric"},{"type":"checkbox","name":"Demo_4","title":{"default":"Welche Sprache(n) sprechen Sie zuhause mit Ihrem Kind? (Mehrere Antworten möglich)","en":"Which language(s) do you speak with your child at home? (Multiple answers possible)","fr":"Quelle(s) langue(s) parlez-vous à la maison avec votre enfant? (Plusieurs réponses possibles)","it":"Quale lingua o quali lingue parlata a casa con vostro figlio? (Sono possibili più risposte)"},"isRequired":true,"choices":[{"value":"37","text":{"default":"Schweizerdeutsch","en":"Swiss German","fr":"Suisse allemand","it":"Svizzero Tedesco"}},{"value":"1","text":{"default":"Deutsch","en":"German","fr":"Allemand","it":"Tedesco"}},{"value":"16","text":{"default":"Albanisch","en":"Albanian","fr":"Albanais","it":"Albanese"}},{"value":"19","text":{"default":"Arabisch","en":"Arabic","fr":"Arabe","it":"Arabo"}},{"value":"20","text":{"default":"Englisch","en":"English","fr":"Anglais","it":"Inglese"}},{"value":"26","text":{"default":"Finnisch","en":"Finnish","fr":"Finnois","it":"Finlandese"}},{"value":"2","text":{"default":"Französisch","en":"French","fr":"Français","it":"Francese"}},{"value":"3","text":{"default":"Italienisch","en":"Italian","fr":"Italien","it":"Italiano"}},{"value":"28","text":{"default":"Kroatisch","en":"Croatian","fr":"Croate","it":"Croato"}},{"value":"18","text":{"default":"Kurdisch","en":"Kurdish","fr":"Kurde","it":"Curdo"}},{"value":"21","text":{"default":"Mazedonisch","en":"Macedonian","fr":"Macédonien","it":"Macedone"}},{"value":"27","text":{"default":"Niederländisch","en":"Dutch","fr":"Néerlandais","it":"Olandese"}},{"value":"33","text":{"default":"Norwegisch","en":"Norwegian","fr":"Norvégien","it":"Norvegese"}},{"value":"24","text":{"default":"Persisch","en":"Persian","fr":"Persan","it":"Persiano"}},{"value":"29","text":{"default":"Portugiesisch","en":"Portuguese","fr":"Portugais","it":"Portoghese"}},{"value":"4","text":{"default":"Romanisch","en":"Romansh","fr":"Romanche","it":"Romancio"}},{"value":"22","text":{"default":"Russisch","en":"Russian","fr":"Russe","it":"Russo"}},{"value":"32","text":{"default":"Schwedisch","en":"Swedish","fr":"Suédois","it":"Svedese"}},{"value":"31","text":{"default":"Serbisch","en":"Serbian","fr":"Serbe","it":"Serbo"}},{"value":"30","text":{"default":"Spanisch","en":"Spanish","fr":"Espagnol","it":"Spagnolo"}},{"value":"36","text":{"default":"Tamil","en":"Tamil","fr":"Tamoul","it":"Tamil"}},{"value":"34","text":{"default":"Thailändisch","en":"Thai","fr":"Thaïlandais","it":"Thailandese"}},{"value":"35","text":{"default":"Tigrinya","en":"Tigrinya","fr":"Tigrinya","it":"Tigrino"}},{"value":"17","text":{"default":"Türkisch","en":"Turkish","fr":"Turc","it":"Turco"}},{"value":"25","text":{"default":"Ungarisch","en":"Hungarian","fr":"Hongrois","it":"Ungherese"}},{"value":"23","text":{"default":"Ukrainisch","en":"Ukrainian","fr":"Ukrainien","it":"Ucraino"}},{"value":"5","text":{"default":"Andere, und zwar (bitte das folgende Textfeld ausfüllen):","en":"Other (please specify):","fr":"Autre, à savoir (veuillez remplir le champ de texte suivant) :","it":"Altro, cioè (per favore compili il campo seguente):"}}]},{"type":"text","name":"Demo_4_other","startWithNewLine":false,"title":{"default":"Andere Sprache","en":"Other language","fr":"Autre langue","it":"Altra lingua"},"visibleIf":"{Demo_4} contains \'5\'","isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]},{"type":"radiogroup","name":"Demo_5","title":{"default":"Leben in Ihrem Haushalt noch andere Kinder (0-17 Jahre alt), z.B. Adoptiv-, Halb-, Stiefgeschwister, Pflegekinder?","en":"Are there other children (aged 0-17) living in your household, e.g. adopted children, half-siblings, step-siblings, foster children?","fr":"D’autres enfants (0–17 ans) vivent-ils dans votre ménage, p. ex. enfants adoptifs, demi-frères et sœurs, beaux-frères et sœurs, enfants placés?","it":"Nel suo nucleo familiare vivono anche altri bambini (0-17 anni), ad es. fratelli adottivi, fratellastri, fratelli acquisiti o bambini in affido?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Ja","en":"Yes","fr":"Oui","it":"Si"}},{"value":"2","text":{"default":"Nein","en":"No","fr":"Non","it":"No"}}]},{"type":"radiogroup","name":"Demo_6","title":{"default":"Wie viele andere Kinder leben in Ihrem Haushalt?","en":"How many other children live in your household?","fr":"Combien d’autres enfants vivent dans votre ménage?","it":"Quanti altri bambini vivono nel suo nucleo familiare?"},"isRequired":true,"visibleIf":"{Demo_5} = \'1\'","choices":[{"value":"1","text":{"default":"1","en":"1","fr":"1","it":"1"}},{"value":"2","text":{"default":"2","en":"2","fr":"2","it":"2"}},{"value":"9","text":{"default":"3","en":"3","fr":"3","it":"3"}},{"value":"10","text":{"default":"4","en":"4","fr":"4","it":"4"}},{"value":"11","text":{"default":"5","en":"5","fr":"5","it":"5"}},{"value":"12","text":{"default":"6","en":"6","fr":"6","it":"6"}},{"value":"13","text":{"default":"mehr als 6 Kinder (bitte Anzahl Kinder eingeben):","en":"more than 6 (please specify):","fr":"Plus de 6 enfants (veuillez indiquer le nombre d\'enfants):","it":"più di 6 bambini (per favore indichi il numero di bambini):"}}]},{"type":"text","name":"Demo_6_count","title":"Demo_6_count","visible":false,"defaultValueExpression":"iif({Demo_6} = \'1\', 1, iif({Demo_6} = \'2\', 2, iif({Demo_6} = \'9\', 3, iif({Demo_6} = \'10\', 4, iif({Demo_6} = \'11\', 5, iif({Demo_6} = \'12\', 6, 0))))))"},{"type":"paneldynamic","name":"Demo_children","title":{"default":"Geben Sie den Jahrgang und das Geschlecht der anderen im Haushalt lebenden Kindern an.","en":"What is the year of birth and gender of the other child?  ","fr":"Veuillez indiquer l’année de naissance et le sexe des autres enfants vivant dans votre ménage.","it":"Indichi l’anno di nascita e il sesso degli altri bambini che vivono nel suo nucleo familiare."},"visibleIf":"{Demo_5} = \'1\' and {Demo_6} notempty and {Demo_6} <> \'13\'","allowAddPanel":false,"allowRemovePanel":false,"templateTitle":{"default":"Kind {panelIndex}","en":"Child {panelIndex}","fr":"Enfant {panelIndex}","it":"Bambino {panelIndex}"},"templateElements":[{"type":"dropdown","name":"jahrgang","isRequired":true,"title":{"default":"Jahrgang","en":"Year of birth","fr":"Année de naissance","it":"Anno di nascita"},"choices":["2026","2025","2024","2023","2022","2021","2020","2019","2018","2017","2016","2015","2014","2013","2012","2011","2010","2009"]},{"type":"radiogroup","name":"geschlecht","isRequired":true,"colCount":0,"startWithNewLine":false,"title":{"default":"Geschlecht","en":"Sex","fr":"Sexe","it":"Sesso"},"choices":[{"value":"w","text":{"default":"weiblich","en":"female","fr":"féminin","it":"femminile"}},{"value":"m","text":{"default":"männlich","en":"male","fr":"masculin","it":"maschile"}},{"value":"d","text":{"default":"divers","en":"diverse","fr":"divers","it":"diverso"}},{"value":"a","text":{"default":"anders","en":"other","fr":"autre","it":"altro"}}]}],"bindings":{"panelCount":"Demo_6_count"}},{"type":"comment","name":"Demo_13","title":{"default":"Bitte geben Sie den Jahrgang und das Geschlecht der weiteren Kinder an. Nennen Sie das Geburtsjahr und das Geschlecht pro Kind, getrennt durch ein Komma, z. B. 2024 weiblich, 2022 männlich, 2020 divers, 2018 anders, ... .","en":"What are the birth years and genders of the other children? List the birth year and gender for each child, separated by a comma, e.g. 2024 female, 2022 male, 2020 diverse, 2018 other, ... .","fr":"Veuillez indiquer l’année de naissance et le sexe des autres enfants. Indiquez l’année de naissance et le sexe pour chaque enfant, séparés par une virgule, par exemple : 2024 féminin, 2022 masculin, 2020 divers, 2018 autre, …","it":"Per favore indichi l’anno di nascita e il sesso degli altri bambini. Scriva l’anno di nascita e il sesso per ogni bambino, separati da una virgola, ad esempio: 2024 femminile, 2022 maschile, 2020 diverso, 2018 altro, …"},"visibleIf":"{Demo_6} = \'13\'","isRequired":true},{"type":"radiogroup","name":"Demo_14","title":{"default":"Was ist Ihr höchster Ausbildungsabschluss (mit Zeugnis, Fähigkeitsausweis oder Diplom)?","en":"What is your highest educational qualification (with certificate, proficiency certificate or diploma)?","fr":"Quel est votre plus haut diplôme de formation (avec certificat, attestation de compétences ou diplôme)?","it":"Qual è il suo più alto titolo di studio (con attestato, certificato di competenza o diploma)?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Keine abgeschlossene Ausbildung (z.B. keine formale schulische oder berufliche Ausbildung abgeschlossen)","en":"No completed vocational training","fr":"Pas de formation professionnelle achevée","it":"Nessuna formazione professionale completata"}},{"value":"2","text":{"default":"Unternehmensinterne Ausbildung","en":"In-house training","fr":"Formation en entreprise","it":"Formazione interna all\'azienda"}},{"value":"3","text":{"default":"Abgeschlossene Berufsausbildung","en":"Completed vocational training","fr":"Formation professionnelle achevée","it":"Formazione professionale completata"}},{"value":"4","text":{"default":"Matura","en":"Matura","fr":"Maturité","it":"Maturità"}},{"value":"5","text":{"default":"Lehrdiplom","en":"Teaching Certificate","fr":"Diplôme d\'enseignement","it":"Diploma di insegnamento"}},{"value":"6","text":{"default":"Höhere Berufsausbildung, Fachschule","en":"Higher vocational education, technical college","fr":"Formation professionnelle supérieure, école spécialisée","it":"Formazione professionale superiore, scuola professionale"}},{"value":"7","text":{"default":"Fachhochschule (FH), Pädagogische Hochschule (PH)","en":"University of applied sciences (FH), teacher training college (PH)","fr":"Haute école spécialisée (HES), haute école pédagogique (PH)","it":"Scuola universitaria professionale (SUP), scuola universitaria di pedagogiga (SUP)"}},{"value":"8","text":{"default":"Universitäre Hochschule (Uni, ETH)","en":"University (UNI, ETH)","fr":"Université (Uni, ETH)","it":"Università (Uni, ETH)"}}]},{"type":"radiogroup","name":"Demo_15","title":{"default":"Wie viel arbeiten Sie durchschnittlich pro Woche?","en":"How much do you work on average per week?","fr":"Combien d’heures travaillez-vous en moyenne par semaine?","it":"Quante ore lavora in media alla settimana?"},"isRequired":true,"colCount":0,"choices":[{"value":"7","text":{"default":"0%","en":"0%","fr":"0%","it":"0%"}},{"value":"1","text":{"default":"bis 20%","en":"up to 20%","fr":"jusqu’à 20 %","it":"Fino al 20%"}},{"value":"2","text":{"default":"21-40%","en":"21-40%","fr":"21-40%","it":"21-40%"}},{"value":"3","text":{"default":"41-60%","en":"41-60%","fr":"41-60%","it":"41-60%"}},{"value":"4","text":{"default":"61-80%","en":"61-80%","fr":"61-80%","it":"61-80%"}},{"value":"5","text":{"default":"81-100%","en":"81-100%","fr":"81-100%","it":"81-100%"}}]},{"type":"text","name":"Demo_16","title":{"default":"Welchen Beruf haben Sie?","en":"What is your current occupation?","fr":"Quelle est votre profession?","it":"Qual è la sua professione?"},"isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]},{"type":"checkbox","name":"Demo_17","title":{"default":"Welche Sprache(n) sprechen Sie? (Mehrere Antworten möglich)","en":"Which language(s) do you speak? (Multiple answers possible)","fr":"Quelle(s) langue(s) parlez-vous? (Plusieurs réponses possibles)","it":"Quale/i lingua/e parla? (Sono possibili più risposte)"},"isRequired":true,"choices":[{"value":"37","text":{"default":"Schweizerdeutsch","en":"Swiss German","fr":"Suisse allemand","it":"Svizzero Tedesco"}},{"value":"1","text":{"default":"Deutsch","en":"German","fr":"Allemand","it":"Tedesco"}},{"value":"16","text":{"default":"Albanisch","en":"Albanian","fr":"Albanais","it":"Albanese"}},{"value":"19","text":{"default":"Arabisch","en":"Arabic","fr":"Arabe","it":"Arabo"}},{"value":"20","text":{"default":"Englisch","en":"English","fr":"Anglais","it":"Inglese"}},{"value":"26","text":{"default":"Finnisch","en":"Finnish","fr":"Finnois","it":"Finlandese"}},{"value":"2","text":{"default":"Französisch","en":"French","fr":"Français","it":"Francese"}},{"value":"3","text":{"default":"Italienisch","en":"Italian","fr":"Italien","it":"Italiano"}},{"value":"28","text":{"default":"Kroatisch","en":"Croatian","fr":"Croate","it":"Croato"}},{"value":"18","text":{"default":"Kurdisch","en":"Kurdish","fr":"Kurde","it":"Curdo"}},{"value":"21","text":{"default":"Mazedonisch","en":"Macedonian","fr":"Macédonien","it":"Macedone"}},{"value":"27","text":{"default":"Niederländisch","en":"Dutch","fr":"Néerlandais","it":"Olandese"}},{"value":"33","text":{"default":"Norwegisch","en":"Norwegian","fr":"Norvégien","it":"Norvegese"}},{"value":"24","text":{"default":"Persisch","en":"Persian","fr":"Persan","it":"Persiano"}},{"value":"29","text":{"default":"Portugiesisch","en":"Portuguese","fr":"Portugais","it":"Portoghese"}},{"value":"4","text":{"default":"Romanisch","en":"Romansh","fr":"Romanche","it":"Romancio"}},{"value":"22","text":{"default":"Russisch","en":"Russian","fr":"Russe","it":"Russo"}},{"value":"32","text":{"default":"Schwedisch","en":"Swedish","fr":"Suédois","it":"Svedese"}},{"value":"31","text":{"default":"Serbisch","en":"Serbian","fr":"Serbe","it":"Serbo"}},{"value":"30","text":{"default":"Spanisch","en":"Spanish","fr":"Espagnol","it":"Spagnolo"}},{"value":"36","text":{"default":"Tamil","en":"Tamil","fr":"Tamoul","it":"Tamil"}},{"value":"34","text":{"default":"Thailändisch","en":"Thai","fr":"Thaïlandais","it":"Thailandese"}},{"value":"35","text":{"default":"Tigrinya","en":"Tigrinya","fr":"Tigrinya","it":"Tigrino"}},{"value":"17","text":{"default":"Türkisch","en":"Turkish","fr":"Turc","it":"Turco"}},{"value":"25","text":{"default":"Ungarisch","en":"Hungarian","fr":"Hongrois","it":"Ungherese"}},{"value":"23","text":{"default":"Ukrainisch","en":"Ukrainian","fr":"Ukrainien","it":"Ucraino"}},{"value":"5","text":{"default":"Andere, und zwar (bitte das folgende Textfeld ausfüllen):","en":"Other (please specify):","fr":"Autre, à savoir (veuillez remplir le champ de texte suivant) :","it":"Altro, cioè (per favore compili il campo seguente):"}}]},{"type":"text","name":"Demo_17_other","startWithNewLine":false,"title":{"default":"Andere Sprache","en":"Other language","fr":"Autre langue","it":"Altra lingua"},"visibleIf":"{Demo_17} contains \'5\'","isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]}]},{"name":"second_parent","visibleIf":"{EV} = \'1\'","elements":[{"type":"html","name":"Demo_18","html":{"default":"<p><strong>Wir bitten Sie nun um Informationen zum zweiten Elternteil/Erziehungsberechtigten.</strong></p>","en":"<p><strong>We now ask you for information about the second parent or legal guardian.</strong></p>","fr":"<p><strong>Nous vous demandons maintenant quelques informations sur le deuxième parent ou le tuteur légal.</strong></p>","it":"<p><strong><br></strong></p>\\n<p><strong>Ora le chiediamo alcune informazioni sul secondo genitore o tutore legale del bambino.</strong></p>\\n<p><strong><br></strong></p>"}},{"type":"radiogroup","name":"Demo_19","title":{"default":"Können Sie Angaben zum zweiten Elternteil/Erziehungsberechtigten des Kindes machen? ","en":"Can you provide information about the child\'s second parent/legal guardian?","fr":"Pouvez-vous donner des informations sur le deuxième parent ou le tuteur légal de l’enfant ?","it":"Può fornire informazioni sul secondo genitore o tutore legale del bambino?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Ja","en":"Yes ","fr":"Oui","it":"Si"}},{"value":"4","text":{"default":"Nein","en":"No","fr":"Non","it":"No"}}]}]},{"name":"second_parent_details","visibleIf":"{EV} = \'1\' and {Demo_19} = \'1\'","elements":[{"type":"radiogroup","name":"Demo_20","title":{"default":"Was ist das Verhältnis zum Kind? (Vom zweiten Elternteil/Erziehungsberechtigen)","en":"What is the relationship with the child?","fr":"Quelle est la relation avec l\'enfant?","it":"Qual è il suo rapporto con il bambino?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Mutter","en":"Mother","fr":"Mère","it":"Madre"}},{"value":"2","text":{"default":"Vater","en":"Father","fr":"Père","it":"Padre"}},{"value":"3","text":{"default":"Anderes:","en":"Other:","fr":"Autre:","it":"Altro:"}}]},{"type":"text","name":"Demo_20_other","startWithNewLine":false,"title":{"default":"Anderes","en":"Other","fr":"Autre","it":"Altro"},"visibleIf":"{Demo_20} = \'3\'","isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]},{"type":"text","name":"Demo_26","title":{"default":"In welchem Jahr wurde das zweite Elternteil/Erziehungsberechtiger geboren?","en":"In what year was the other parent born?","fr":"En quelle année le deuxième parent est-il né ?","it":"In che anno è nato il secondo genitore?"},"isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(19[3-9][0-9]|200[0-8])$","text":{"default":"Bitte geben Sie ein Jahr zwischen 1930 und 2008 ein (vierstellig).","en":"Please enter a year between 1930 and 2008 (four digits).","fr":"Veuillez saisir une année entre 1930 et 2008 (quatre chiffres).","it":"Inserisca un anno compreso tra il 1930 e il 2008 (quattro cifre)."}}],"inputMode":"numeric","maxLength":4},{"type":"radiogroup","name":"Demo_21","title":{"default":"Was ist der höchste Ausbildungabschluss des zweiten Elternteils/Erziehungsberechtigtens (mit Zeugnis, Fähigkeitsausweis oder Diplom)?","en":"What is the highest educational qualification of the second parent (with certificate, certificate of proficiency or diploma)?","fr":"Quel est le plus haut diplôme de formation du deuxième parent (avec certificat, attestation de compétences ou diplôme)?","it":"Qual è il più alto titolo di studio del secondo genitore (con attestato, certificato di competenza o diploma)?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Keine abgeschlossene Ausbildung (z.B. keine formale schulische oder berufliche Ausbildung abgeschlossen)","en":"No completed vocational training","fr":"Pas de formation professionnelle achevée","it":"Nessuna formazione professionale completata"}},{"value":"2","text":{"default":"Unternehmensinterne Ausbildung","en":"In-house training","fr":"Formation en entreprise","it":"Formazione interna all\'azienda"}},{"value":"3","text":{"default":"Abgeschlossene Berufsausbildung","en":"Completed vocational training","fr":"Formation professionnelle achevée","it":"Formazione professionale completata"}},{"value":"4","text":{"default":"Matura","en":"Matura","fr":"Maturité","it":"Maturità"}},{"value":"5","text":{"default":"Lehrdiplom","en":"Teaching Certificate","fr":"Diplôme d\'enseignement","it":"Diploma di insegnamento"}},{"value":"6","text":{"default":"Höhere Berufsausbildung, Fachschule","en":"High vocational education, technical college","fr":"Formation professionnelle supérieure, école spécialisée","it":"Formazione professionale superiore, scuola professionale "}},{"value":"7","text":{"default":"Fachhochschule (FH), Pädagogische Hochschule (PH)","en":"University of applied sciences (FH), teacher training college (PH)","fr":"Haute école spécialisée (HES), haute école pédagogique (PH)","it":"Scuola universitaria professionale (SUP), scuola universitaria di pedagogiga (SUP)"}},{"value":"8","text":{"default":"Universitäre Hochschule (Uni, ETH)","en":"University (Uni, ETH)","fr":"Univeristé (Uni, ETH)","it":"Università (Uni, ETH)"}}]},{"type":"radiogroup","name":"Demo_22","title":{"default":"Wie viel arbeitet das zweite Elternteil/Erziehungsberechtiger durchschnittlich pro Woche?","en":"How much does the second parent work on average per week?","fr":"Combien le deuxième parent travaille-t-il en moyenne par semaine?","it":"Quante ore lavora in media alla settimana il secondo genitore?"},"isRequired":true,"colCount":0,"choices":[{"value":"7","text":{"default":"0%","en":"0%","fr":"0%","it":"0%"}},{"value":"1","text":{"default":"bis 20%","en":"Up to 20%","fr":"jusqu’à 20 %","it":"Fino al 20%"}},{"value":"2","text":{"default":"21-40%","en":"21-40%","fr":"21-40%","it":"21-40%"}},{"value":"3","text":{"default":"41-60%","en":"41-60%","fr":"41-60%","it":"41-60%"}},{"value":"4","text":{"default":"61-80%","en":"61-80%","fr":"61-80%","it":"61-80%"}},{"value":"5","text":{"default":"81-100%","en":"81-100%","fr":"81-100%","it":"81-100%"}}]},{"type":"text","name":"Demo_23","title":{"default":"Welchen Beruf hat das zweite Elternteil/Erziehungsberechtigter?","en":"What is the current occupation of the other parent?","fr":"Quelle est la profession du deuxième parent?","it":"Qual è la professione del secondo genitore?"},"isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]},{"type":"checkbox","name":"Demo_24","title":{"default":"Welche Sprache(n) spricht das zweite Elternteil/Erziehungsberechtigter? (Mehrere Antworten möglich)","en":"What language(s) does the other parent speak? (Multiple answers possible)","fr":"Quelle(s) langue(s) le deuxième parent parle-t-il? (Plusieurs réponses possibles)","it":"Quale/i lingua/e parla il secondo genitore? (Sono possibili più risposte)"},"isRequired":true,"choices":[{"value":"37","text":{"default":"Schweizerdeutsch","en":"Swiss German","fr":"Suisse allemand","it":"Svizzero Tedesco"}},{"value":"1","text":{"default":"Deutsch","en":"German","fr":"Allemand","it":"Tedesco"}},{"value":"16","text":{"default":"Albanisch","en":"Albanian","fr":"Albanais","it":"Albanese"}},{"value":"19","text":{"default":"Arabisch","en":"Arabic","fr":"Arabe","it":"Arabo"}},{"value":"20","text":{"default":"Englisch","en":"English","fr":"Anglais","it":"Inglese"}},{"value":"26","text":{"default":"Finnisch","en":"Finnish","fr":"Finnois","it":"Finlandese"}},{"value":"2","text":{"default":"Französisch","en":"French","fr":"Français","it":"Francese"}},{"value":"3","text":{"default":"Italienisch","en":"Italian","fr":"Italien","it":"Italiano"}},{"value":"28","text":{"default":"Kroatisch","en":"Croatian","fr":"Croate","it":"Croato"}},{"value":"18","text":{"default":"Kurdisch","en":"Kurdish","fr":"Kurde","it":"Curdo"}},{"value":"21","text":{"default":"Mazedonisch","en":"Macedonian","fr":"Macédonien","it":"Macedone"}},{"value":"27","text":{"default":"Niederländisch","en":"Dutch","fr":"Néerlandais","it":"Olandese"}},{"value":"33","text":{"default":"Norwegisch","en":"Norwegian","fr":"Norvégien","it":"Norvegese"}},{"value":"24","text":{"default":"Persisch","en":"Persian","fr":"Persan","it":"Persiano"}},{"value":"29","text":{"default":"Portugiesisch","en":"Portuguese","fr":"Portugais","it":"Portoghese"}},{"value":"4","text":{"default":"Romanisch","en":"Romansh","fr":"Romanche","it":"Romancio"}},{"value":"22","text":{"default":"Russisch","en":"Russian","fr":"Russe","it":"Russo"}},{"value":"32","text":{"default":"Schwedisch","en":"Swedish","fr":"Suédois","it":"Svedese"}},{"value":"31","text":{"default":"Serbisch","en":"Serbian","fr":"Serbe","it":"Serbo"}},{"value":"30","text":{"default":"Spanisch","en":"Spanish","fr":"Espagnol","it":"Spagnolo"}},{"value":"36","text":{"default":"Tamil","en":"Tamil","fr":"Tamoul","it":"Tamil"}},{"value":"34","text":{"default":"Thailändisch","en":"Thai","fr":"Thaïlandais","it":"Thailandese"}},{"value":"35","text":{"default":"Tigrinya","en":"Tigrinya","fr":"Tigrinya","it":"Tigrino"}},{"value":"17","text":{"default":"Türkisch","en":"Turkish","fr":"Turc","it":"Turco"}},{"value":"25","text":{"default":"Ungarisch","en":"Hungarian","fr":"Hongrois","it":"Ungherese"}},{"value":"23","text":{"default":"Ukrainisch","en":"Ukrainian","fr":"Ukrainien","it":"Ucraino"}},{"value":"5","text":{"default":"Andere, und zwar (bitte das folgende Textfeld ausfüllen):","en":"Other (please specify):","fr":"Autre, à savoir (veuillez remplir le champ de texte suivant) :","it":"Altro, cioè (per favore compili il campo seguente):"}}]},{"type":"text","name":"Demo_24_other","startWithNewLine":false,"title":{"default":"Andere Sprache","en":"Other language","fr":"Autre langue","it":"Altra lingua"},"visibleIf":"{Demo_24} contains \'5\'","isRequired":true,"validators":[{"type":"regexvalidator","regex":"^(?=.*[A-Za-zÀ-ÿ])[^0-9]+$","text":{"default":"Bitte geben Sie keine Zahlen ein.","en":"Please do not enter numbers.","fr":"Veuillez ne pas saisir de chiffres.","it":"Non inserire numeri."}}]}]}],"completedHtml":{"default":"<p>Vielen Dank! Die Lernaufgabe beginnt gleich.</p>","en":"<p>Thank you! The learning task will begin shortly.</p>","fr":"<p>Merci! L\'exercice va commencer.</p>","it":"<p>Grazie! Il compito inizierà a breve.</p>"},"checkErrorsMode":"onValueChanged"}';
+SET @part2_json = '{"title":{"default":"Kanji – Teil 3: Gerät und Abschlusscode","en":"Kanji – Part 3: Device and Closing Code","fr":"Kanji – Partie 3: appareil et code final","it":"Kanji – Parte 3: dispositivo e codice finale"},"locale":"de","showQuestionNumbers":"off","showProgressBar":"off","progressBarType":"pages","pages":[{"name":"closing","elements":[{"type":"html","name":"E1","html":{"default":"<p><strong><br></strong></p>\\n<p><strong>Sie haben nun alle Kanjis gelernt! Vielen Dank!</strong></p>\\n<p>Drücken Sie weiter, um zum Schluss der Lernaufgabe zu gelangen.</p>","en":"<p><strong><br></strong></p>\\n<p><strong>You have now learned all the kanji! Thank you very much!</strong></p>\\n<p>Press the button to proceed to the end of the learning task.</p>","fr":"<p><strong><br></strong></p>\\n<p><strong>Vous avez maintenant appris tous les kanjis! Merci beaucoup!</strong></p>\\n<p>Cliquez sur Continuer pour accéder à la fin de l’exercice d’apprentissage.</p>","it":"<p><strong><br></strong></p>\\n<p><strong>Ha imparato tutti i kanji! Grazie mille!</strong></p>\\n<p>Clicchi su Continua per arrivare alla fine del compito di apprendimento.</p>"}},{"type":"radiogroup","name":"Device","title":{"default":"Auf welchem Gerät haben Sie die Umfrage ausgefüllt?","en":"Which device did you use to complete the learning task?","fr":"Sur quel appareil avez-vous répondu au sondage?","it":"Su quale dispositivo ha compilato il sondaggio?"},"isRequired":true,"choices":[{"value":"1","text":{"default":"Laptop / Computer","en":"laptop / computer","fr":"Ordinateur portable / Ordinateur","it":"Laptop / Computer"}},{"value":"2","text":{"default":"Tablet","en":"tablet","fr":"Tablettes","it":"Tablet"}},{"value":"3","text":{"default":"Handy","en":"mobile phone","fr":"téléphone portable","it":"Smartphone"}}]},{"type":"text","name":"ID_2","title":{"default":"Um die Lernaufgabe abzuschliessen und Ihre Antworten eindeutig Ihrem Kind zuordnen zu können, geben Sie bitte erneut den Code in das Textfeld ein:<div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>","en":"To complete the learning task and ensure that your answers are clearly assigned to your child, please re-enter the code in the text field:  <div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>","fr":"Pour terminer le questionnaire et pouvoir attribuer clairement vos réponses à votre enfant, veuillez entrer à nouveau le code dans le champ de texte:  <div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>","it":"Per concludere il sondaggio e poter attribuire chiaramente le sue risposte a suo figlio/a, la preghiamo di inserire nuovamente il codice nel campo di testo:<div style=\\"margin:.75em 0;\\"><img style=\\"max-width:100%;width:420px;height:auto;object-fit:contain;\\" src=\\"{{ASSET_BASE}}/ID_Kind.png\\" alt=\\"\\"></div>"},"isRequired":true,"validators":[{"type":"textvalidator","minLength":3,"text":{"default":"Bitte geben Sie den Code vom Brief ein.","en":"Please enter the code from the letter.","fr":"Veuillez saisir le code figurant sur la lettre.","it":"Inserisca il codice riportato nella lettera."}}]},{"type":"text","name":"Finished_Study","title":"Finished_Study","visible":false,"defaultValue":"1","clearIfInvisible":"none"}]}],"completedHtml":{"default":"<p><strong>Vielen Dank für Ihre Teilnahme!</strong></p><p>Die Lernaufgabe ist abgeschlossen. Sie können das Fenster jetzt schliessen.</p>","en":"<p><strong>Thank you for taking part!</strong></p><p>The learning task is complete. You may now close this window.</p>","fr":"<p><strong>Merci de votre participation!</strong></p><p>L\'exercice est terminé. Vous pouvez fermer cette fenêtre.</p>","it":"<p><strong>Grazie per la partecipazione!</strong></p><p>Il compito è terminato. Può chiudere questa finestra.</p>"},"checkErrorsMode":"onValueChanged"}';
 
 SET @part1_json = REPLACE(@part1_json, '{{ASSET_BASE}}', @asset_base);
 SET @part2_json = REPLACE(@part2_json, '{{ASSET_BASE}}', @asset_base);
@@ -778,6 +1125,88 @@ DELETE FROM `surveys` WHERE `survey_generated_id` IN
    'SVJS_KANJIPAUSE01','SVJS_KANJIPAUSE02','SVJS_KANJIPAUSE03',
    'Kanji_Part1','Kanji_Part2',
    'Kanji_Pause1','Kanji_Pause2','Kanji_Pause3');
+
+-- -----------------------------------------------------------------------
+-- Part 1 is two surveys
+--
+-- The used-code message lives on the page a survey redirects to, and a
+-- surveyJS redirect only fires on `finished`. Keeping consent, the code and
+-- the demographics in one survey therefore meant answering every question
+-- before being told the code was already used. Splitting after the code page
+-- moves that check 28 questions earlier.
+--
+-- Both bodies are derived here rather than written out twice, so the source
+-- JSON above stays the single definition.
+-- -----------------------------------------------------------------------
+
+-- Consent + code: pages 0-2 (consent, consent_declined, code).
+SET @code_json = JSON_SET(@part1_json, '$.pages',
+    JSON_ARRAY(
+        JSON_EXTRACT(@part1_json, '$.pages[0]'),
+        JSON_EXTRACT(@part1_json, '$.pages[1]'),
+        JSON_EXTRACT(@part1_json, '$.pages[2]')
+    ));
+
+-- Demographics: pages 3-5, and it needs its own code holder because
+-- url_params fills it from the URL rather than from ID_1.
+SET @demo_json = JSON_SET(@part1_json, '$.pages',
+    JSON_ARRAY(
+        JSON_EXTRACT(@part1_json, '$.pages[3]'),
+        JSON_EXTRACT(@part1_json, '$.pages[4]'),
+        JSON_EXTRACT(@part1_json, '$.pages[5]')
+    ));
+SET @demo_json = JSON_SET(@demo_json, '$.title.default', 'Kanji – Teil 2: Angaben');
+SET @demo_json = JSON_SET(@demo_json, '$.title.en', 'Kanji – Part 2: Demographics');
+SET @demo_json = JSON_SET(@demo_json, '$.title.fr', 'Kanji – Partie 2: données');
+SET @demo_json = JSON_SET(@demo_json, '$.title.it', 'Kanji – Parte 2: dati');
+SET @demo_json = JSON_ARRAY_APPEND(@demo_json, '$.pages[0].elements',
+    JSON_OBJECT('name', 'extra_param_code', 'type', 'text', 'title', 'extra_param_code',
+                'visible', CAST(FALSE AS JSON), 'clearIfInvisible', 'none'));
+
+SET @part1_json = @code_json;
+
+-- -----------------------------------------------------------------------
+-- Carry earlier installs over to the renamed surveys
+--
+-- Seeding matches on `config.title.default`, so a renamed survey would be
+-- seeded as a second copy and leave the original behind, still bound to its
+-- section. Retitle in place first; ids stay stable and anyone mid-study is
+-- unaffected.
+-- -----------------------------------------------------------------------
+
+UPDATE `surveys`
+   SET `config`    = JSON_SET(`config`,    '$.title.default', 'Kanji – Teil 1: Einverständnis und Code',
+                                           '$.title.en', 'Kanji – Part 1: Consent and Code',
+                                           '$.title.fr', 'Kanji – Partie 1: consentement et code',
+                                           '$.title.it', 'Kanji – Parte 1: consenso e codice'),
+       `published` = JSON_SET(`published`, '$.title.default', 'Kanji – Teil 1: Einverständnis und Code',
+                                           '$.title.en', 'Kanji – Part 1: Consent and Code',
+                                           '$.title.fr', 'Kanji – Partie 1: consentement et code',
+                                           '$.title.it', 'Kanji – Parte 1: consenso e codice')
+ WHERE JSON_UNQUOTE(JSON_EXTRACT(`config`, '$.title.default')) = 'Kanji – Teil 1: Einverständnis und Angaben';
+
+UPDATE `surveys`
+   SET `config`    = JSON_SET(`config`,    '$.title.default', 'Kanji – Teil 2: Angaben',
+                                           '$.title.en', 'Kanji – Part 2: Demographics',
+                                           '$.title.fr', 'Kanji – Partie 2: données',
+                                           '$.title.it', 'Kanji – Parte 2: dati'),
+       `published` = JSON_SET(`published`, '$.title.default', 'Kanji – Teil 2: Angaben',
+                                           '$.title.en', 'Kanji – Part 2: Demographics',
+                                           '$.title.fr', 'Kanji – Partie 2: données',
+                                           '$.title.it', 'Kanji – Parte 2: dati')
+ WHERE JSON_UNQUOTE(JSON_EXTRACT(`config`, '$.title.default')) = 'Kanji – Teil 1b: Angaben';
+
+UPDATE `surveys`
+   SET `config`    = JSON_SET(`config`,    '$.title.default', 'Kanji – Teil 3: Gerät und Abschlusscode',
+                                           '$.title.en', 'Kanji – Part 3: Device and Closing Code',
+                                           '$.title.fr', 'Kanji – Partie 3: appareil et code final',
+                                           '$.title.it', 'Kanji – Parte 3: dispositivo e codice finale'),
+       `published` = JSON_SET(`published`, '$.title.default', 'Kanji – Teil 3: Gerät und Abschlusscode',
+                                           '$.title.en', 'Kanji – Part 3: Device and Closing Code',
+                                           '$.title.fr', 'Kanji – Partie 3: appareil et code final',
+                                           '$.title.it', 'Kanji – Parte 3: dispositivo e codice finale')
+ WHERE JSON_UNQUOTE(JSON_EXTRACT(`config`, '$.title.default')) = 'Kanji – Teil 2: Gerät und Abschlusscode';
+
 
 SET @seed_title = JSON_UNQUOTE(JSON_EXTRACT(@part1_json, '$.title.default'));
 SET @survey_part1 = (SELECT id FROM `surveys`
@@ -790,6 +1219,18 @@ SELECT 'Kanji_Data', @part1_json, @part1_json, NOW()
 SET @survey_part1 = COALESCE(@survey_part1, LAST_INSERT_ID());
 UPDATE `surveys` SET `config` = @part1_json, `published` = @part1_json,
        `published_at` = NOW() WHERE id = @survey_part1;
+
+SET @seed_title = JSON_UNQUOTE(JSON_EXTRACT(@demo_json, '$.title.default'));
+SET @survey_demo = (SELECT id FROM `surveys`
+  WHERE `survey_generated_id` = 'Kanji_Data'
+    AND JSON_UNQUOTE(JSON_EXTRACT(`config`, '$.title.default')) = @seed_title
+  ORDER BY id LIMIT 1);
+INSERT INTO `surveys` (`survey_generated_id`, `config`, `published`, `published_at`)
+SELECT 'Kanji_Data', @demo_json, @demo_json, NOW()
+  WHERE @survey_demo IS NULL;
+SET @survey_demo = COALESCE(@survey_demo, LAST_INSERT_ID());
+UPDATE `surveys` SET `config` = @demo_json, `published` = @demo_json,
+       `published_at` = NOW() WHERE id = @survey_demo;
 
 SET @seed_title = JSON_UNQUOTE(JSON_EXTRACT(@part2_json, '$.title.default'));
 SET @survey_part2 = (SELECT id FROM `surveys`
@@ -845,6 +1286,30 @@ SELECT 'Kanji_Data', @pause_json, @pause_json, NOW()
 SET @survey_pause3 = COALESCE(@survey_pause3, LAST_INSERT_ID());
 UPDATE `surveys` SET `config` = @pause_json, `published` = @pause_json,
        `published_at` = NOW() WHERE id = @survey_pause3;
+
+-- -----------------------------------------------------------------------
+-- Every survey needs a question to hold the code
+--
+-- url_params writes the code into the survey as `extra_param_code`, but
+-- SurveyJS discards a value with no matching question, so `redirect_at_end`
+-- resolved `{{extra_param_code}}` to nothing and sent the participant to a
+-- URL with a trailing slash, which does not route. The question is hidden and
+-- never cleared, so it survives to the redirect.
+--
+-- Part 1 has its own copy that mirrors ID_1; this adds one to the others.
+-- -----------------------------------------------------------------------
+
+UPDATE `surveys`
+   SET `published` = JSON_ARRAY_APPEND(`published`, '$.pages[0].elements',
+         JSON_OBJECT('name', 'extra_param_code', 'type', 'text', 'title', 'extra_param_code',
+                'visible', CAST(FALSE AS JSON), 'clearIfInvisible', 'none')),
+       `config`    = JSON_ARRAY_APPEND(`config`,    '$.pages[0].elements',
+         JSON_OBJECT('name', 'extra_param_code', 'type', 'text', 'title', 'extra_param_code',
+                'visible', CAST(FALSE AS JSON), 'clearIfInvisible', 'none'))
+ WHERE JSON_EXTRACT(`published`, '$.title.default') IS NOT NULL
+   AND JSON_UNQUOTE(JSON_EXTRACT(`published`, '$.title.default')) LIKE 'Kanji%'
+   AND JSON_SEARCH(`published`, 'one', 'extra_param_code', NULL, '$.pages[*].elements[*].name') IS NULL;
+
 
 -- -----------------------------------------------------------------------
 -- Study content: lab.js memory task
@@ -912,6 +1377,11 @@ SET @sec_pause3 = (SELECT id FROM sections WHERE name = 'kanji-pause-3');
 
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES (@sec_part1, get_field_id('survey-js'), '0000000001', '0000000001', @survey_part1)
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+SET @sec_demo = (SELECT id FROM sections WHERE name = 'kanji-survey-demo');
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES (@sec_demo, get_field_id('survey-js'), '0000000001', '0000000001', @survey_demo)
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
