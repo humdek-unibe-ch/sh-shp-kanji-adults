@@ -1024,6 +1024,10 @@ ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 -- never passes through them, so a resubmission under a finished code would
 -- still overwrite the row. `block_updates_when` refuses the write itself,
 -- whatever page it came from.
+--
+-- kanji-survey-part2 is excluded: it is the survey that sets Finished_Study,
+-- and a component is never blocked by a column it writes itself, so the
+-- field would do nothing there.
 -- -----------------------------------------------------------------------
 
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
@@ -1032,6 +1036,7 @@ SELECT s.id, get_field_id('block_updates_when'), '0000000001', '0000000001', 'Fi
   JOIN `styles` st ON st.id = s.id_styles
  WHERE st.name IN ('surveyJS', 'labJS')
    AND s.name LIKE 'kanji-%'
+   AND s.name <> 'kanji-survey-part2'
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 
