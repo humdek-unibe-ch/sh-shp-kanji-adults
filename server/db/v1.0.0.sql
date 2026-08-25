@@ -242,7 +242,7 @@ ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 INSERT IGNORE INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
     (@ks_part1, get_field_id('restart_on_refresh'),'0000000001', '0000000001', '0'),
-    (@ks_part1, get_field_id('own_entries_only'),  '0000000001', '0000000001', '1');
+    (@ks_part1, get_field_id('own_entries_only'),  '0000000001', '0000000001', '0');
 
 INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
 VALUES (@kanji_survey, @ks_part1, 0)
@@ -716,7 +716,7 @@ SET @ks_part2 = (SELECT id FROM sections WHERE name = 'kanji-survey-part2');
 INSERT IGNORE INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
     (@ks_part2, get_field_id('restart_on_refresh'),'0000000001', '0000000001', '0'),
-    (@ks_part2, get_field_id('own_entries_only'),  '0000000001', '0000000001', '1');
+    (@ks_part2, get_field_id('own_entries_only'),  '0000000001', '0000000001', '0');
 
 INSERT IGNORE INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
 VALUES (@kanji_questions, @ks_part2, 0);
@@ -1033,6 +1033,24 @@ ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 
 -- -----------------------------------------------------------------------
+-- A run belongs to its code, not to a session
+--
+-- own_entries_only scopes the row lookup to the session user. A save that
+-- crosses a login boundary then cannot find the row it started, and
+-- save_data refuses to insert when its key matches nothing, so the survey
+-- reports "Data not saved". Participants are guests throughout, but anyone
+-- logged in for part of a run would lose it.
+-- -----------------------------------------------------------------------
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+SELECT s.id, get_field_id('own_entries_only'), '0000000001', '0000000001', '0'
+  FROM `sections` s
+  JOIN `styles` st ON st.id = s.id_styles
+ WHERE st.name = 'surveyJS' AND s.name LIKE 'kanji-%'
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+
+-- -----------------------------------------------------------------------
 -- A finished code is read-only
 --
 -- The containers on task 1 hide the experiment, but a save is a POST and
@@ -1159,6 +1177,13 @@ SET @demo_json = JSON_SET(@demo_json, '$.title.default', 'Kanji – Teil 2: Anga
 SET @demo_json = JSON_SET(@demo_json, '$.title.en', 'Kanji – Part 2: Demographics');
 SET @demo_json = JSON_SET(@demo_json, '$.title.fr', 'Kanji – Partie 2: données');
 SET @demo_json = JSON_SET(@demo_json, '$.title.it', 'Kanji – Parte 2: dati');
+-- The pages gated on {EV}, the consent question, which stays in part 1.
+-- Reaching this survey already means consent was given, so drop that
+-- clause and keep any remaining condition.
+SET @demo_json = JSON_REMOVE(@demo_json, '$.pages[1].visibleIf');
+SET @demo_json = JSON_REMOVE(@demo_json, '$.pages[0].visibleIf');
+SET @demo_json = JSON_SET(@demo_json, '$.pages[2].visibleIf', '{Demo_19} = ''1''');
+
 SET @demo_json = JSON_ARRAY_APPEND(@demo_json, '$.pages[0].elements',
     JSON_OBJECT('name', 'extra_param_code', 'type', 'text', 'title', 'extra_param_code',
                 'visible', CAST(FALSE AS JSON), 'clearIfInvisible', 'none'));
