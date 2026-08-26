@@ -16,7 +16,7 @@ no PHP and there are no hooks.
 
 Both must be installed and migrated **before** this one runs. The versions
 matter: the study needs `url_params`, `{{name}}` templating in
-`redirect_at_end`, `update_based_on` and `block_updates_when` on both styles.
+`redirect_at_end` and `update_based_on` on both styles.
 
 ## Install
 
@@ -25,6 +25,11 @@ matter: the study needs `url_params`, `{{name}}` templating in
    `@asset_base` at the top of the migration set the URL prefix; `@base_path`
    must match `BASE_PATH` in `globals_untracked.php`. The default asset folder
    is `/assets/kanji`.
+
+   Put `kanji_labjs.css` in `/assets` while you are there. The migration already
+   seeds this stylesheet into the task pages, so the study is styled without it;
+   the copy in `/assets` is what a researcher loads into the lab.js Builder to
+   preview a task the way participants see it.
 3. Run the migration **with an explicit UTF-8 charset**:
 
    ```
@@ -67,8 +72,9 @@ Participants arrive from a letter without logging in, so every page grants
 access to all groups and carries an `acl_users` row for the guest user. Every
 page except the welcome page and the first task page is headless, so the study
 runs without the site header and footer. The first task page keeps the chrome
-because a finished code can stop a participant there, and a headless page would
-leave no way out; the task CSS hides it again while the experiment is running.
+because an already-finished task can stop a participant there, and a headless
+page would leave no way out; the task CSS hides it again while the experiment
+is running.
 
 ## How a run holds together
 
@@ -79,57 +85,69 @@ after it has `url_params` on, so it saves the code it was opened with as
 than a query parameter because only route parameters reach a style, which is
 what lets the guard below filter a row by it.
 
-All nine components write into one table, `Kanji_Data`, and set
-`update_based_on` to `extra_param_code`, so each save updates the row already
-carrying that code. One participant is **one row**.
+Each component keeps its own data table, the one its style names by default,
+and sets `update_based_on` to `extra_param_code`, so a component run twice
+updates its own row rather than opening a second. One participant is **one row
+per component**, and the code is what joins them at analysis time.
+
+Part 1 is the exception: `update_based_on` is empty there because it is the
+page where the code is typed, so there is nothing to key on until it has been
+answered.
 
 Nothing is kept in the session, so a run survives a dropped session, a new tab,
 a different device, and a login part-way through.
 
 An unfinished run can be resumed and writes into its existing row: a participant
 who stops and comes back replaces their earlier answers where the attempts
-overlap, and keeps the first attempt where the second did not reach. Once
-`Finished_Study` is set the row is read-only and no later save can change it.
+overlap, and keeps the first attempt where the second did not reach.
 
-## A code is used once
+## A finished page is not repeated
 
-`Finished_Study` is a hidden question on the closing survey, so it is set only
-when a run reaches the end. An abandoned run leaves it unset and can be
-resumed; a completed one is refused. Two layers enforce that.
+Every page that carries the code holds two conditional containers — one with
+the component, one with an "already completed" message in all four languages.
+Both read **that page's own data table**, filter it by the code in the URL, and
+test the row's `triggerType` from opposite sides.
 
-**What renders.** Every page that carries the code holds two conditional
-containers — one with the component, one with an "already completed" message
-in all four languages. Both read the row for the code in the URL and test
-`Finished_Study` from opposite sides. This is CMS configuration, `condition`
-and `data_config` on the containers, not code.
+A component writes `finished` only when it is submitted, so a page shows its
+done message once its own survey or experiment has been completed, and a page
+left part way through still opens and can be resumed. Going back to a finished
+task therefore says so, while the next task opens normally.
 
-**What is written.** A save is a POST straight to the component's controller
-and never passes through a container, so the containers alone would not
-protect the data. Every component also sets `block_updates_when` to
-`Finished_Study`, which makes the model refuse to update a row that is
-already finished — whatever page the request came from.
+This is CMS configuration — `condition` and `data_config` on the containers —
+not code. The filter takes the code straight from the URL as `{{__code__}}`,
+which every style exposes for its route parameters.
 
 Part 1 has no container: it is where the code is typed, so there is no route
 parameter to filter on yet. It is deliberately short — consent and the code,
-seven questions — so a used code is caught on the very next page rather than
-after the demographics. `block_updates_when` covers part 1 itself, so a
-returning participant can open the form but cannot overwrite a finished row.
+seven questions — so a finished page is caught on the very next page rather
+than after the demographics.
+
+Containers decide what renders, not what is written. A save is a POST straight
+to the component's controller and never passes through them, so a participant
+who reposts by hand can still write. Nothing in the study depends on stopping
+that: each component owns its own row, so a repeat overwrites only its own
+data.
 
 ## Recorded data
 
-One row per participant in `Kanji_Data`.
+Ten tables, one per component, each with one row per participant. Every row
+carries `extra_param_code`, which is what joins them.
 
-| Column | Contents |
+| Table | Contents |
 |---|---|
-| `EV`, `ID_1` | Consent and code (part 1) |
-| `Demo_*` | Demographics (part 2) |
-| `P1_*`, `P2_*`, `P3_*` | Vignette ratings from each break |
-| `Device`, `ID_2` | Device, closing code |
-| `extra_data_trials_learn_A/_B` | Learning: item shown, on-screen duration |
-| `extra_data_trials_recall_A/_B` | Recall: choice, confidence, reaction times, accuracy |
-| `extra_data_n_*` | Per-block trial and correct counts |
-| `extra_data_UserLanguage` | `DE` / `EN` / `FR` / `IT` |
-| `Finished_Study` | `1` once the closing survey is done |
+| `Kanji_Part1` | `EV`, `ID_1` — consent and code |
+| `Kanji_Demographics` | `Demo_*` |
+| `Kanji_Task1` | `extra_data_trials_learn_A` — item shown, on-screen duration |
+| `Kanji_Pause1` | `P1_*` — Französische Vokabeln ratings |
+| `Kanji_Task2` | `extra_data_trials_recall_A` — choice, confidence, reaction times, accuracy |
+| `Kanji_Pause2` | `P2_*` — Geografie Quiz ratings |
+| `Kanji_Task3` | `extra_data_trials_learn_B` |
+| `Kanji_Pause3` | `P3_*` — Mathematik and Aufsatz ratings |
+| `Kanji_Task4` | `extra_data_trials_recall_B` |
+| `Kanji_Part2` | `Device`, `ID_2`, `Finished_Study` — set to `1` once the closing survey is done |
+
+The task tables also carry `extra_data_n_*` (per-block trial and correct
+counts) and `extra_data_UserLanguage` (`DE` / `EN` / `FR` / `IT`).
 
 Questionnaire columns carry the Qualtrics names without the per-language suffix
 (`Demo_2` here, `Demo_2_DE` there), so the two waves line up. The task blocks
@@ -142,7 +160,7 @@ log and is by far the largest.
 
 Because participants are not logged in, every write belongs to the guest user,
 so the code is the only thing separating one participant from another. A code
-given to two people would put them in one row.
+given to two people would merge them into the same row in every table.
 
 ## Editing the study
 
