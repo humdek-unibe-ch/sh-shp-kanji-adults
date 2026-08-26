@@ -1058,6 +1058,35 @@ ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 
 -- -----------------------------------------------------------------------
+-- One sitting, and a used code is sent on rather than shown an error
+--
+-- `restart_on_refresh` stops a survey resuming a part-finished response.
+-- Participants are told to do the study in one sitting, so a return is a
+-- fresh start. It also keeps the url parameters working: the client only
+-- applies them when it opens a new response, so a resumed survey would
+-- lose the code and redirect to a url with an empty segment.
+--
+-- `redirect_when_blocked` makes a refused save follow redirect_at_end
+-- instead of reporting a failure. Part 1 is where a used code is typed,
+-- and that page cannot be guarded because the code is not in the url yet,
+-- so the refusal is the only signal available.
+-- -----------------------------------------------------------------------
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+SELECT s.id, get_field_id('restart_on_refresh'), '0000000001', '0000000001', '1'
+  FROM `sections` s
+  JOIN `styles` st ON st.id = s.id_styles
+ WHERE st.name = 'surveyJS'
+   AND s.name LIKE 'kanji-%'
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+SELECT s.id, get_field_id('redirect_when_blocked'), '0000000001', '0000000001', '1'
+  FROM `sections` s WHERE s.name = 'kanji-survey-part1'
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+
+-- -----------------------------------------------------------------------
 -- The code travels as a path segment
 --
 -- A page keeps its url once created, so INSERT IGNORE above cannot add the
