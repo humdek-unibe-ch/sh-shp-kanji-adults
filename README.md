@@ -16,7 +16,8 @@ no PHP and there are no hooks.
 
 Both must be installed and migrated **before** this one runs. The versions
 matter: the study needs `url_params`, `{{name}}` templating in
-`redirect_at_end` and `update_based_on` on both styles.
+`redirect_at_end` and `update_based_on` on both styles, and `warning_on_reload`
+and `preload_files` on `labJS`.
 
 ## Install
 
@@ -100,6 +101,18 @@ a different device, and a login part-way through.
 An unfinished run can be resumed and writes into its existing row: a participant
 who stops and comes back replaces their earlier answers where the attempts
 overlap, and keeps the first attempt where the second did not reach.
+
+A refresh part-way through a page is handled per style. The surveys have
+`restart_on_refresh` off, so reloading one reopens the response already in
+progress instead of starting an empty one; the stored row carries the code, so
+resuming keeps it and the redirect at the end still builds a complete URL. An
+experiment cannot resume mid-way — a reload restarts it from the first trial —
+so the four task pages set `warning_on_reload` and the browser asks before the
+refresh throws the trials away.
+
+The task pages also set `preload_files`, which fetches the whole image pool in
+the background once the task starts, so a later trial shows its stimulus from
+the browser cache rather than waiting on the network.
 
 ## A finished page is not repeated
 
