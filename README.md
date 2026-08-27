@@ -17,7 +17,7 @@ no PHP and there are no hooks.
 Both must be installed and migrated **before** this one runs. The versions
 matter: the study needs `url_params`, `{{name}}` templating in
 `redirect_at_end` and `update_based_on` on both styles, and `warning_on_reload`
-and `preload_files` on `labJS`.
+on `labJS`.
 
 ## Install
 
@@ -109,10 +109,6 @@ resuming keeps it and the redirect at the end still builds a complete URL. An
 experiment cannot resume mid-way — a reload restarts it from the first trial —
 so the four task pages set `warning_on_reload` and the browser asks before the
 refresh throws the trials away.
-
-The task pages also set `preload_files`, which fetches the whole image pool in
-the background once the task starts, so a later trial shows its stimulus from
-the browser cache rather than waiting on the network.
 
 ## A finished page is not repeated
 
