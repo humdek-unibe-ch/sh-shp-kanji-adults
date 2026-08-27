@@ -106,104 +106,15 @@ VALUES
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
     VALUES (get_style_id('container'), 'kanji-welcome-container', NULL);
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
-    VALUES (get_style_id('markdown'), 'kanji-welcome-style', NULL);
-INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
     VALUES (get_style_id('markdown'), 'kanji-welcome-text', NULL);
 
 SET @kw_container = (SELECT id FROM sections WHERE name = 'kanji-welcome-container');
-SET @kw_style     = (SELECT id FROM sections WHERE name = 'kanji-welcome-style');
 SET @kw_text      = (SELECT id FROM sections WHERE name = 'kanji-welcome-text');
 
 INSERT IGNORE INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
     (@kw_container, get_field_id('css'),      '0000000001', '0000000001', 'px-3'),
     (@kw_container, get_field_id('is_fluid'), '0000000001', '0000000001', '0');
-
--- Welcome styling. Delivered as a markdown section for the same reason the task
--- stylesheet is: the section's `css` field is a class-name list, not a place for
--- a stylesheet. Everything is scoped under .kanji-welcome so nothing here can
--- reach another page.
-SET @welcome_css = '<style>
-.kanji-welcome {
-  max-width: 40rem;
-  margin: 0 auto;
-  padding: 3rem 0 4rem;
-}
-.kanji-welcome__eyebrow {
-  font-size: .8125rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: #6b7280;
-  margin: 0 0 .5rem;
-}
-.kanji-welcome__title {
-  font-size: 2rem;
-  line-height: 1.2;
-  margin: 0 0 1rem;
-  text-wrap: balance;
-}
-.kanji-welcome__lead {
-  font-size: 1.0625rem;
-  line-height: 1.6;
-  color: #374151;
-  margin: 0 0 2rem;
-}
-.kanji-welcome__facts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: .75rem;
-  margin: 0 0 2rem;
-  padding: 0;
-  list-style: none;
-}
-.kanji-welcome__fact {
-  border: 1px solid #e5e7eb;
-  border-radius: .5rem;
-  padding: .875rem 1rem;
-  background: #fff;
-}
-.kanji-welcome__fact b {
-  display: block;
-  font-size: .9375rem;
-  margin-bottom: .125rem;
-}
-.kanji-welcome__fact span {
-  font-size: .8125rem;
-  line-height: 1.4;
-  color: #6b7280;
-}
-.kanji-welcome__start {
-  display: inline-block;
-  background: #8b5e3c;
-  color: #fff;
-  font-size: 1.0625rem;
-  font-weight: 600;
-  padding: .75rem 1.75rem;
-  border-radius: .5rem;
-  text-decoration: none;
-}
-.kanji-welcome__start:hover,
-.kanji-welcome__start:focus {
-  background: #744d31;
-  color: #fff;
-  text-decoration: none;
-}
-.kanji-welcome__note {
-  font-size: .8125rem;
-  color: #6b7280;
-  margin: 1.25rem 0 0;
-}
-@media (max-width: 30rem) {
-  .kanji-welcome { padding: 2rem 0 3rem; }
-  .kanji-welcome__title { font-size: 1.625rem; }
-  .kanji-welcome__start { display: block; text-align: center; }
-}
-</style>';
-
-INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
-SELECT @kw_style, get_field_id('text_md'), l.id, '0000000001', @welcome_css
-  FROM languages l WHERE l.locale <> 'all'
-ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 -- The welcome page is written for this port, so it has no counterpart in the
 -- .qsf and carries its own translations. `text_md` is translatable, so one
@@ -221,104 +132,103 @@ INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_langu
 VALUES
     (@kw_text, get_field_id('text_md'),
      (SELECT id FROM languages WHERE locale = 'de-CH'), '0000000001',
-CONCAT('<div class="kanji-welcome" markdown="1">
+CONCAT('<div class="col-md-8 col-lg-6 mx-auto py-5" markdown="1">
 
-<p class="kanji-welcome__eyebrow">Studie zum Lernen</p>
+<p class="small text-uppercase text-muted mb-2">Studie zum Lernen</p>
 
-<h1 class="kanji-welcome__title">Kanji Lernaufgabe</h1>
+<h1 class="h2 mb-3">Kanji Lernaufgabe</h1>
 
-<p class="kanji-welcome__lead">Vielen Dank für Ihr Interesse an unserer Studie.
+<p class="lead mb-4">Vielen Dank für Ihr Interesse an unserer Studie.
 Sie lernen gleich japanische Schriftzeichen kennen und prüfen anschliessend,
 woran Sie sich erinnern. Vorkenntnisse brauchen Sie keine.</p>
 
-<ul class="kanji-welcome__facts">
-<li class="kanji-welcome__fact"><b>Rund 30 Minuten</b><span>Planen Sie die Zeit am Stück ein</span></li>
-<li class="kanji-welcome__fact"><b>In einem Zug</b><span>Ein Unterbrechen und späteres Fortsetzen ist nicht möglich</span></li>
-<li class="kanji-welcome__fact"><b>Code bereithalten</b><span>Sie finden ihn in dem Brief, den Sie erhalten haben</span></li>
-</ul>
+<div class="row mb-4">
+<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Rund 30 Minuten</b><span class="small text-muted">Planen Sie die Zeit am Stück ein</span></div></div></div>
+<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">In einem Zug</b><span class="small text-muted">Ein Unterbrechen und späteres Fortsetzen ist nicht möglich</span></div></div></div>
+<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Code bereithalten</b><span class="small text-muted">Sie finden ihn in dem Brief, den Sie erhalten haben</span></div></div></div>
+</div>
 
-<a class="kanji-welcome__start" href="', @base_path, '/kanji-adults-survey">Aufgabe starten</a>
+<a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Aufgabe starten</a>
 
-<p class="kanji-welcome__note">Bitte bearbeiten Sie die Aufgabe an einem ruhigen Ort.
+<p class="small text-muted mt-4">Bitte bearbeiten Sie die Aufgabe an einem ruhigen Ort.
 Die Sprache können Sie unten auf dieser Seite wechseln — später nicht mehr.</p>
 
 </div>')),
     (@kw_text, get_field_id('text_md'),
      (SELECT id FROM languages WHERE locale = 'en-GB'), '0000000001',
-CONCAT('<div class="kanji-welcome" markdown="1">
+CONCAT('<div class="col-md-8 col-lg-6 mx-auto py-5" markdown="1">
 
-<p class="kanji-welcome__eyebrow">A study on learning</p>
+<p class="small text-uppercase text-muted mb-2">A study on learning</p>
 
-<h1 class="kanji-welcome__title">Kanji Learning Task</h1>
+<h1 class="h2 mb-3">Kanji Learning Task</h1>
 
-<p class="kanji-welcome__lead">Thank you for your interest in our study.
+<p class="lead mb-4">Thank you for your interest in our study.
 You are about to learn some Japanese characters and then see how many you
 remember. No prior knowledge is needed.</p>
 
-<ul class="kanji-welcome__facts">
-<li class="kanji-welcome__fact"><b>About 30 minutes</b><span>Set the time aside in one block</span></li>
-<li class="kanji-welcome__fact"><b>In one sitting</b><span>You cannot pause and continue later</span></li>
-<li class="kanji-welcome__fact"><b>Have your code ready</b><span>It is in the letter you received</span></li>
-</ul>
+<div class="row mb-4">
+<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">About 30 minutes</b><span class="small text-muted">Set the time aside in one block</span></div></div></div>
+<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">In one sitting</b><span class="small text-muted">You cannot pause and continue later</span></div></div></div>
+<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Have your code ready</b><span class="small text-muted">It is in the letter you received</span></div></div></div>
+</div>
 
-<a class="kanji-welcome__start" href="', @base_path, '/kanji-adults-survey">Start the task</a>
+<a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Start the task</a>
 
-<p class="kanji-welcome__note">Please work somewhere quiet.
+<p class="small text-muted mt-4">Please work somewhere quiet.
 You can change the language at the bottom of this page — but not once you have started.</p>
 
 </div>')),
     (@kw_text, get_field_id('text_md'),
      (SELECT id FROM languages WHERE locale = 'fr-CH'), '0000000001',
-CONCAT('<div class="kanji-welcome" markdown="1">
+CONCAT('<div class="col-md-8 col-lg-6 mx-auto py-5" markdown="1">
 
-<p class="kanji-welcome__eyebrow">Étude sur l’apprentissage</p>
+<p class="small text-uppercase text-muted mb-2">Étude sur l’apprentissage</p>
 
-<h1 class="kanji-welcome__title">Tâche d’apprentissage Kanji</h1>
+<h1 class="h2 mb-3">Tâche d’apprentissage Kanji</h1>
 
-<p class="kanji-welcome__lead">Merci de l’intérêt que vous portez à notre étude.
+<p class="lead mb-4">Merci de l’intérêt que vous portez à notre étude.
 Vous allez découvrir des caractères japonais, puis vérifier ce dont vous vous
 souvenez. Aucune connaissance préalable n’est nécessaire.</p>
 
-<ul class="kanji-welcome__facts">
-<li class="kanji-welcome__fact"><b>Environ 30 minutes</b><span>Prévoyez ce temps d’un seul tenant</span></li>
-<li class="kanji-welcome__fact"><b>En une seule fois</b><span>Vous ne pourrez pas interrompre puis reprendre plus tard</span></li>
-<li class="kanji-welcome__fact"><b>Gardez votre code</b><span>Il figure dans la lettre que vous avez reçue</span></li>
-</ul>
+<div class="row mb-4">
+<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Environ 30 minutes</b><span class="small text-muted">Prévoyez ce temps d’un seul tenant</span></div></div></div>
+<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">En une seule fois</b><span class="small text-muted">Vous ne pourrez pas interrompre puis reprendre plus tard</span></div></div></div>
+<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Gardez votre code</b><span class="small text-muted">Il figure dans la lettre que vous avez reçue</span></div></div></div>
+</div>
 
-<a class="kanji-welcome__start" href="', @base_path, '/kanji-adults-survey">Commencer l’exercice</a>
+<a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Commencer l’exercice</a>
 
-<p class="kanji-welcome__note">Veuillez travailler dans un endroit calme.
+<p class="small text-muted mt-4">Veuillez travailler dans un endroit calme.
 Vous pouvez changer de langue en bas de cette page — mais plus une fois commencé.</p>
 
 </div>')),
     (@kw_text, get_field_id('text_md'),
      (SELECT id FROM languages WHERE locale = 'it-CH'), '0000000001',
-CONCAT('<div class="kanji-welcome" markdown="1">
+CONCAT('<div class="col-md-8 col-lg-6 mx-auto py-5" markdown="1">
 
-<p class="kanji-welcome__eyebrow">Studio sull’apprendimento</p>
+<p class="small text-uppercase text-muted mb-2">Studio sull’apprendimento</p>
 
-<h1 class="kanji-welcome__title">Compito di apprendimento Kanji</h1>
+<h1 class="h2 mb-3">Compito di apprendimento Kanji</h1>
 
-<p class="kanji-welcome__lead">La ringraziamo per l’interesse dimostrato verso il
+<p class="lead mb-4">La ringraziamo per l’interesse dimostrato verso il
 nostro studio. Imparerà alcuni caratteri giapponesi e verificherà poi quanti ne
 ricorda. Non sono richieste conoscenze pregresse.</p>
 
-<ul class="kanji-welcome__facts">
-<li class="kanji-welcome__fact"><b>Circa 30 minuti</b><span>Prenda questo tempo senza interruzioni</span></li>
-<li class="kanji-welcome__fact"><b>In un’unica sessione</b><span>Non potrà interrompere e riprendere più tardi</span></li>
-<li class="kanji-welcome__fact"><b>Tenga a portata il codice</b><span>Lo trova nella lettera che ha ricevuto</span></li>
-</ul>
+<div class="row mb-4">
+<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Circa 30 minuti</b><span class="small text-muted">Prenda questo tempo senza interruzioni</span></div></div></div>
+<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">In un’unica sessione</b><span class="small text-muted">Non potrà interrompere e riprendere più tardi</span></div></div></div>
+<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Tenga a portata il codice</b><span class="small text-muted">Lo trova nella lettera che ha ricevuto</span></div></div></div>
+</div>
 
-<a class="kanji-welcome__start" href="', @base_path, '/kanji-adults-survey">Inizia il compito</a>
+<a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Inizia il compito</a>
 
-<p class="kanji-welcome__note">La preghiamo di svolgerlo in un luogo tranquillo.
+<p class="small text-muted mt-4">La preghiamo di svolgerlo in un luogo tranquillo.
 Può cambiare lingua in fondo a questa pagina — ma non dopo aver iniziato.</p>
 
 </div>'))
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 INSERT INTO `sections_hierarchy` (`parent`, `child`, `position`) VALUES
-    (@kw_container, @kw_style, 0),
     (@kw_container, @kw_text, 10)
 ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
 
@@ -509,218 +419,10 @@ SET @kt1_done_text = (SELECT id FROM sections WHERE name = 'kanji-task-1-done-te
 
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
-    (@kt1_done_text, get_field_id('text_md'), '0000000002', '0000000001', '<style>
-.kanji-done {
-  max-width: 34rem;
-  margin: 0 auto;
-  padding: 4rem 0 5rem;
-  text-align: center;
-}
-.kanji-done__mark {
-  width: 3.5rem;
-  height: 3.5rem;
-  margin: 0 auto 1.5rem;
-  border-radius: 50%;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #047857;
-  font-size: 1.5rem;
-  line-height: 1;
-}
-.kanji-done__eyebrow {
-  font-size: .8125rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: #6b7280;
-  margin: 0 0 .5rem;
-}
-.kanji-done__title {
-  font-size: 1.75rem;
-  line-height: 1.25;
-  margin: 0 0 1rem;
-  text-wrap: balance;
-}
-.kanji-done__lead {
-  font-size: 1.0625rem;
-  line-height: 1.6;
-  color: #374151;
-  margin: 0 0 2rem;
-}
-.kanji-done__note {
-  font-size: .875rem;
-  line-height: 1.5;
-  color: #6b7280;
-  border-top: 1px solid #e5e7eb;
-  padding-top: 1.25rem;
-  margin: 0;
-}
-@media (max-width: 480px) {
-  .kanji-done { padding: 2.5rem 1rem 3rem; }
-  .kanji-done__title { font-size: 1.5rem; }
-}
-</style><div class="kanji-done"><div class="kanji-done__mark">&#10003;</div><p class="kanji-done__eyebrow">Geschafft</p><h1 class="kanji-done__title">Diese Aufgabe wurde bereits abgeschlossen</h1><p class="kanji-done__lead">Unter Ihrem Code wurde die Aufgabe bereits vollständig bearbeitet. Vielen Dank für Ihre Teilnahme — sie ist nur einmal möglich.</p><p class="kanji-done__note">Sollte das nicht stimmen, wenden Sie sich bitte an das Studienteam.</p></div>'),
-    (@kt1_done_text, get_field_id('text_md'), '0000000003', '0000000001', '<style>
-.kanji-done {
-  max-width: 34rem;
-  margin: 0 auto;
-  padding: 4rem 0 5rem;
-  text-align: center;
-}
-.kanji-done__mark {
-  width: 3.5rem;
-  height: 3.5rem;
-  margin: 0 auto 1.5rem;
-  border-radius: 50%;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #047857;
-  font-size: 1.5rem;
-  line-height: 1;
-}
-.kanji-done__eyebrow {
-  font-size: .8125rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: #6b7280;
-  margin: 0 0 .5rem;
-}
-.kanji-done__title {
-  font-size: 1.75rem;
-  line-height: 1.25;
-  margin: 0 0 1rem;
-  text-wrap: balance;
-}
-.kanji-done__lead {
-  font-size: 1.0625rem;
-  line-height: 1.6;
-  color: #374151;
-  margin: 0 0 2rem;
-}
-.kanji-done__note {
-  font-size: .875rem;
-  line-height: 1.5;
-  color: #6b7280;
-  border-top: 1px solid #e5e7eb;
-  padding-top: 1.25rem;
-  margin: 0;
-}
-@media (max-width: 480px) {
-  .kanji-done { padding: 2.5rem 1rem 3rem; }
-  .kanji-done__title { font-size: 1.5rem; }
-}
-</style><div class="kanji-done"><div class="kanji-done__mark">&#10003;</div><p class="kanji-done__eyebrow">All done</p><h1 class="kanji-done__title">This task has already been completed</h1><p class="kanji-done__lead">The task has already been completed in full under your code. Thank you for taking part — it can only be done once.</p><p class="kanji-done__note">If you think this is not correct, please contact the study team.</p></div>'),
-    (@kt1_done_text, get_field_id('text_md'), '0000000016', '0000000001', '<style>
-.kanji-done {
-  max-width: 34rem;
-  margin: 0 auto;
-  padding: 4rem 0 5rem;
-  text-align: center;
-}
-.kanji-done__mark {
-  width: 3.5rem;
-  height: 3.5rem;
-  margin: 0 auto 1.5rem;
-  border-radius: 50%;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #047857;
-  font-size: 1.5rem;
-  line-height: 1;
-}
-.kanji-done__eyebrow {
-  font-size: .8125rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: #6b7280;
-  margin: 0 0 .5rem;
-}
-.kanji-done__title {
-  font-size: 1.75rem;
-  line-height: 1.25;
-  margin: 0 0 1rem;
-  text-wrap: balance;
-}
-.kanji-done__lead {
-  font-size: 1.0625rem;
-  line-height: 1.6;
-  color: #374151;
-  margin: 0 0 2rem;
-}
-.kanji-done__note {
-  font-size: .875rem;
-  line-height: 1.5;
-  color: #6b7280;
-  border-top: 1px solid #e5e7eb;
-  padding-top: 1.25rem;
-  margin: 0;
-}
-@media (max-width: 480px) {
-  .kanji-done { padding: 2.5rem 1rem 3rem; }
-  .kanji-done__title { font-size: 1.5rem; }
-}
-</style><div class="kanji-done"><div class="kanji-done__mark">&#10003;</div><p class="kanji-done__eyebrow">Terminé</p><h1 class="kanji-done__title">Cette tâche a déjà été effectuée</h1><p class="kanji-done__lead">La tâche a déjà été entièrement effectuée avec votre code. Merci de votre participation — elle ne peut être réalisée qu’une seule fois.</p><p class="kanji-done__note">Si vous pensez que ce n’est pas correct, veuillez contacter l’équipe de l’étude.</p></div>'),
-    (@kt1_done_text, get_field_id('text_md'), '0000000017', '0000000001', '<style>
-.kanji-done {
-  max-width: 34rem;
-  margin: 0 auto;
-  padding: 4rem 0 5rem;
-  text-align: center;
-}
-.kanji-done__mark {
-  width: 3.5rem;
-  height: 3.5rem;
-  margin: 0 auto 1.5rem;
-  border-radius: 50%;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #047857;
-  font-size: 1.5rem;
-  line-height: 1;
-}
-.kanji-done__eyebrow {
-  font-size: .8125rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: #6b7280;
-  margin: 0 0 .5rem;
-}
-.kanji-done__title {
-  font-size: 1.75rem;
-  line-height: 1.25;
-  margin: 0 0 1rem;
-  text-wrap: balance;
-}
-.kanji-done__lead {
-  font-size: 1.0625rem;
-  line-height: 1.6;
-  color: #374151;
-  margin: 0 0 2rem;
-}
-.kanji-done__note {
-  font-size: .875rem;
-  line-height: 1.5;
-  color: #6b7280;
-  border-top: 1px solid #e5e7eb;
-  padding-top: 1.25rem;
-  margin: 0;
-}
-@media (max-width: 480px) {
-  .kanji-done { padding: 2.5rem 1rem 3rem; }
-  .kanji-done__title { font-size: 1.5rem; }
-}
-</style><div class="kanji-done"><div class="kanji-done__mark">&#10003;</div><p class="kanji-done__eyebrow">Completato</p><h1 class="kanji-done__title">Questo compito è già stato completato</h1><p class="kanji-done__lead">Con il suo codice il compito è già stato completato interamente. Grazie per la partecipazione — può essere svolto una sola volta.</p><p class="kanji-done__note">Se ritiene che non sia corretto, contatti il team dello studio.</p></div>')
+    (@kt1_done_text, get_field_id('text_md'), '0000000002', '0000000001', '<div class="col-md-8 col-lg-6 mx-auto py-5 text-center"><p class="display-4 text-success mb-3">&#10003;</p><p class="small text-uppercase text-muted mb-2">Geschafft</p><h1 class="h3 mb-3">Diese Aufgabe wurde bereits abgeschlossen</h1><p class="lead mb-4">Unter Ihrem Code wurde die Aufgabe bereits vollständig bearbeitet. Vielen Dank für Ihre Teilnahme — sie ist nur einmal möglich.</p><p class="small text-muted mb-0">Sollte das nicht stimmen, wenden Sie sich bitte an das Studienteam.</p></div>'),
+    (@kt1_done_text, get_field_id('text_md'), '0000000003', '0000000001', '<div class="col-md-8 col-lg-6 mx-auto py-5 text-center"><p class="display-4 text-success mb-3">&#10003;</p><p class="small text-uppercase text-muted mb-2">All done</p><h1 class="h3 mb-3">This task has already been completed</h1><p class="lead mb-4">The task has already been completed in full under your code. Thank you for taking part — it can only be done once.</p><p class="small text-muted mb-0">If you think this is not correct, please contact the study team.</p></div>'),
+    (@kt1_done_text, get_field_id('text_md'), '0000000016', '0000000001', '<div class="col-md-8 col-lg-6 mx-auto py-5 text-center"><p class="display-4 text-success mb-3">&#10003;</p><p class="small text-uppercase text-muted mb-2">Terminé</p><h1 class="h3 mb-3">Cette tâche a déjà été effectuée</h1><p class="lead mb-4">La tâche a déjà été entièrement effectuée avec votre code. Merci de votre participation — elle ne peut être réalisée qu’une seule fois.</p><p class="small text-muted mb-0">Si vous pensez que ce n’est pas correct, veuillez contacter l’équipe de l’étude.</p></div>'),
+    (@kt1_done_text, get_field_id('text_md'), '0000000017', '0000000001', '<div class="col-md-8 col-lg-6 mx-auto py-5 text-center"><p class="display-4 text-success mb-3">&#10003;</p><p class="small text-uppercase text-muted mb-2">Completato</p><h1 class="h3 mb-3">Questo compito è già stato completato</h1><p class="lead mb-4">Con il suo codice il compito è già stato completato interamente. Grazie per la partecipazione — può essere svolto una sola volta.</p><p class="small text-muted mb-0">Se ritiene che non sia corretto, contatti il team dello studio.</p></div>')
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
