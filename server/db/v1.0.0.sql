@@ -41,19 +41,7 @@ SET @asset_base = CONCAT(@base_path, '/assets/kanji');
 -- its own survey or experiment has been completed, and a run resumed part way
 -- through picks up where it stopped. The filter takes the code straight from
 -- the url as {{__code__}}, which every style exposes for its route parameters.
---
--- An earlier version merged everything into one row using three hooks. They are
--- removed here, together with the plugin registration they belonged to, so an
--- existing installation upgrades cleanly.
 -- -----------------------------------------------------------------------
-
-DELETE FROM `hooks` WHERE `name` IN (
-    'kanji-adults-merge-survey-row',
-    'kanji-adults-merge-task-row',
-    'kanji-adults-rename-columns'
-);
-
-DELETE FROM `plugins` WHERE `name` = 'kanji-adults';
 
 -- -----------------------------------------------------------------------
 -- Languages
@@ -89,8 +77,8 @@ SET @kanji_welcome = (SELECT id FROM pages WHERE keyword = 'kanji-adults');
 
 -- Everything past the welcome page runs without the site header and footer, as
 -- the Qualtrics original did: once the run starts there is nothing to navigate
--- to, and the chrome invites participants to wander off mid-task. INSERT IGNORE
--- above leaves an existing install untouched, so set the flag explicitly.
+-- to, and the chrome invites participants to wander off mid-task. The pages are
+-- created above without the flag, so it is set here in one statement.
 UPDATE `pages` SET `is_headless` = 1
  WHERE `keyword` IN ('kanji-adults-survey', 'kanji-adults-pause-1',
                      'kanji-adults-pause-2', 'kanji-adults-pause-3',
@@ -138,9 +126,8 @@ VALUES
 -- are the part a participant has to act on before starting, and prose is easy
 -- to skim past.
 --
--- ON DUPLICATE KEY UPDATE rather than INSERT IGNORE: this content is rewritten
--- by later builds, and an install that already has the earlier wording should
--- pick up the new one.
+-- ON DUPLICATE KEY UPDATE rather than INSERT IGNORE, so re-running the script
+-- while editing the wording replaces it rather than keeping the first version.
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
     (@kw_text, get_field_id('text_md'),
@@ -156,16 +143,6 @@ CONCAT('<div class="row justify-content-center"><div class="col-12 col-md-10 col
      (SELECT id FROM languages WHERE locale = 'it-CH'), '0000000001',
 CONCAT('<div class="row justify-content-center"><div class="col-12 col-md-10 col-lg-8 py-5"><p class="text-uppercase text-muted small mb-2">Studio sull’apprendimento</p><h1 class="mb-3">Compito di apprendimento Kanji</h1><p class="lead mb-4">La ringraziamo per l’interesse dimostrato verso il nostro studio. Imparerà alcuni caratteri giapponesi e verificherà poi quanti ne ricorda. Non sono richieste conoscenze pregresse.</p><div class="card-deck flex-column flex-md-row mb-4"><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">Circa 30 minuti</h2><p class="small text-muted mb-0">Prenda questo tempo senza interruzioni</p></div></div><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">In un’unica sessione</h2><p class="small text-muted mb-0">Non potrà interrompere e riprendere più tardi</p></div></div><div class="card mb-2"><div class="card-body p-3"><h2 class="h6 mb-1">Tenga a portata il codice</h2><p class="small text-muted mb-0">Lo trova nella lettera che ha ricevuto</p></div></div></div><a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Inizia il compito</a><p class="small text-muted mt-3 mb-0">La preghiamo di svolgerlo in un luogo tranquillo. Può cambiare lingua in fondo a questa pagina — ma non dopo aver iniziato.</p></div></div>'))
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
-
--- The welcome page is Bootstrap-only, so its stylesheet section is dropped.
--- INSERT IGNORE above cannot remove it from an install that already has it.
-DELETE sh FROM `sections_hierarchy` sh
-  JOIN `sections` s ON s.id = sh.child
- WHERE s.name = 'kanji-welcome-style';
-DELETE ps FROM `pages_sections` ps
-  JOIN `sections` s ON s.id = ps.id_sections
- WHERE s.name = 'kanji-welcome-style';
-DELETE FROM `sections` WHERE name = 'kanji-welcome-style';
 
 INSERT INTO `sections_hierarchy` (`parent`, `child`, `position`) VALUES
     (@kw_container, @kw_text, 10)
@@ -204,8 +181,8 @@ SELECT p.id, f.id, l.id, t.label
   JOIN pages p ON p.keyword IN ('home', 'kanji-adults')
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
--- One header entry, not two: the study page is reachable by URL but no longer
--- listed, because the start page now leads to exactly the same place.
+-- One header entry, not two: the study page is reachable by URL but is not
+-- listed, because the start page leads to exactly the same place.
 UPDATE `pages` SET `nav_position` = NULL WHERE `keyword` = 'kanji-adults';
 
 -- -----------------------------------------------------------------------
@@ -683,19 +660,6 @@ ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
 INSERT IGNORE INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
 VALUES (@kanji_pause_3, @sec_pause_3, 0);
-
--- -----------------------------------------------------------------------
--- Retire the pre-split single task page. Installs created before the task
--- was split into four still have it, and it would otherwise stay reachable
--- with a stale redirect.
-DELETE ps FROM `pages_sections` ps
-  JOIN `pages` p ON p.id = ps.id_pages
-  WHERE p.keyword = 'kanji-adults-task';
-DELETE sft FROM `sections_fields_translation` sft
-  JOIN `sections` s ON s.id = sft.id_sections
-  WHERE s.name IN ('kanji-task-labjs', 'kanji-task-style');
-DELETE FROM `sections` WHERE name IN ('kanji-task-labjs', 'kanji-task-style');
-DELETE FROM `pages` WHERE keyword = 'kanji-adults-task';
 
 -- -----------------------------------------------------------------------
 -- Page 4: part 2 questionnaire (vignettes, device, closing code)
