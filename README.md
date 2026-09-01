@@ -52,19 +52,34 @@ stay stable and anyone mid-study is unaffected.
 
 ## Pages
 
-| Keyword | Contents |
-|---|---|
-| `home` / `kanji-adults` | Welcome — one section, two URLs |
-| `kanji-adults-survey` | Part 1: consent and code |
-| `kanji-adults-demographics` | Part 2: demographics |
-| `kanji-adults-task-1` | Instructions, practice, learn A |
-| `kanji-adults-pause-1` | Vignette: Französische Vokabeln |
-| `kanji-adults-task-2` | Recall A |
-| `kanji-adults-pause-2` | Vignette: Geografie Quiz |
-| `kanji-adults-task-3` | Learn B |
-| `kanji-adults-pause-3` | Vignettes: Mathematik, Aufsatz |
-| `kanji-adults-task-4` | Recall B, closing screen |
-| `kanji-adults-questions` | Part 3: device, closing code |
+Every page below carries exactly one surveyJS or labJS component. The name is
+what the CMS lists it under — Module SurveyJS or Module LabJS — and each
+component writes to its own data table.
+
+| Keyword | Contents | Component | Name in the CMS | Data table |
+|---|---|---|---|---|
+| `home` / `kanji-adults` | Welcome — one section, two URLs | — | — | — |
+| `kanji-adults-survey` | Part 1: consent and code | surveyJS | Kanji – Teil 1: Einverständnis und Code | `Kanji_Part1` |
+| `kanji-adults-demographics` | Part 2: demographics | surveyJS | Kanji – Teil 2: Angaben | `Kanji_Demographics` |
+| `kanji-adults-task-1` | Instructions, practice, learn A | labJS | Kanji Aufgabe 1: Instruktion, Übung, Lernen Liste A | `Kanji_Task1` |
+| `kanji-adults-pause-1` | Vignette: Französische Vokabeln | surveyJS | Kanji – Pause 1: Französische Vokabeln | `Kanji_Pause1` |
+| `kanji-adults-task-2` | Recall A | labJS | Kanji Aufgabe 2: Abfrage Liste A | `Kanji_Task2` |
+| `kanji-adults-pause-2` | Vignette: Geografie Quiz | surveyJS | Kanji – Pause 2: Geografie Quiz | `Kanji_Pause2` |
+| `kanji-adults-task-3` | Learn B | labJS | Kanji Aufgabe 3: Lernen Liste B | `Kanji_Task3` |
+| `kanji-adults-pause-3` | Vignettes: Mathematik, Aufsatz | surveyJS | Kanji – Pause 3: Mathematik und Aufsatz | `Kanji_Pause3` |
+| `kanji-adults-task-4` | Recall B, closing screen | labJS | Kanji Aufgabe 4: Abfrage Liste B, Abschluss | `Kanji_Task4` |
+| `kanji-adults-questions` | Part 3: device, closing code | surveyJS | Kanji – Teil 2: Gerät und Abschlusscode | `Kanji_Part2` |
+
+The four lab.js entries are one study split across four pages. They are
+generated together by `php content/build_labjs.php` from `items_learn.csv`,
+`items_recall.csv` and `instructions.json` — edit those rather than the
+`.builder.json` files, which are build output.
+
+The order participants move through is the table order: each component's
+`redirect_at_end` names the next page and hands the code along with it.
+
+    survey → demographics → task-1 → pause-1 → task-2 → pause-2
+           → task-3 → pause-3 → task-4 → questions
 
 The vignettes are interleaved with the memory task, as in the original: each
 fills the retention interval between learning a list and recalling it.
