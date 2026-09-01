@@ -857,7 +857,7 @@ INSERT IGNORE INTO `acl_groups` (`id_groups`, `id_pages`, `acl_select`, `acl_ins
            IF(g.name = 'admin', 1, 0), IF(g.name = 'admin', 1, 0), IF(g.name = 'admin', 1, 0)
     FROM `groups` g
     CROSS JOIN `pages` p
-    WHERE p.keyword IN ('kanji-adults', 'kanji-adults-survey',
+    WHERE p.keyword IN ('home', 'kanji-adults', 'kanji-adults-survey',
                         'kanji-adults-task-1', 'kanji-adults-task-2',
                         'kanji-adults-task-3', 'kanji-adults-task-4',
                         'kanji-adults-pause-1', 'kanji-adults-pause-2',
@@ -869,10 +869,14 @@ INSERT IGNORE INTO `acl_groups` (`id_groups`, `id_pages`, `acl_select`, `acl_ins
 -- user, so group grants alone never apply to it. Public pages therefore need a
 -- direct `acl_users` row, which is how the existing open pages (home, login,
 -- theorie, …) are configured.
+--
+-- `home` is included because the welcome container is attached to it above, so
+-- it is the study's entry point. A clone that never made `home` public leaves
+-- participants at "no access" on the first page they open.
 INSERT IGNORE INTO `acl_users` (`id_users`, `id_pages`, `acl_select`, `acl_insert`, `acl_update`, `acl_delete`)
     SELECT (SELECT id FROM users WHERE email = 'guest'), p.id, 1, 0, 0, 0
     FROM `pages` p
-    WHERE p.keyword IN ('kanji-adults', 'kanji-adults-survey',
+    WHERE p.keyword IN ('home', 'kanji-adults', 'kanji-adults-survey',
                         'kanji-adults-task-1', 'kanji-adults-task-2',
                         'kanji-adults-task-3', 'kanji-adults-task-4',
                         'kanji-adults-pause-1', 'kanji-adults-pause-2',
