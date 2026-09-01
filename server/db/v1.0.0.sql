@@ -15,12 +15,16 @@
 -- re-run `php content/build_migration.php`.
 
 -- -----------------------------------------------------------------------
--- Asset base URL. Every image path in the lab.js study is built from this.
+-- Asset base URL, used by the six images the surveys reference by url: the
+-- logo, the ID_Kind example, and the four vignette pictures. They belong
+-- directly in the install's `assets/` folder. The lab.js stimuli are not
+-- among them — those are base64-embedded in the study itself.
+--
 -- BASE_PATH in globals_untracked.php is '/' . PROJECT_NAME, so the served
 -- prefix must include it. Change @base_path if this install differs.
 -- -----------------------------------------------------------------------
 SET @base_path  = '/selfhelp';
-SET @asset_base = CONCAT(@base_path, '/assets/kanji');
+SET @asset_base = CONCAT(@base_path, '/assets');
 
 -- -----------------------------------------------------------------------
 -- Study identity
