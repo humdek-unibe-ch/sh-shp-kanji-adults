@@ -861,7 +861,8 @@ INSERT IGNORE INTO `acl_groups` (`id_groups`, `id_pages`, `acl_select`, `acl_ins
                         'kanji-adults-task-1', 'kanji-adults-task-2',
                         'kanji-adults-task-3', 'kanji-adults-task-4',
                         'kanji-adults-pause-1', 'kanji-adults-pause-2',
-                        'kanji-adults-pause-3', 'kanji-adults-questions');
+                        'kanji-adults-pause-3', 'kanji-adults-questions',
+                        'kanji-adults-demographics');
 
 -- Guest access. Participants arrive from a letter without logging in, and the
 -- guest user (id 1) belongs to no group — core checks ACL against the session
@@ -875,7 +876,8 @@ INSERT IGNORE INTO `acl_users` (`id_users`, `id_pages`, `acl_select`, `acl_inser
                         'kanji-adults-task-1', 'kanji-adults-task-2',
                         'kanji-adults-task-3', 'kanji-adults-task-4',
                         'kanji-adults-pause-1', 'kanji-adults-pause-2',
-                        'kanji-adults-pause-3', 'kanji-adults-questions');
+                        'kanji-adults-pause-3', 'kanji-adults-questions',
+                        'kanji-adults-demographics');
 
 -- -----------------------------------------------------------------------
 -- Reload warning on the experiments
