@@ -301,10 +301,20 @@ VALUES
     (@ks_part1, get_field_id('redirect_at_end'),   '0000000001', '0000000001', 'kanji-adults-demographics/{{ID_1}}')
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
+-- Part 1 always opens at the consent page. The last response is loaded scoped
+-- to $_SESSION['id_user'], and participants are guests sharing one id, so
+-- restoring would hand a parent whoever answered last — including a decline,
+-- which has no navigation to leave. Restarting costs two short pages.
 INSERT IGNORE INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
-    (@ks_part1, get_field_id('restart_on_refresh'),'0000000001', '0000000001', '0'),
+    (@ks_part1, get_field_id('restart_on_refresh'),'0000000001', '0000000001', '1'),
     (@ks_part1, get_field_id('own_entries_only'),  '0000000001', '0000000001', '1');
+
+-- INSERT IGNORE leaves an existing install on its old value.
+UPDATE `sections_fields_translation`
+   SET `content` = '1'
+ WHERE `id_sections` = @ks_part1
+   AND `id_fields` = get_field_id('restart_on_refresh');
 
 INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
 VALUES (@kanji_survey, @ks_part1, 0)
