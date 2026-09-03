@@ -75,7 +75,7 @@ SET @kanji_welcome = (SELECT id FROM pages WHERE keyword = 'kanji-adults');
 -- to, and the chrome invites participants to wander off mid-task. INSERT IGNORE
 -- above leaves an existing install untouched, so set the flag explicitly.
 UPDATE `pages` SET `is_headless` = 1
- WHERE `keyword` IN ('kanji-adults-survey', 'kanji-adults-pause-1',
+ WHERE `keyword` IN ('kanji-adults', 'kanji-adults-survey', 'kanji-adults-pause-1',
                      'kanji-adults-pause-2', 'kanji-adults-pause-3',
                      'kanji-adults-questions', 'kanji-adults-demographics',
                      'kanji-adults-task-1', 'kanji-adults-task-2',
@@ -105,120 +105,107 @@ SET @kw_text      = (SELECT id FROM sections WHERE name = 'kanji-welcome-text');
 
 INSERT IGNORE INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
-    (@kw_container, get_field_id('css'),      '0000000001', '0000000001', 'px-3'),
+    (@kw_container, get_field_id('css'),      '0000000001', '0000000001', 'kanji-welcome-holder'),
     (@kw_container, get_field_id('is_fluid'), '0000000001', '0000000001', '0');
 
--- The welcome page is written for this port, so it has no counterpart in the
--- .qsf and carries its own translations. `text_md` is translatable, so one
--- row per language; the participant sees the row matching the picker.
+-- The landing page asks for a language and nothing else.
 --
--- The three conditions that decide whether a run is usable — uninterrupted,
--- quiet, code to hand — are lifted out of the prose into their own cards. They
--- are the part a participant has to act on before starting, and prose is easy
--- to skim past.
+-- SelfHelp keeps the language in `$_SESSION['language']`. A guest has no profile
+-- carrying a preference, and every page after this one is headless, where the
+-- footer picker does not render, so this is the one place a parent chooses.
 --
--- ON DUPLICATE KEY UPDATE rather than INSERT IGNORE: this content is rewritten
--- by later builds, and an install that already has the earlier wording should
--- pick up the new one.
+-- The choice itself is the `languagePicker` style, not markup written here: the
+-- page CSP pins a script hash, which voids `unsafe-inline` and blocks every
+-- inline <script>, so a hand-written picker cannot act on a click. A style ships
+-- its behaviour as a js include, which is `self` and therefore allowed.
+--
+-- This section carries only the logo and the prompt. `text_md` is translatable,
+-- so it is read for the page's active language and has to be written for each
+-- one; the prompt names all four languages, so every row holds the same markup.
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+SELECT @kw_text, get_field_id('text_md'), l.id, '0000000001',
+CONCAT('<div class="kanji-lang-intro">
+
+<img class="kanji-lang-logo" src="', @asset_base, '/Logo_Universitaet_Bern.png" alt="Universit&auml;t Bern">
+
+<p class="kanji-lang-prompt">Bitte w&auml;hlen Sie Ihre Sprache.<br>
+Please choose your language.<br>
+Veuillez choisir votre langue.<br>
+Si prega di scegliere la lingua.</p>
+
+</div>
+
+<style>
+/* The page is the choice: the questionnaire ground, no chrome, nothing else. */
+html, body { background-color: #eff8f5; }
+.cms-edit { display: none; }
+
+.kanji-welcome-holder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 4vh 1rem;
+  box-sizing: border-box;
+}
+.kanji-lang-intro { text-align: center; }
+.kanji-lang-logo {
+  width: 160px;
+  max-width: 50%;
+  height: auto;
+  margin: 2.5rem auto;
+  display: block;
+}
+.kanji-lang-prompt {
+  font-size: 18px;
+  line-height: 1.7;
+  color: #5f5e61;
+  margin: 0 0 2rem;
+}
+
+/* The picker style ships neutral controls so it inherits a site theme; this
+   study gives it the questionnaire button instead. */
+.kanji-welcome-holder .selfHelp-language-picker {
+  flex-direction: column;
+  width: 100%;
+  max-width: 320px;
+  gap: .75rem;
+}
+.kanji-welcome-holder .selfHelp-language-picker__button {
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: .75em 1.5em;
+  border: none;
+  border-radius: 6px;
+  background: #19b394;
+  color: #fff;
+}
+.kanji-welcome-holder .selfHelp-language-picker__button:hover { background: #149c80; }
+.kanji-welcome-holder .selfHelp-language-picker__button[aria-current="true"] { background: #149c80; }
+</style>')
+  FROM languages l WHERE l.locale <> 'all'
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+-- The picker itself. `redirect_at_select` sends the parent on to consent, so
+-- choosing a language is also the step that starts the study.
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+    VALUES (get_style_id('languagePicker'), 'kanji-welcome-picker', NULL);
+
+SET @kw_picker = (SELECT id FROM sections WHERE name = 'kanji-welcome-picker');
+
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
 VALUES
-    (@kw_text, get_field_id('text_md'),
-     (SELECT id FROM languages WHERE locale = 'de-CH'), '0000000001',
-CONCAT('<div class="col-md-8 col-lg-6 mx-auto py-5" markdown="1">
-
-<p class="small text-uppercase text-muted mb-2">Studie zum Lernen</p>
-
-<h1 class="h2 mb-3">Kanji Lernaufgabe</h1>
-
-<p class="lead mb-4">Vielen Dank für Ihr Interesse an unserer Studie.
-Sie lernen gleich japanische Schriftzeichen kennen und prüfen anschliessend,
-woran Sie sich erinnern. Vorkenntnisse brauchen Sie keine.</p>
-
-<div class="row mb-4">
-<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Rund 30 Minuten</b><span class="small text-muted">Planen Sie die Zeit am Stück ein</span></div></div></div>
-<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">In einem Zug</b><span class="small text-muted">Ein Unterbrechen und späteres Fortsetzen ist nicht möglich</span></div></div></div>
-<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Code bereithalten</b><span class="small text-muted">Sie finden ihn in dem Brief, den Sie erhalten haben</span></div></div></div>
-</div>
-
-<a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Aufgabe starten</a>
-
-<p class="small text-muted mt-4">Bitte bearbeiten Sie die Aufgabe an einem ruhigen Ort.
-Die Sprache können Sie unten auf dieser Seite wechseln — später nicht mehr.</p>
-
-</div>')),
-    (@kw_text, get_field_id('text_md'),
-     (SELECT id FROM languages WHERE locale = 'en-GB'), '0000000001',
-CONCAT('<div class="col-md-8 col-lg-6 mx-auto py-5" markdown="1">
-
-<p class="small text-uppercase text-muted mb-2">A study on learning</p>
-
-<h1 class="h2 mb-3">Kanji Learning Task</h1>
-
-<p class="lead mb-4">Thank you for your interest in our study.
-You are about to learn some Japanese characters and then see how many you
-remember. No prior knowledge is needed.</p>
-
-<div class="row mb-4">
-<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">About 30 minutes</b><span class="small text-muted">Set the time aside in one block</span></div></div></div>
-<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">In one sitting</b><span class="small text-muted">You cannot pause and continue later</span></div></div></div>
-<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Have your code ready</b><span class="small text-muted">It is in the letter you received</span></div></div></div>
-</div>
-
-<a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Start the task</a>
-
-<p class="small text-muted mt-4">Please work somewhere quiet.
-You can change the language at the bottom of this page — but not once you have started.</p>
-
-</div>')),
-    (@kw_text, get_field_id('text_md'),
-     (SELECT id FROM languages WHERE locale = 'fr-CH'), '0000000001',
-CONCAT('<div class="col-md-8 col-lg-6 mx-auto py-5" markdown="1">
-
-<p class="small text-uppercase text-muted mb-2">Étude sur l’apprentissage</p>
-
-<h1 class="h2 mb-3">Tâche d’apprentissage Kanji</h1>
-
-<p class="lead mb-4">Merci de l’intérêt que vous portez à notre étude.
-Vous allez découvrir des caractères japonais, puis vérifier ce dont vous vous
-souvenez. Aucune connaissance préalable n’est nécessaire.</p>
-
-<div class="row mb-4">
-<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Environ 30 minutes</b><span class="small text-muted">Prévoyez ce temps d’un seul tenant</span></div></div></div>
-<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">En une seule fois</b><span class="small text-muted">Vous ne pourrez pas interrompre puis reprendre plus tard</span></div></div></div>
-<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Gardez votre code</b><span class="small text-muted">Il figure dans la lettre que vous avez reçue</span></div></div></div>
-</div>
-
-<a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Commencer l’exercice</a>
-
-<p class="small text-muted mt-4">Veuillez travailler dans un endroit calme.
-Vous pouvez changer de langue en bas de cette page — mais plus une fois commencé.</p>
-
-</div>')),
-    (@kw_text, get_field_id('text_md'),
-     (SELECT id FROM languages WHERE locale = 'it-CH'), '0000000001',
-CONCAT('<div class="col-md-8 col-lg-6 mx-auto py-5" markdown="1">
-
-<p class="small text-uppercase text-muted mb-2">Studio sull’apprendimento</p>
-
-<h1 class="h2 mb-3">Compito di apprendimento Kanji</h1>
-
-<p class="lead mb-4">La ringraziamo per l’interesse dimostrato verso il
-nostro studio. Imparerà alcuni caratteri giapponesi e verificherà poi quanti ne
-ricorda. Non sono richieste conoscenze pregresse.</p>
-
-<div class="row mb-4">
-<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Circa 30 minuti</b><span class="small text-muted">Prenda questo tempo senza interruzioni</span></div></div></div>
-<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">In un’unica sessione</b><span class="small text-muted">Non potrà interrompere e riprendere più tardi</span></div></div></div>
-<div class="col-sm-4 mb-3"><div class="card h-100"><div class="card-body p-3"><b class="d-block mb-1">Tenga a portata il codice</b><span class="small text-muted">Lo trova nella lettera che ha ricevuto</span></div></div></div>
-</div>
-
-<a class="btn btn-primary btn-lg btn-block" href="', @base_path, '/kanji-adults-survey">Inizia il compito</a>
-
-<p class="small text-muted mt-4">La preghiamo di svolgerlo in un luogo tranquillo.
-Può cambiare lingua in fondo a questa pagina — ma non dopo aver iniziato.</p>
-
-</div>'))
+    (@kw_picker, get_field_id('display_style'),      '0000000001', '0000000001', 'buttons'),
+    (@kw_picker, get_field_id('redirect_at_select'), '0000000001', '0000000001', 'kanji-adults-survey'),
+    -- Nobody has chosen yet on this page, so marking the session default would
+    -- show a selection the parent did not make.
+    (@kw_picker, get_field_id('highlight_selected'), '0000000001', '0000000001', '0')
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT INTO `sections_hierarchy` (`parent`, `child`, `position`) VALUES
+    (@kw_container, @kw_picker, 20)
+ON DUPLICATE KEY UPDATE `position` = VALUES(`position`);
 
 INSERT INTO `sections_hierarchy` (`parent`, `child`, `position`) VALUES
     (@kw_container, @kw_text, 10)
@@ -242,6 +229,11 @@ SET @home = (SELECT id FROM pages WHERE keyword = 'home');
 
 INSERT IGNORE INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
 SELECT @home, @kw_container, 0 FROM DUAL WHERE @home IS NOT NULL;
+
+-- `home` shows the same language page, so it loses the chrome as well. This is
+-- a core page, so the change reaches outside the plugin: on an install that
+-- serves anything else from `/`, drop this statement.
+UPDATE `pages` SET `is_headless` = 1 WHERE `keyword` = 'home';
 
 -- Name the start page after the study, in every language. Only `de-CH` had a
 -- title ('Start'), and the study page itself was missing `fr`/`it`, so a French
