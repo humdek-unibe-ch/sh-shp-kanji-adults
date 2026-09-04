@@ -28,9 +28,9 @@ on `labJS`.
    is `/assets/kanji`.
 
    Put `kanji_labjs.css` in `/assets` while you are there. The migration already
-   seeds this stylesheet into the task pages, so the study is styled without it;
-   the copy in `/assets` is what a researcher loads into the lab.js Builder to
-   preview a task the way participants see it.
+   links this stylesheet from the task pages rather than carrying a copy, so
+   without it the task renders unstyled; it is also what a researcher loads
+   into the lab.js Builder to preview a task the way participants see it.
 3. Run the migration **with an explicit UTF-8 charset**:
 
    ```
@@ -46,7 +46,7 @@ Re-running is safe. Pages and sections use `INSERT IGNORE`; questionnaires and
 task segments are matched on their title or name and updated in place, so ids
 stay stable and anyone mid-study is unaffected.
 
-> **The shipped migration is a reduced test build: 5 trials per block, 23 in
+> **The shipped migration is a reduced test build: 3 trials per block, 15 in
 > total.** It is for walking the study end to end, not for data collection. The
 > full study is 93 trials — ask the dev responsible for a production build.
 
@@ -58,7 +58,7 @@ component writes to its own data table.
 
 | Keyword | Contents | Component | Name in the CMS | Data table |
 |---|---|---|---|---|
-| `home` / `kanji-adults` | Welcome — one section, two URLs | — | — | — |
+| `home` | Welcome: logo, prompt, language picker | languagePicker | — | — |
 | `kanji-adults-survey` | Part 1: consent and code | surveyJS | Kanji – Teil 1: Einverständnis und Code | `Kanji_Part1` |
 | `kanji-adults-demographics` | Part 2: demographics | surveyJS | Kanji – Teil 2: Angaben | `Kanji_Demographics` |
 | `kanji-adults-task-1` | Instructions, practice, learn A | labJS | Kanji Aufgabe 1: Instruktion, Übung, Lernen Liste A | `Kanji_Task1` |
