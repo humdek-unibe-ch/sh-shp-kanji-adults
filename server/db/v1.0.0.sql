@@ -816,16 +816,6 @@ WHERE `keyword` IN ('kanji-adults-task-1', 'kanji-adults-task-2',
                     'kanji-adults-pause-3', 'kanji-adults-questions');
 
 
--- -----------------------------------------------------------------------
--- The first task page keeps the site chrome
---
--- It is the one study page a participant can be stopped on, and a headless
--- page would leave them with no way out. The experiment fills the viewport
--- when it runs, so the header costs nothing while the task is open.
--- -----------------------------------------------------------------------
-
-UPDATE `pages` SET `is_headless` = 0 WHERE `keyword` = 'kanji-adults-task-1';
-
 
 -- -----------------------------------------------------------------------
 -- Page access
