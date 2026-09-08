@@ -43,12 +43,23 @@ SET @asset_base = CONCAT(@base_path, '/assets');
 -- The study ships German, English, French and Italian inside the surveys and
 -- the lab.js task, but SelfHelp only lists a language in its picker if the
 -- language exists. Without these two rows French and Italian are unreachable.
+--
+-- The names carry no region suffix. Each language appears exactly once here,
+-- so "(Schweiz)" or "(GB)" distinguishes nothing for a participant, and the
+-- name is what the language picker prints. The four are set rather than only
+-- inserted, because de-CH and en-GB ship with SelfHelp and would otherwise
+-- keep their suffixes.
 -- -----------------------------------------------------------------------
 
 INSERT IGNORE INTO `languages` (`locale`, `language`, `csv_separator`)
-    VALUES ('fr-CH', 'Français (Suisse)', ',');
+    VALUES ('fr-CH', 'Français', ',');
 INSERT IGNORE INTO `languages` (`locale`, `language`, `csv_separator`)
-    VALUES ('it-CH', 'Italiano (Svizzera)', ',');
+    VALUES ('it-CH', 'Italiano', ',');
+
+UPDATE `languages` SET `language` = 'Deutsch'   WHERE `locale` = 'de-CH';
+UPDATE `languages` SET `language` = 'English'   WHERE `locale` = 'en-GB';
+UPDATE `languages` SET `language` = 'Français'  WHERE `locale` = 'fr-CH';
+UPDATE `languages` SET `language` = 'Italiano'  WHERE `locale` = 'it-CH';
 
 -- -----------------------------------------------------------------------
 -- Page 1: welcome / landing
