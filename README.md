@@ -69,6 +69,7 @@ component writes to its own data table.
 | `kanji-adults-pause-3` | Vignettes: Mathematik, Aufsatz | surveyJS | Kanji – Pause 3: Mathematik und Aufsatz | `Kanji_Pause3` |
 | `kanji-adults-task-4` | Recall B, closing screen | labJS | Kanji Aufgabe 4: Abfrage Liste B, Abschluss | `Kanji_Task4` |
 | `kanji-adults-questions` | Part 3: device, closing code | surveyJS | Kanji – Teil 2: Gerät und Abschlusscode | `Kanji_Part2` |
+| `kanji-adults-prize-draw` | Optional prize draw, e-mail only | surveyJS | Kanji – Verlosung | `Kanji_PrizeDraw` |
 
 The four lab.js entries are one study split across four pages. They are
 generated together by `php content/build_labjs.php` from `items_learn.csv`,
@@ -175,8 +176,9 @@ counts) and `extra_data_UserLanguage` (`DE` / `EN` / `FR` / `IT`).
 
 Questionnaire columns carry the Qualtrics names without the per-language suffix
 (`Demo_2` here, `Demo_2_DE` there), so the two waves line up. The task blocks
-stay as JSON, keeping the original `Auswahl_Q42` / `Reaktionszeit_Q42_ms` field
-names inside. The practice round is not stored.
+stay as JSON, keeping the original Qualtrics field
+names inside — the numbers differ per block (`Q22`/`Q23` practice,
+`Q42`/`Q43` recall A, `Q2`/`Q3` recall B). The practice round is stored, in `extra_data_trials_practice`.
 
 The export also carries SelfHelp's own columns — `_meta_*`, `_json`,
 `_raw_data`, `response_id` and similar. `_raw_data` is the complete lab.js event
@@ -186,7 +188,16 @@ Because participants are not logged in, every write belongs to the guest user,
 so the code is the only thing separating one participant from another. A code
 given to two people would merge them into the same row in every table.
 
+`Kanji_PrizeDraw` sits outside that scheme: it stores an e-mail address and
+nothing else, with no participant code, so a draw entry cannot be tied back to
+anyone's answers. The export keeps it in its own file for the same reason.
+
 ## Editing the study
+
+Demographic answer values are sequential `1..n` in display order. The
+conditional logic (`visibleIf`, `defaultValueExpression`) references those
+values, so renumbering an option means updating the expressions in the same
+edit or questions silently stop appearing.
 
 The database is the live system: the questionnaires are editable under **Module
 SurveyJS** and the task under **Module LabJS**, and an edit takes effect
