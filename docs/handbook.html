@@ -1,0 +1,781 @@
+<title>Kanji Study Handbook</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --paper:      #FAF8F4;
+    --paper-sunk: #F2EEE6;
+    --card:       #FFFFFF;
+    --ink:        #201D18;
+    --ink-soft:   #4A443A;
+    --grey:       #6E665A;
+    --rule:       #E6E1D7;
+    --indigo:     #2F4A7C;
+    --indigo-dim: #E8EDF5;
+    --clay:       #A85832;
+    --clay-dim:   #F7EBE4;
+    --moss:       #4A6741;
+    --moss-dim:   #EAF0E7;
+
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --mono:  "IBM Plex Mono", "Consolas", "Courier New", monospace;
+
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #16140F;
+      --paper-sunk: #1E1B15;
+      --card:       #201D17;
+      --ink:        #EDE8DE;
+      --ink-soft:   #C8C1B4;
+      --grey:       #958C7D;
+      --rule:       #353027;
+      --indigo:     #9BB5DC;
+      --indigo-dim: #1B2333;
+      --clay:       #DB9A78;
+      --clay-dim:   #2E211A;
+      --moss:       #A8C29B;
+      --moss-dim:   #1D241A;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #16140F;
+    --paper-sunk: #1E1B15;
+    --card:       #201D17;
+    --ink:        #EDE8DE;
+    --ink-soft:   #C8C1B4;
+    --grey:       #958C7D;
+    --rule:       #353027;
+    --indigo:     #9BB5DC;
+    --indigo-dim: #1B2333;
+    --clay:       #DB9A78;
+    --clay-dim:   #2E211A;
+    --moss:       #A8C29B;
+    --moss-dim:   #1D241A;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.62;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 56px;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 32px 120px;
+  }
+
+  /* ---------- masthead ---------- */
+  header.masthead {
+    grid-column: 1 / -1;
+    padding: 64px 0 40px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin: 0 0 18px;
+  }
+  h1 {
+    font-size: clamp(34px, 5.2vw, 52px);
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+  .standfirst {
+    font-size: 20px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 58ch;
+    margin: 0;
+  }
+
+  /* ---------- nav ---------- */
+  nav.toc {
+    position: sticky;
+    top: 24px;
+    align-self: start;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  nav.toc .toc-title {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 10.5px;
+    color: var(--grey);
+    margin-bottom: 14px;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; }
+  nav.toc li { margin-bottom: 9px; }
+  nav.toc a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    display: block;
+    border-left: 2px solid var(--rule);
+    padding-left: 11px;
+  }
+  nav.toc a:hover { color: var(--indigo); border-left-color: var(--indigo); }
+  nav.toc a:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+  nav.toc .num { color: var(--grey); margin-right: 7px; }
+
+  main { min-width: 0; }
+
+  section { margin-bottom: 68px; scroll-margin-top: 24px; }
+
+  h2 {
+    font-size: 30px;
+    line-height: 1.16;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+  .sec-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--indigo);
+    display: block;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  h3 {
+    font-size: 21px;
+    font-weight: 600;
+    margin: 38px 0 10px;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 26px 0 8px;
+    font-family: var(--mono);
+    letter-spacing: -0.005em;
+  }
+  p { margin: 0 0 16px; max-width: var(--measure); }
+  .lede { font-size: 18.5px; color: var(--ink-soft); max-width: 62ch; }
+
+  a { color: var(--indigo); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.875em;
+    background: var(--paper-sunk);
+    padding: 1px 5px;
+    border-radius: 3px;
+    word-break: break-word;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.62;
+    background: var(--paper-sunk);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 0 0 20px;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  ul, ol { max-width: var(--measure); padding-left: 22px; margin: 0 0 18px; }
+  li { margin-bottom: 8px; }
+
+  /* ---------- steps ---------- */
+  ol.steps {
+    list-style: none;
+    padding: 0;
+    counter-reset: step;
+    max-width: var(--measure);
+  }
+  ol.steps > li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 44px;
+    margin-bottom: 22px;
+  }
+  ol.steps > li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 1px;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    background: var(--indigo);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  ol.steps > li > strong { display: block; margin-bottom: 2px; }
+
+  /* ---------- tables ---------- */
+  .tablewrap { overflow-x: auto; margin: 0 0 22px; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14.5px;
+    min-width: 460px;
+  }
+  th {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--grey);
+    font-weight: 500;
+    border-bottom: 1.5px solid var(--ink);
+    padding: 0 14px 7px 0;
+    vertical-align: bottom;
+  }
+  td {
+    padding: 9px 14px 9px 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    line-height: 1.45;
+  }
+  td.var, td code { font-family: var(--mono); }
+  td.var {
+    font-size: 13px;
+    color: var(--indigo);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  td.val {
+    font-family: var(--mono);
+    font-size: 13px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-soft);
+  }
+  table.tight td { padding-top: 6px; padding-bottom: 6px; }
+
+  /* ---------- callouts ---------- */
+  .note {
+    border-left: 3px solid var(--indigo);
+    background: var(--indigo-dim);
+    padding: 15px 18px;
+    margin: 0 0 22px;
+    max-width: var(--measure);
+    border-radius: 0 4px 4px 0;
+  }
+  .warn {
+    border-left: 3px solid var(--clay);
+    background: var(--clay-dim);
+    padding: 15px 18px;
+    margin: 0 0 22px;
+    max-width: var(--measure);
+    border-radius: 0 4px 4px 0;
+  }
+  .ok {
+    border-left: 3px solid var(--moss);
+    background: var(--moss-dim);
+    padding: 15px 18px;
+    margin: 0 0 22px;
+    max-width: var(--measure);
+    border-radius: 0 4px 4px 0;
+  }
+  .note p:last-child, .warn p:last-child, .ok p:last-child { margin-bottom: 0; }
+  .note .tag, .warn .tag, .ok .tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .note .tag { color: var(--indigo); }
+  .warn .tag { color: var(--clay); }
+  .ok   .tag { color: var(--moss); }
+
+  /* ---------- flow diagram ---------- */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    align-items: center;
+    margin: 0 0 22px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .flow span.node {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 6px 10px;
+    white-space: nowrap;
+  }
+  .flow span.node.task { border-color: var(--indigo); color: var(--indigo); }
+  .flow span.arrow { color: var(--grey); }
+
+  hr.div {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin: 34px 0;
+    max-width: var(--measure);
+  }
+
+  .fileline {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--grey);
+    margin: -8px 0 16px;
+  }
+
+  footer.end {
+    grid-column: 1 / -1;
+    border-top: 2px solid var(--ink);
+    padding-top: 22px;
+    margin-top: 30px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--grey);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  @media (max-width: 860px) {
+    .wrap { grid-template-columns: 1fr; gap: 0; padding: 0 22px 80px; }
+    nav.toc { position: static; margin-bottom: 44px; }
+    nav.toc ol { columns: 2; column-gap: 22px; }
+    header.masthead { padding-top: 44px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Kanji Adults · Parent–child memory study</p>
+    <h1>Working with the Kanji study</h1>
+    <p class="standfirst">Where each part of the study lives in the CMS, what every column in the exported data means, and how to change the questionnaires and the memory task yourself.</p>
+  </header>
+
+  <nav class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#map"><span class="num">1</span>The page flow</a></li>
+      <li><a href="#surveys"><span class="num">2</span>Editing a questionnaire</a></li>
+      <li><a href="#labjs"><span class="num">3</span>Editing the memory task</a></li>
+      <li><a href="#export"><span class="num">4</span>Getting the data out</a></li>
+      <li><a href="#columns"><span class="num">5</span>The columns explained</a></li>
+      <li><a href="#trials"><span class="num">6</span>The memory task columns</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <!-- ============ 2 ============ -->
+    <!-- ============ 1 ============ -->
+    <section id="map">
+      <span class="sec-num">Section 1</span>
+      <h2>The page flow</h2>
+      <p class="lede">Which CMS entry belongs to which step, and where each one saves its answers.</p>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:38px">#</th>
+              <th style="width:150px">Step</th>
+              <th style="width:105px">Edit in</th>
+              <th>Entry name in the CMS</th>
+              <th style="width:150px">Data table</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="val">1</td><td>Consent + code</td><td>Module SurveyJS</td><td>Kanji – Teil 1: Einverständnis und Code</td><td class="var">Kanji_Part1</td></tr>
+            <tr><td class="val">2</td><td>Demographics</td><td>Module SurveyJS</td><td>Kanji – Teil 2: Angaben</td><td class="var">Kanji_Demographics</td></tr>
+            <tr><td class="val">3</td><td>Task 1 · learn A</td><td>Module LabJS</td><td>Kanji Aufgabe 1: Instruktion, Übung, Lernen Liste A</td><td class="var">Kanji_Task1</td></tr>
+            <tr><td class="val">4</td><td>Pause 1 · French</td><td>Module SurveyJS</td><td>Kanji – Pause 1: Französische Vokabeln</td><td class="var">Kanji_Pause1</td></tr>
+            <tr><td class="val">5</td><td>Task 2 · recall A</td><td>Module LabJS</td><td>Kanji Aufgabe 2: Abfrage Liste A</td><td class="var">Kanji_Task2</td></tr>
+            <tr><td class="val">6</td><td>Pause 2 · Geography</td><td>Module SurveyJS</td><td>Kanji – Pause 2: Geografie Quiz</td><td class="var">Kanji_Pause2</td></tr>
+            <tr><td class="val">7</td><td>Task 3 · learn B</td><td>Module LabJS</td><td>Kanji Aufgabe 3: Lernen Liste B</td><td class="var">Kanji_Task3</td></tr>
+            <tr><td class="val">8</td><td>Pause 3 · Maths + essay</td><td>Module SurveyJS</td><td>Kanji – Pause 3: Mathematik und Aufsatz</td><td class="var">Kanji_Pause3</td></tr>
+            <tr><td class="val">9</td><td>Task 4 · recall B</td><td>Module LabJS</td><td>Kanji Aufgabe 4: Abfrage Liste B, Abschluss</td><td class="var">Kanji_Task4</td></tr>
+            <tr><td class="val">10</td><td>Device + closing code</td><td>Module SurveyJS</td><td>Kanji – Teil 2: Gerät und Abschlusscode</td><td class="var">Kanji_Part2</td></tr>
+            <tr><td class="val">—</td><td>Prize draw</td><td>Module SurveyJS</td><td>Kanji – Verlosung</td><td class="var">Kanji_PrizeDraw</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>To test a step directly, add a code to the page address — <code>kanji-adults-pause-1/TEST123</code> opens pause 1 as if that code had arrived there.</p>
+
+      <div class="warn">
+        <span class="tag">Keep the prize draw separate</span>
+        <p>The prize draw file has no participant code attached. Never join it back to the study data.</p>
+      </div>
+    </section>
+
+    <!-- ============ 2 ============ -->
+    <section id="surveys">
+      <span class="sec-num">Section 2</span>
+      <h2>Editing a questionnaire</h2>
+      <p class="lede">Consent, demographics and the three pause vignettes are all edited the same way, in the SelfHelp CMS.</p>
+
+      <ol class="steps">
+        <li><strong>Open Module SurveyJS</strong> from the admin menu and pick the questionnaire by its CMS name (see the table above).</li>
+        <li><strong>Edit the question</strong> directly in the Creator. To add an answer option, select the question and use the Choices list on the right.</li>
+        <li><strong>Check every language</strong> — German, English, French, Italian, using the language selector at the top. A language left blank shows an empty question to those participants.</li>
+        <li><strong>Save, then Publish.</strong> Saving only stores a draft — Publish is what participants see.</li>
+      </ol>
+
+      <div class="warn">
+        <span class="tag">Leave question names alone</span>
+        <p>Change the visible text freely, but leave question names (like <code>Demo_14</code>) alone once the study is collecting data — renaming splits old and new answers into different columns.</p>
+      </div>
+
+    </section>
+
+    <!-- ============ 3 ============ -->
+    <section id="labjs">
+      <span class="sec-num">Section 3</span>
+      <h2>Editing the memory task</h2>
+      <p class="lede">The four Kanji blocks are built in lab.js. Editing them is copy out, change, copy back.</p>
+
+      <ol class="steps">
+        <li><strong>Open Module LabJS</strong> and find the block by its CMS name (see the table above). Copy its configuration text.</li>
+        <li><strong>Save it as a file</strong> on your computer, e.g. <code>task2.json</code>, in plain text — not <code>.txt</code>.</li>
+        <li><strong>Open <a href="https://labjs.felixhenninger.com/" target="_blank" rel="noopener">labjs.felixhenninger.com</a></strong> and open your file there. Press Preview to run the task as a participant sees it.</li>
+        <li><strong>Make your change,</strong> then export the study as a <code>.json</code> file from the Builder.</li>
+        <li><strong>Paste it back</strong> into Module LabJS over the old configuration, save, and test the whole block with a test code.</li>
+      </ol>
+
+    </section>
+
+    <!-- ============ 4 ============ -->
+    <section id="export">
+      <span class="sec-num">Section 4</span>
+      <h2>Getting the data out</h2>
+      <p class="lede">The R script from the developer downloads all ten tables and merges them into a single spreadsheet.</p>
+
+      <ol class="steps">
+        <li><strong>Open RStudio.</strong> Your token is already filled in, so there is nothing to edit. If you dont have a token, ask the develop team for one.</li>
+        <li><strong>File → Source R Code…</strong> and choose the script. It runs straight away — the first run installs a few packages and takes a few minutes, later runs take seconds.</li>
+      </ol>
+
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:220px">File</th><th>Contents</th></tr></thead>
+          <tbody>
+            <tr><td class="var">kanji_merged.csv</td><td>The study data, one row per participant.</td></tr>
+            <tr><td class="var">kanji_prize_draw.csv</td><td>E-mail address and date only.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Running it again overwrites both files with fresh data — it only reads, so run it as often as you like.</p>
+
+      <div class="note">
+        <span class="tag">Only need one table?</span>
+        <p>Open <strong>Data</strong> in the admin menu, pick the table by name, and export it directly — no R needed. The R script produces the same data joined on the participant code, one row per participant.</p>
+      </div>
+
+      <div class="warn">
+        <span class="tag">If it stops with an error</span>
+        <p><strong>Permission denied</strong> writing <code>kanji_merged.csv</code> — the file is open in Excel. Close it and run again.</p>
+        <p><strong>Could not reach the study website</strong> — connect the VPN. <strong>Server rejected the token</strong> — re-paste it, or ask for a new one. <strong>No API token set</strong> — the <code>api_key</code> line is empty.</p>
+      </div>
+
+      <div class="warn">
+        <span class="tag">Keep the token private</span>
+        <p>Do not e-mail the script with the token in it or put it in a shared folder. If someone else needs to export the data, ask the developer for a token of their own rather than sharing yours.</p>
+      </div>
+    </section>
+
+    <!-- ============ 5 ============ -->
+    <!-- ============ 5 ============ -->
+    <section id="columns">
+      <span class="sec-num">Section 5</span>
+      <h2>The columns explained</h2>
+      <p class="lede">242 columns. Each is prefixed with the page it came from, so <code>Demographics_Demo_14</code> is question <code>Demo_14</code> answered on the demographics page.</p>
+
+      <div class="note">
+        <span class="tag">The key column</span>
+        <p><code>extra_param_code</code> is the participant code. It is the one column with no page prefix.</p>
+      </div>
+
+      <h3>Repeated on every page</h3>
+      <p>These appear once per page, with each prefix.</p>
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:240px">Column</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td class="var">*_triggerType</td><td><code>finished</code> = page completed. <code>started</code> / <code>updated</code> = opened but not finished.</td></tr>
+            <tr><td class="var">*_entry_date</td><td>When the row was last saved.</td></tr>
+            <tr><td class="var">*_record_id</td><td>Internal row number. Empty if the participant never reached this page.</td></tr>
+            <tr><td class="var">*_id_users<br>*_user_name<br>*_user_code</td><td>Always the shared guest account — participants never log in. Ignore.</td></tr>
+            <tr><td class="var">*_id_actionTriggerTypes</td><td>Numeric form of <code>triggerType</code>. Ignore.</td></tr>
+            <tr><td class="var">*_source_table</td><td>Which table the row came from.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Timing and device — questionnaire pages only</h3>
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:240px">Column</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td class="var">*__meta_duration</td><td>Seconds spent on the page.</td></tr>
+            <tr><td class="var">*__meta_start_time<br>*__meta_end_time</td><td>UTC timestamps for opening and submitting.</td></tr>
+            <tr><td class="var">*__meta_pages</td><td>Per-page timings, packed as one cell (see below).</td></tr>
+            <tr><td class="var">*__meta_viewport_width<br>*__meta_viewport_height</td><td>Browser window size in pixels. Best indicator of phone vs laptop.</td></tr>
+            <tr><td class="var">*__meta_screen_width<br>*__meta_screen_height</td><td>Whole screen size, not just the browser.</td></tr>
+            <tr><td class="var">*__meta_pixel_ratio</td><td>Display density (2 on most phones, 1 on older screens).</td></tr>
+            <tr><td class="var">*__meta_user_agent</td><td>Browser and operating system as one long text string.</td></tr>
+            <tr><td class="var">*_pageNo</td><td>Last page number reached inside that questionnaire.</td></tr>
+            <tr><td class="var">*_response_id<br>*_survey_generated_id</td><td>Internal identifiers for the submission and the questionnaire.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Part 1 — consent</h3>
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:190px">Column</th><th>Question and values</th></tr></thead>
+          <tbody>
+            <tr><td class="var">Part1_EV</td><td>Sind Sie mit der Teilnahme einverstanden?<br><span style="color:var(--grey)">1 = Ja · 2 = Nein</span></td></tr>
+            <tr><td class="var">Part1_ID_1</td><td>The code typed from the letter. Free text.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Demographics — responding parent</h3>
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:230px">Column</th><th>Question and values</th></tr></thead>
+          <tbody>
+            <tr><td class="var">Demographics_Demo_2</td><td>Verhältnis zum Kind<br><span style="color:var(--grey)">1 = Mutter · 2 = Vater · 3 = Anderes</span></td></tr>
+            <tr><td class="var">Demographics_Demo_25</td><td>Geburtsjahr. Free text.</td></tr>
+            <tr><td class="var">Demographics_Demo_3</td><td>Personen im Haushalt<br><span style="color:var(--grey)">1–6 = that number · 7 = mehr als 6</span></td></tr>
+            <tr><td class="var">Demographics_Demo_3_other</td><td>Exact number, filled only when <code>Demo_3 = 7</code>.</td></tr>
+            <tr><td class="var">Demographics_Demo_4</td><td>Sprache(n) zuhause mit dem Kind. <strong>Multiple answers in one cell.</strong> See the language codes below.</td></tr>
+            <tr><td class="var">Demographics_Demo_4_other</td><td>Free-text language, filled only when <code>Demo_4</code> contains 27 (Andere).</td></tr>
+            <tr><td class="var">Demographics_Demo_5</td><td>Weitere Kinder im Haushalt?<br><span style="color:var(--grey)">1 = Ja · 2 = Nein</span></td></tr>
+            <tr><td class="var">Demographics_Demo_6</td><td>Wie viele andere Kinder — only when <code>Demo_5 = 1</code><br><span style="color:var(--grey)">1–6 = that number · 7 = mehr als 6</span></td></tr>
+            <tr><td class="var">Demographics_Demo_6_count</td><td>Exact number, filled only when <code>Demo_6 = 7</code>.</td></tr>
+            <tr><td class="var">Demographics_Demo_children</td><td>Year of birth and sex per child, several entries packed in one cell. Not shown when <code>Demo_6 = 7</code>.</td></tr>
+            <tr><td class="var">Demographics_Demo_14</td><td>Höchster Ausbildungsabschluss<br><span style="color:var(--grey)">1 = keine abgeschlossene Ausbildung · 2 = unternehmensinterne Ausbildung · 3 = abgeschlossene Berufsausbildung · 4 = Matura · 5 = Lehrdiplom · 6 = höhere Berufsausbildung / Fachschule · 7 = FH / PH · 8 = Universität, ETH</span></td></tr>
+            <tr><td class="var">Demographics_Demo_15</td><td>Arbeitspensum<br><span style="color:var(--grey)">1 = 0% · 2 = bis 20% · 3 = 21–40% · 4 = 41–60% · 5 = 61–80% · 6 = 81–100%</td></tr>
+            <tr><td class="var">Demographics_Demo_16</td><td>Beruf. Free text, and not asked when <code>Demo_15 = 1</code> (0%).</td></tr>
+            <tr><td class="var">Demographics_Demo_17</td><td>Sprache(n), die Sie sprechen. <strong>Multiple answers in one cell.</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Demographics — second parent</h3>
+      <p>All of these are blank by design when <code>Demo_19 = 2</code> (Nein). That is “not applicable”, not missing data.</p>
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:230px">Column</th><th>Question and values</th></tr></thead>
+          <tbody>
+            <tr><td class="var">Demographics_Demo_19</td><td>Angaben zum zweiten Elternteil möglich?<br><span style="color:var(--grey)">1 = Ja · 2 = Nein</td></tr>
+            <tr><td class="var">Demographics_Demo_20</td><td>Verhältnis zum Kind<br><span style="color:var(--grey)">1 = Mutter · 2 = Vater · 3 = Anderes</span></td></tr>
+            <tr><td class="var">Demographics_Demo_26</td><td>Geburtsjahr. Free text.</td></tr>
+            <tr><td class="var">Demographics_Demo_21</td><td>Ausbildungsabschluss — same 1–8 codes as <code>Demo_14</code>.</td></tr>
+            <tr><td class="var">Demographics_Demo_22</td><td>Arbeitspensum — same codes as <code>Demo_15</code> (1 = 0%).</td></tr>
+            <tr><td class="var">Demographics_Demo_23</td><td>Beruf. Free text, not asked when <code>Demo_22 = 1</code> (0%).</td></tr>
+            <tr><td class="var">Demographics_Demo_24</td><td>Sprache(n). <strong>Multiple answers in one cell.</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Language codes</h3>
+      <p>Used by <code>Demo_4</code>, <code>Demo_17</code> and <code>Demo_24</code>. Several answers can arrive in one cell, comma-separated.</p>
+      <div class="tablewrap">
+        <table class="tight">
+          <tbody>
+            <tr><td class="val">1</td><td>Schweizerdeutsch</td><td class="val">2</td><td>Deutsch</td><td class="val">3</td><td>Albanisch</td></tr>
+            <tr><td class="val">4</td><td>Arabisch</td><td class="val">5</td><td>Englisch</td><td class="val">6</td><td>Finnisch</td></tr>
+            <tr><td class="val">7</td><td>Französisch</td><td class="val">8</td><td>Italienisch</td><td class="val">9</td><td>Kroatisch</td></tr>
+            <tr><td class="val">10</td><td>Kurdisch</td><td class="val">11</td><td>Mazedonisch</td><td class="val">12</td><td>Niederländisch</td></tr>
+            <tr><td class="val">13</td><td>Norwegisch</td><td class="val">14</td><td>Persisch</td><td class="val">15</td><td>Portugiesisch</td></tr>
+            <tr><td class="val">16</td><td>Romanisch</td><td class="val">17</td><td>Russisch</td><td class="val">18</td><td>Schwedisch</td></tr>
+            <tr><td class="val">19</td><td>Serbisch</td><td class="val">20</td><td>Spanisch</td><td class="val">21</td><td>Tamil</td></tr>
+            <tr><td class="val">22</td><td>Thailändisch</td><td class="val">23</td><td>Tigrinya</td><td class="val">24</td><td>Türkisch</td></tr>
+            <tr><td class="val">25</td><td>Ungarisch</td><td class="val">26</td><td>Ukrainisch</td><td class="val">27</td><td>Andere (see <code>_other</code>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The pause vignettes</h3>
+      <p>Six statements each, rated 1–5. The statement wording is on the live page, or in the SurveyJS Creator.</p>
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:300px">Columns</th><th>Vignette</th></tr></thead>
+          <tbody>
+            <tr><td class="var">Pause1_P1_Vignette_Franz_1…6</td><td>Französische Vokabeln</td></tr>
+            <tr><td class="var">Pause2_P2_Vignette_Geo_1…6</td><td>Geografie Quiz</td></tr>
+            <tr><td class="var">Pause3_P3_Vignette_Math_1…6</td><td>Mathematik</td></tr>
+            <tr><td class="var">Pause3_P3_Vignette_Deut_1…6</td><td>Aufsatz / Deutsch</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><span style="color:var(--grey)">1 = sehr unwahrscheinlich · 2 = unwahrscheinlich · 3 = vielleicht · 4 = wahrscheinlich · 5 = sehr wahrscheinlich</span></p>
+
+      <h3>Part 2 — closing</h3>
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:190px">Column</th><th>Question and values</th></tr></thead>
+          <tbody>
+            <tr><td class="var">Part2_Device</td><td>Auf welchem Gerät ausgefüllt?<br><span style="color:var(--grey)">1 = Laptop / Computer · 2 = Tablet · 3 = Handy</span></td></tr>
+            <tr><td class="var">Part2_ID_2</td><td>The code re-entered at the end. Compare with <code>Part1_ID_1</code>.</td></tr>
+            <tr><td class="var">Part2_Finished_Study</td><td>Filled only for participants who reached the final page.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Prize draw file</h3>
+      <p><code>kanji_prize_draw.csv</code> has two columns only: <code>email</code> and <code>entry_date</code>. No participant code, so it cannot be joined back to the study data — and must not be.</p>
+    </section>
+
+    <!-- ============ 6 ============ -->
+    <section id="trials">
+      <span class="sec-num">Section 6</span>
+      <h2>The memory task columns</h2>
+      <p class="lede">The four task pages store their data differently from the questionnaires. Each one carries a few summary numbers plus one packed cell holding every trial.</p>
+
+      <h3>Summary columns</h3>
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:300px">Column</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td class="var">Task1_extra_data_n_trials_practice</td><td>Practice trials shown.</td></tr>
+            <tr><td class="var">Task1_extra_data_n_correct_practice</td><td>Practice trials answered correctly.</td></tr>
+            <tr><td class="var">Task1_extra_data_n_trials_learn_A</td><td>Learning trials, list A.</td></tr>
+            <tr><td class="var">Task2_extra_data_n_trials_recall_A</td><td>Recall trials, list A.</td></tr>
+            <tr><td class="var">Task2_extra_data_n_correct_recall_A</td><td><strong>Correct recalls, list A.</strong></td></tr>
+            <tr><td class="var">Task3_extra_data_n_trials_learn_B</td><td>Learning trials, list B.</td></tr>
+            <tr><td class="var">Task4_extra_data_n_trials_recall_B</td><td>Recall trials, list B.</td></tr>
+            <tr><td class="var">Task4_extra_data_n_correct_recall_B</td><td><strong>Correct recalls, list B.</strong></td></tr>
+            <tr><td class="var">Task*_extra_data_block</td><td>Which phase the page ran: <code>learn_A</code>, <code>recall_A</code>, <code>learn_B</code>, <code>recall_B</code>.</td></tr>
+            <tr><td class="var">Task*_extra_data_slice</td><td>Segment index within the experiment.</td></tr>
+            <tr><td class="var">Task*_extra_data_UserLanguage</td><td>Language the task ran in (DE, EN, FR, IT).</td></tr>
+            <tr><td class="var">Task*_labjs_generated_id</td><td>Which task block, e.g. <code>Kanji_Task1</code>.</td></tr>
+            <tr><td class="var">Task*_labjs_response_id</td><td>Links the four task pages to one sitting.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warn">
+        <span class="tag">Check the trial count first</span>
+        <p>If <code>Task1_extra_data_n_trials_learn_A</code> reads 3, that is the short test build, not a real run. Recall counts are lower than learning counts by design — participants learn more pairs than they are tested on.</p>
+      </div>
+
+      <h3>Packed trial cells</h3>
+      <p>The columns ending in <code>_trials_…</code> hold every trial of that block inside one cell, so Excel shows a single long line instead of numbers. <strong>Learning and recall blocks store different fields.</strong></p>
+
+      <h4>Learning blocks</h4>
+      <p class="fileline">Task1_extra_data_trials_practice · Task1_…_trials_learn_A · Task3_…_trials_learn_B</p>
+      <p>Nothing is asked while learning, so each trial records only what was shown and for how long.</p>
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:150px">Field</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td class="var">trial</td><td>Trial number within the block, starting at 1.</td></tr>
+            <tr><td class="var">item</td><td>Which Kanji–picture pair was shown, e.g. <code>Baumwolle</code>.</td></tr>
+            <tr><td class="var">dauer_ms</td><td>How long the pair stayed on screen, in milliseconds.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Recall blocks</h4>
+      <p class="fileline">Task2_extra_data_trials_recall_A · Task4_…_trials_recall_B</p>
+      <p>Here the participant answers and then rates their confidence, so every trial carries both responses and three timings.</p>
+      <div class="warn">
+        <span class="tag">The field names differ per block</span>
+        <p>Each block kept the question numbers from the original Qualtrics study, so the same measurement has a different name depending on the block: <strong>practice</strong> uses <code>Q22</code>/<code>Q23</code>, <strong>recall A</strong> uses <code>Q42</code>/<code>Q43</code>, and <strong>recall B</strong> uses <code>Q2</code>/<code>Q3</code>. The first number of each pair is the image choice, the second the confidence rating.</p>
+      </div>
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:250px">Field</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td class="var">trial</td><td>Trial number within the block.</td></tr>
+            <tr><td class="var">item</td><td>Which pair was tested, e.g. <code>Herbst</code>.</td></tr>
+            <tr><td class="var">Auswahl_Q42</td><td>Image the participant chose, e.g. <code>Ast.jpg</code>. <strong>List B uses <code>Auswahl_Q2</code>.</strong></td></tr>
+            <tr><td class="var">Auswahl_Q43</td><td><strong>Confidence rating</strong> for that answer. List B uses <code>Auswahl_Q3</code>.</td></tr>
+            <tr><td class="var">Reaktionszeit_Q42_ms</td><td><strong>Answer reaction time</strong> — trial appearing to answer locked in, ms. List B: <code>Reaktionszeit_Q2_ms</code>.</td></tr>
+            <tr><td class="var">Reaktionszeit_Q43_ms</td><td><strong>Confidence reaction time</strong> — trial appearing to confidence locked in, ms. List B: <code>Reaktionszeit_Q3_ms</code>.</td></tr>
+            <tr><td class="var">Reaktionszeit_Q43_ab_Q42_ms</td><td>Gap between the two: time to rate confidence after answering. List B: <code>Reaktionszeit_Q3_ab_Q2_ms</code>.</td></tr>
+            <tr><td class="var">korrekt</td><td>1 = correct, 0 = wrong.</td></tr>
+            <tr><td class="var">korrekt_seite</td><td>Which side held the correct image: <code>left</code> or <code>right</code>.</td></tr>
+            <tr><td class="var">gewaehlt</td><td>Which side the participant clicked. Compare with <code>korrekt_seite</code> to check for a side bias.</td></tr>
+            <tr><td class="var">orig_pos</td><td>Position of the item in the original list order.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Which column holds which block</h3>
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:300px">Column</th><th style="width:110px">Shape</th><th>Block</th></tr></thead>
+          <tbody>
+            <tr><td class="var">Task1_extra_data_trials_practice</td><td>learning</td><td>Practice round, before the real study</td></tr>
+            <tr><td class="var">Task1_extra_data_trials_learn_A</td><td>learning</td><td>Learning list A</td></tr>
+            <tr><td class="var">Task2_extra_data_trials_recall_A</td><td>recall</td><td>Recall of list A</td></tr>
+            <tr><td class="var">Task3_extra_data_trials_learn_B</td><td>learning</td><td>Learning list B</td></tr>
+            <tr><td class="var">Task4_extra_data_trials_recall_B</td><td>recall</td><td>Recall of list B</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Reading a packed cell</h3>
+      <p>Each cell is a list of trials wrapped in <code>[ ]</code>. Every trial sits between its own <code>{ }</code> and reads as <code>"field":value</code>, separated by commas. One recall cell with two trials looks like this:</p>
+
+      <pre><code>[{"trial":1,"item":"Herbst","Auswahl_Q42":"Ast.jpg","Auswahl_Q43":2,
+  "Reaktionszeit_Q42_ms":814,"Reaktionszeit_Q43_ms":1545,
+  "Reaktionszeit_Q43_ab_Q42_ms":732,"korrekt":0,
+  "korrekt_seite":"right","gewaehlt":"left","orig_pos":"1"},
+ {"trial":2,"item":"Baumwolle","Auswahl_Q42":"Pflanze.jpg",...}]</code></pre>
+
+      <p>So the first trial above tested <strong>Herbst</strong>, the participant picked <strong>Ast.jpg</strong>, rated confidence <strong>2</strong>, took <strong>814 ms</strong> to answer and <strong>732 ms</strong> more to rate it, and was <strong>wrong</strong> (<code>korrekt: 0</code>) because the correct image was on the right and they clicked left.</p>
+
+      <p>A learning cell is shorter, because nothing is asked while learning:</p>
+
+      <pre><code>[{"trial":1,"item":"Baumwolle","dauer_ms":4991},
+ {"trial":2,"item":"Herbst","dauer_ms":4975},
+ {"trial":3,"item":"Ast","dauer_ms":4983}]</code></pre>
+
+      <p>The <code>*__meta_pages</code> column on questionnaire pages is packed the same way, holding <code>pageNo</code>, <code>start_time</code> and <code>end_time</code> per page.</p>
+    </section>
+
+  </main>
+
+  <footer class="end">
+    <span>Kanji Adults · parent–child memory study</span>
+    <span>Handbook for the research team</span>
+  </footer>
+
+</div>
