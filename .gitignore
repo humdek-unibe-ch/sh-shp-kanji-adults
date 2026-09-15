@@ -3,4 +3,4 @@ server/service/globals_untracked.php
 
 # Generated export output
 export/*.csv
-content/export/
+export/*.xlsx
