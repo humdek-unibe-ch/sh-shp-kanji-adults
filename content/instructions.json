@@ -1,0 +1,106 @@
+{
+    "instr_learn": [
+        {
+            "de": "<b>Nun kommt die Lernaufgabe.</b> <ul> <li>Wenn Sie jetzt weiter drücken, geht die Lernaufgabe los! </li> <li>Sie können die Aufgabe nicht unterbrechen / pausieren. </li> <li>Sie benötigen ca. 15 min Zeit. </li> </ul> <b>Drücken Sie erst auf weiter, wenn Sie bereit sind! </b>",
+            "en": "<b>The learning task will start next.</b> <ul> <li>When you continue, the task will begin!</li> <li>You cannot interrupt or pause the task.</li> <li>You will need approximately 15 minutes to complete it.</li> </ul> <br type=\"_moz\" /> <b>Only press continue when you are ready! </b>",
+            "fr": "<p data-end=\"152\" data-start=\"106\"> </p> <p data-end=\"152\" data-start=\"106\"><b>L&rsquo;exercice d&rsquo;apprentissage va commencer.</b></p> <ul> <li data-end=\"330\" data-start=\"154\">Lorsque vous continuerez, l&rsquo;exercice d&eacute;butera.</li> <li data-end=\"330\" data-start=\"154\">Vous ne pourrez pas interrompre ou mettre l&rsquo;exercice en pause.</li> <li data-end=\"330\" data-start=\"154\">Vous aurez besoin d&rsquo;environ 15 minutes pour le terminer.</li> </ul> <b>N&#39;appuyez sur Continuer que lorsque vous &ecirc;tes pr&ecirc;t! </b>",
+            "it": "<p data-start=\"56\" data-end=\"101\"> <b>Ora inizia il compito di apprendimento.</b></p> <ul> <li data-start=\"56\" data-end=\"101\">Quando preme Avanti, il compito avrà inizio.</li> <li data-start=\"56\" data-end=\"101\">Non potrà interrompere o mettere in pausa il compito.</li> <li data-start=\"56\" data-end=\"101\">Avrà bisogno di circa 15 minuti per completarlo.</li> </ul> <b>Premete “avanti” solo quando siete pronti!</b>"
+        },
+        {
+            "de": "<p>Sie werden nun japanische Zeichen lernen. Diese Zeichen nennt man Kanjis. </p> <p>{{IMG:Baer_Kanji.jpg}}</p>",
+            "en": "<p>You are now going to learn Japanese characters. These characters are called kanji. </p> <p>{{IMG:Baer_Kanji.jpg}}</p>",
+            "fr": "<p>Vous allez maintenant apprendre des caractères japonais. Ces caractères s’appellent les kanjis.</p> <p>{{IMG:Baer_Kanji.jpg}}</p>",
+            "it": "<p>Ora imparerà dei caratteri giapponesi. Questi caratteri si chiamano kanji.</p> <p>{{IMG:Baer_Kanji.jpg}}</p>"
+        },
+        {
+            "de": "<p>Sie sehen ein Kanji. Daneben sehen Sie, was das Kanji bedeutet.</p> <p>{{IMG:Baer_Kanji.jpg}} {{IMG:Baer.jpg}}</p>",
+            "en": "<p>You see a kanji. Next to it is the meaning of the kanji.</p> <p>{{IMG:Baer_Kanji.jpg}} {{IMG:Baer.jpg}}</p>",
+            "fr": "<p>Vous verrez un kanji. À côté, vous verrez ce que ce kanji signifie.</p> <p>{{IMG:Baer_Kanji.jpg}} {{IMG:Baer.jpg}}</p>",
+            "it": "<p>Vedrà un kanji. Accanto vedrà il significato del kanji.</p> <p>{{IMG:Baer_Kanji.jpg}} {{IMG:Baer.jpg}}</p>"
+        },
+        {
+            "de": "<p><b>Sie können das Lernen der Kanjis nun üben.</b> </p> <ul> <li>Merken Sie sich gut, was die Kanjis bedeuten.</li> <li>Sie sehen die Kanjis nur für eine kurze Zeit.</li> </ul>",
+            "en": "<b>You can now practice memorizing the kanji. </b><ul> <li>Memorize the meanings of the kanji carefully.</li> <li>You will only see the kanji for a short time.</li></ul><ul> </ul>",
+            "fr": "<p data-end=\"161\" data-start=\"96\"><b> </b></p><p data-end=\"161\" data-start=\"96\"><b>Vous pouvez maintenant vous exercer à apprendre les kanjis.</b></p><p data-end=\"161\" data-start=\"96\"><b> </b></p> <ul> <li data-end=\"161\" data-start=\"96\">Mémorisez bien la signification des kanjis.</li> <li data-end=\"161\" data-start=\"96\">Vous ne verrez les kanjis que pendant un court moment.</li> </ul>",
+            "it": "<p data-start=\"47\" data-end=\"93\"><b> </b></p><p data-start=\"47\" data-end=\"93\"><b>Ora può esercitarsi ad imparare i kanji.</b> </p> <ul> <li data-start=\"47\" data-end=\"93\">Si ricordi bene cosa significano i kanji.</li> <li data-start=\"47\" data-end=\"93\">Vedrà i kanji solo per un breve momento.</li> </ul>"
+        }
+    ],
+    "instr_recall": [
+        {
+            "de": "<p> Sie sehen danach immer zwei Bilder unter einem Kanji. Sie müssen herausfinden, welches Bild zum Kanji gehört. </p> <p>{{IMG:Auswahl_Kanji_Uebung.png}}</p>",
+            "en": "<p>You will then always see two pictures under a kanji. You have to figure out which picture belongs to the kanji. </p> <p>{{IMG:Auswahl_Kanji_Uebung.png}}</p>",
+            "fr": "<p>Vous verrez ensuite deux images sous un kanji.<br data-start=\"103\" data-end=\"106\"> Vous devez déterminer quelle image correspond au kanji.</p> <p>{{IMG:Auswahl_Kanji_Uebung.png}}</p>",
+            "it": "<p>Vedrà poi due immagini sotto un kanji.<br data-start=\"84\" data-end=\"87\"> Dovrà capire quale immagine corrisponde al kanji.</p> <p>{{IMG:Auswahl_Kanji_Uebung.png}}</p>"
+        },
+        {
+            "de": "<p>Sie werden auch gefragt, wie <b>sicher</b> Sie sich sind, dass Sie das <b>richtige Bild gewählt </b>haben. </p><p>Wenn Sie sich ganz <b>unsicher </b>sind, dann drücken Sie auf das Bild hier:</p><p>{{IMG:Instruktion_CJ_unsicher.png}}</p>",
+            "en": "<p>You will also be asked how<b> confident </b>you are that you have <b>selected the correct image</b>. </p><p>If you are <b>unsure</b>, click on the image here:</p><p>{{IMG:Instruktion_CJ_unsicher_EN.png}}</p>",
+            "fr": "<p>On vous demandera &eacute;galement &agrave; quel point vous &ecirc;tes <b>s&ucirc;r(e)</b> d&rsquo;avoir <b>choisi la bonne image</b>. </p><p>Si vous n’êtes <b>pas du tout sûr(e)</b>, cliquez sur cette image:</p><p>{{IMG:Instruktion_CJ_unsicher_FR.png}}</p>",
+            "it": "<p> Le verr&agrave; anche chiesto quanto &egrave; <b>sicuro/a</b> di aver <b>scelto l&rsquo;immagine corretta</b>.</p><p>Se non &egrave; per <b>niente sicuro/a</b>, prema su questa immagine:</p><p>{{IMG:Instruktion_CJ_unsicher_IT.png}}</p>"
+        },
+        {
+            "de": "<p>Wenn Sie sich ganz<b> sicher</b> sind, drücken Sie auf dieses Bild hier:</p><p>{{IMG:Instruktion_CJ_sicher.png}}</p>",
+            "en": "<p>If you are absolutely <b>sure</b>, click on this image here:</p><p>{{IMG:Instruktion_CJ_sicher_EN.png}}</p>",
+            "fr": "<p>Si vous êtes <b>complètement sûr(e)</b>, cliquez sur cette image:</p><p>{{IMG:Instruktion_CJ_sicher_FR.png}}</p>",
+            "it": "<p> Se &egrave; <b>completamente sicuro/a</b>, prema su questa immagine:</p><p>{{IMG:Instruktion_CJ_sicher_IT.png}}</p>"
+        },
+        {
+            "de": "<p>Wenn Sie sich nicht ganz sicher, aber auch nicht ganz unsicher sind, nehmen Sie dieses Bild hier:</p><p>{{IMG:Instruktion_CJ_mittel.png}}</p>",
+            "en": "<p>If you are not entirely sure, but also not entirely unsure, take this picture here:</p><p>{{IMG:Instruktion_CJ_mittel_EN.png}}</p>",
+            "fr": "<p>Si vous n’êtes ni complètement sûr(e) ni complètement incertain(e), choisissez cette image:</p><p>{{IMG:Instruktion_CJ_mittel_FR.png}}</p>",
+            "it": "<p> Se non &egrave; del tutto sicuro/a, ma neanche del tutto incerto/a, scelga questa immagine:</p><p>{{IMG:Instruktion_CJ_mittel_IT.png}}</p>"
+        },
+        {
+            "de": "<p><b>Sie werden die Aufgabe nun einmal üben können. </b></p>",
+            "en": "<p><b>You will now be able to practice the task. </b></p>",
+            "fr": "<p><b>Vous allez maintenant pouvoir vous entra&icirc;ner &agrave; l&rsquo;exercice une fois.</b></p>",
+            "it": "<p> <b>Ora potr&agrave; esercitarsi con il compito una volta.</b> </p>"
+        }
+    ],
+    "start_learn_A": [
+        {
+            "de": "<b>Wir starten jetzt mit der Lernaufgabe.</b> <ul> <li>Sie werden zwei Runden der Lernaufgabe lösen. In jeder Runde werden Sie 30 Kanjis lernen. </li> <li>Zwischendurch gibt es kleine Pausen. In diesen dürfen Sie kurze Fragen zu Ihrer Familie beantworten. </li> <li>Machen Sie sich keine Sorgen, wenn Sie Fehler machen. Fehler sind normal. Wir wollen die Fehler sehen, weil sie für unsere Forschung wichtig sind.</li> </ul> <p>{{IMG:aufmerksamkeit_4_gluehbirne.png}}</p>",
+            "en": "<b>We will now begin with the learning task.</b> <ul> <li>You will complete two rounds of the learning task. In each round, you will learn 30 kanji characters.</li> <li>There will be short breaks in between. During these breaks, you will answer brief questions about your family.</li> <li>Don&#39;t worry if you make mistakes. Mistakes are normal. We want to observe the mistakes because they are important for our research. </li> </ul> <p>{{IMG:aufmerksamkeit_4_gluehbirne.png}}</p>",
+            "fr": "<p data-end=\"162\" data-start=\"96\"> <b>Nous allons maintenant commencer l&rsquo;exercice d&rsquo;apprentissage.</b></p> <ul> <li data-end=\"162\" data-start=\"96\">Vous allez r&eacute;aliser deux s&eacute;ries de l&rsquo;exercice d&rsquo;apprentissage. Dans chaque s&eacute;rie, vous apprendrez 30 kanjis.</li> <li data-end=\"162\" data-start=\"96\">Entre les s&eacute;ries, il y aura de courtes pauses. Pendant ces pauses, vous pourrez r&eacute;pondre &agrave; quelques questions sur votre famille.</li> <li data-end=\"162\" data-start=\"96\">Ne vous inqui&eacute;tez pas si vous faites des erreurs. Les erreurs sont normales. Nous voulons les voir, car elles sont importantes pour notre recherche.</li> </ul> <p>{{IMG:aufmerksamkeit_4_gluehbirne.png}}</p>",
+            "it": "<p data-end=\"94\" data-start=\"47\"><b>Ora iniziamo il compito di apprendimento.</b></p> <ul> <li data-end=\"94\" data-start=\"47\">Affronter&agrave; due serie del compito di apprendimento. In ogni serie imparer&agrave; 30 kanji.</li> <li data-end=\"94\" data-start=\"47\">Ci saranno brevi pause tra le serie. Durante queste pause potr&agrave; rispondere a brevi domande sulla sua famiglia.</li> <li data-end=\"94\" data-start=\"47\">Non si preoccupi se commette degli errori. Gli errori sono normali. Vogliamo osservarli perch&eacute; sono importanti per la nostra ricerca.</li> </ul> <p>{{IMG:aufmerksamkeit_4_gluehbirne.png}}</p>"
+        }
+    ],
+    "start_recall_A": [
+        {
+            "de": "<p><b> </b></p><p><b>Jetzt geht es weiter mit der Lernaufgabe. </b> </p> <p>Wir wollen schauen, an welche Kanjis aus der ersten Runde Sie sich noch erinnern können. Denken Sie daran, klicken Sie ein zweites Mal auf das Bild, um Ihre Antwort zu bestätigen.</p> <p>{{IMG:aufmerksamkeit_2c_ausrufezeichen+(1).png}}</p>",
+            "en": "<p><b> </b></p><p><b>Now let's continue with the learning task. </b></p> <p>We want to see which kanji from the first round you can still remember. Remember to click on the image a second time to confirm your answer.</p> <p>{{IMG:aufmerksamkeit_2c_ausrufezeichen+(1).png}}</p>",
+            "fr": "<p> <p data-start=\"56\" data-end=\"121\"><b> </b></p><p data-start=\"56\" data-end=\"121\"><b>Nous continuons maintenant avec l’exercice d’apprentissage.</b></p> <p>Nous voulons voir quels kanjis de la première série vous vous souvenez encore. N’oubliez pas : cliquez une deuxième fois sur l’image pour confirmer votre réponse.</p> </p> <p>{{IMG:aufmerksamkeit_2c_ausrufezeichen+(1).png}}</p>",
+            "it": "<p> <p data-start=\"47\" data-end=\"101\"><b> </b></p><p data-start=\"47\" data-end=\"101\"><b>Ora continuiamo con il compito di apprendimento.</b></p> <p>Vogliamo vedere quali kanji della prima serie ricorda ancora. Ricordi: clicchi una seconda volta sull’immagine per confermare la sua risposta.</p> </p> <p>{{IMG:aufmerksamkeit_2c_ausrufezeichen+(1).png}}</p>"
+        }
+    ],
+    "start_learn_B": [
+        {
+            "de": "<p><b> </b></p><p><b>Jetzt geht es weiter mit der Lernaufgabe! </b> </p> <p>Sie dürfen nun wieder 30 Kanjis lernen. Wir starten jetzt mit der zweiten Runde. </p> <p>{{IMG:aufmerksamkeit_4_gluehbirne.png}}</p>",
+            "en": "<p><b> </b></p><p><b>Now we continue with the learning task! </b></p> <p>You can now learn 30 more kanji. We will now start the second round. </p> <p>{{IMG:aufmerksamkeit_4_gluehbirne.png}}</p>",
+            "fr": "<p> <p data-start=\"56\" data-end=\"122\"><b> </b></p><p data-start=\"56\" data-end=\"122\"><b>Nous continuons maintenant avec l’exercice d’apprentissage!</b></p> <p>Vous allez apprendre à nouveau 30 kanjis. Nous commençons maintenant la deuxième série.</p> </p> <p>{{IMG:aufmerksamkeit_4_gluehbirne.png}}</p>",
+            "it": "<p> <p data-start=\"47\" data-end=\"101\"><b> </b></p><p data-start=\"47\" data-end=\"101\"><b>Ora continuiamo con il compito di apprendimento!</b></p> <p>Potrà imparare nuovamente 30 kanji. Iniziamo ora la seconda serie.</p> </p> <p>{{IMG:aufmerksamkeit_4_gluehbirne.png}}</p>"
+        }
+    ],
+    "start_recall_B": [
+        {
+            "de": "<p><b> </b></p><p><b>Jetzt geht es weiter mit der Lernaufgabe!</b> </p> <p>Wir wollen schauen, an welche Kanjis aus der zweiten Runde Sie sich noch erinnern können. </p> <p>{{IMG:aufmerksamkeit_2c_ausrufezeichen+(1).png}}</p>",
+            "en": "<p><b> </b></p><p><b>Now let's continue with the learning task. </b></p> <p>We want to see which kanji from the second round you can still remember.</p> <p>{{IMG:aufmerksamkeit_2c_ausrufezeichen+(1).png}}</p>",
+            "fr": "<p> <p data-start=\"56\" data-end=\"122\"><b> </b></p><p data-start=\"56\" data-end=\"122\"><b>Nous continuons maintenant avec l’exercice d’apprentissage!</b></p> <p>Nous voulons voir quels kanjis de la deuxième série vous vous souvenez encore.</p> </p> <p>{{IMG:aufmerksamkeit_2c_ausrufezeichen+(1).png}}</p>",
+            "it": "<p> <p data-start=\"47\" data-end=\"101\"><b> </b></p><p data-start=\"47\" data-end=\"101\"><b>Ora continuiamo con il compito di apprendimento!</b></p> <p>Vogliamo vedere quali kanji della seconda serie ricorda ancora.</p> </p> <p>{{IMG:aufmerksamkeit_2c_ausrufezeichen+(1).png}}</p>"
+        }
+    ],
+    "ende": [
+        {
+            "de": "<p><b> </b></p><p><b>Sie haben nun alle Kanjis gelernt! Vielen Dank!</b></p> <p> Drücken Sie weiter, um zum Schluss der Lernaufgabe zu gelangen. </p> <p>{{IMG:00_ablenkung_konfetti_luftb.png}}</p>",
+            "en": "<p><b> </b></p><p><b>You have now learned all the kanji! Thank you very much!</b></p> <p>Press the button to proceed to the end of the learning task.</p> <p>{{IMG:00_ablenkung_konfetti_luftb.png}}</p>",
+            "fr": "<p> <p data-end=\"124\" data-start=\"56\"><b> </b></p><p data-end=\"124\" data-start=\"56\"><b>Vous avez maintenant appris tous les kanjis! Merci beaucoup!</b></p> <p>Cliquez sur Continuer pour accéder à la fin de l’exercice d’apprentissage.</p> </p> <p>{{IMG:00_ablenkung_konfetti_luftb.png}}</p>",
+            "it": "<p> <p data-start=\"47\" data-end=\"93\"><b> </b></p><p data-start=\"47\" data-end=\"93\"><b>Ha imparato tutti i kanji! Grazie mille!</b></p> <p>Clicchi su Continua per arrivare alla fine del compito di apprendimento.</p> </p> <p>{{IMG:00_ablenkung_konfetti_luftb.png}}</p>"
+        }
+    ],
+    "_button": {
+        "de": "Weiter",
+        "en": "Next",
+        "fr": "Suivant",
+        "it": "Avanti"
+    }
+}

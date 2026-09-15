@@ -1,4 +1,6 @@
 server/service/globals_untracked.php
 *.log
-# Build sources
-content/
+
+# Generated export output
+export/*.csv
+content/export/

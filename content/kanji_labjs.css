@@ -1,0 +1,360 @@
+/* Kanji Adults — lab.js task styling.
+
+   Shipped by the `kanji-task-style` markdown section, which sits on the task
+   page ahead of the experiment and renders this file inside a <style> tag.
+
+   It cannot live anywhere inside the study: every lab.html.Screen does
+   `el.innerHTML = content` on run, so a <style> in a screen is wiped by the
+   next one. Nor in the section's `css` field — that is a class-name list
+   rendered inside class="…", so a stylesheet there never applies.
+
+   Sizing note: the stimulus images are 2048x2048, so every image is bounded
+   here by viewport *height* first. Width-only limits (e.g. max-width: 45%)
+   let a square image grow as tall as it is wide and push the options below
+   the fold on a laptop screen. */
+
+/* Full-bleed task.
+   The labJS style wraps the experiment in `.container.fullscreen`, which the
+   plugin's own lab.css gives a 24px margin, a 1px border, a rounded corner and
+   a 900px width variable, and pads `main` by another 24px. For a timed task
+   that chrome is only wasted viewport, so the page overrides it here rather
+   than by patching the lab plugin. */
+.selfHelp-lab-js-holder {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+.selfHelp-lab-js-holder .container,
+.selfHelp-lab-js-holder .container.fullscreen {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: none;
+  min-height: 100vh;
+  border: none;
+  border-radius: 0;
+}
+.selfHelp-lab-js-holder main,
+.selfHelp-lab-js-holder header,
+.selfHelp-lab-js-holder footer {
+  padding: 0;
+  border: none;
+}
+
+.kanji-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* The container chrome is stripped above, so the stage is the viewport. */
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 1vh 1vw;
+  gap: 3vh;
+  overflow: hidden;
+}
+
+/* Fixation cross — centred, and large enough to actually hold the eye.
+   Sized against the stimulus that follows (max-height: 68vh), not as an
+   afterthought: the cross marks the spot the kanji is about to occupy.
+
+   The asset used to be an 80px cross floating in a 1280x720 white frame, so
+   only 6% of the width was ink — every CSS width here was effectively divided
+   by sixteen, which is why earlier attempts to enlarge it did nothing visible.
+   It is now cropped square to the cross, so this width is the cross. */
+.kanji-fix { width: clamp(80px, 12vh, 160px); height: auto; }
+
+/* Learning trial: kanji and meaning side by side.
+   Matches the Qualtrics LA2 layout, but capped by height so the pair always
+   fits on one screen. */
+.kanji-pair {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 4vw;
+}
+.kanji-pair .kanji-item {
+  max-height: 68vh;
+  max-width: 44vw;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Recall trial: cue, the two options, and the confidence row all share one
+   screen (as in the Qualtrics original), so each band gets a smaller slice. */
+.kanji-cue {
+  max-height: 24vh;
+  max-width: 28vw;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* How to answer, between the kanji and the two options. `white-space:
+   pre-line` keeps the three lines the text is written on without needing
+   markup for them, and the max-width stops the longest line running out
+   to both edges of a wide screen - the text should read as a column under
+   the kanji, not as a banner across the page. */
+.kanji-prompt {
+  margin: 0 auto 2vh;
+  max-width: min(52ch, 80vw);
+  text-align: center;
+  white-space: pre-line;
+  font-size: clamp(0.9rem, 1.6vh, 1.15rem);
+  line-height: 1.5;
+}
+
+.kanji-choices {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5vw;
+  flex-wrap: nowrap;
+}
+
+.kanji-opt {
+  border: 2px solid #000;
+  border-radius: 12px;
+  background: #fff;
+  padding: 6px;
+  cursor: pointer;
+  transition: border-color .2s ease, transform .1s ease;
+  line-height: 0;
+}
+.kanji-opt img {
+  max-height: 28vh;
+  max-width: 24vw;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+  display: block;
+}
+.kanji-opt:hover { border-color: #2365c8; }
+.kanji-opt:active { transform: scale(.98); }
+
+/* Select-then-confirm. First click selects (blue), second click locks it
+   (brown) and freezes the group — the same two-stage interaction and the same
+   colours as the Qualtrics original. */
+.kanji-opt.selected {
+  border: 4px solid #2365c8;
+  padding: 4px;
+}
+.kanji-opt.locked {
+  border: 4px solid #8b5e3c;
+  padding: 4px;
+  opacity: .9;
+  pointer-events: none;
+}
+.kanji-choices.is-locked .kanji-opt:not(.locked) {
+  pointer-events: none;
+  opacity: .55;
+}
+
+/* The confidence row is revealed once the answer locks. It keeps its place
+   in the layout while hidden, so locking an answer does not shift the cue
+   and the choices, and it fades in rather than appearing instantly. */
+#kanjiConfidence[hidden] {
+  /* Still laid out, so revealing it moves nothing; just not painted. */
+  display: flex;
+  visibility: hidden;
+  pointer-events: none;
+}
+#kanjiConfidence:not([hidden]) {
+  animation: kanjiConfidenceIn .45s ease-out both;
+}
+@keyframes kanjiConfidenceIn {
+  from { opacity: 0; transform: translateY(18px) scale(.96); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #kanjiConfidence:not([hidden]) { animation: none; }
+}
+
+/* Confidence scale. The original fixes each tile at 100px wide, which also
+   keeps the three identical despite uneven source images (421x390, 423x390,
+   422x389 in DE; different again per language). */
+.kanji-cj {
+  gap: 30px;
+  margin-top: 2vh;
+  /* The tiles get their src only once the answer locks, so without a
+     reserved height the row is 0px until then and the trial jumps when
+     the images arrive. Hold the tallest case: a square tile plus its
+     6px padding and 2px border on each side. */
+  min-height: calc(clamp(120px, 13vw, 168px) + 16px);
+}
+.kanji-cj .kanji-opt {
+  width: clamp(120px, 13vw, 168px);
+  flex: 0 0 auto;
+}
+.kanji-cj .kanji-opt img {
+  width: 100%;
+  max-height: none;
+  max-width: none;
+}
+
+/* Instruction / orientation screens.
+   Self-paced text pages with a Weiter button. These scroll if the content is
+   long — unlike the trial screens, there is no timing reason to force them
+   into the fold, and the original was an ordinary scrollable survey page. */
+.kanji-instr {
+  justify-content: flex-start;
+  gap: 1.5rem;
+  overflow-y: auto;
+  padding: 4vh 2vw;
+  /* Same ground the questionnaire pages paint, so moving between a survey and
+     an instruction screen is not a white flash. The timed trials keep the
+     default: their stimuli are judged against a neutral background. */
+  background: #e7f0ff;
+}
+.kanji-instr-body {
+  /* Roughly the questionnaire container's measure. Wider than the 60ch that
+     reads best for prose, traded for matching the surveys either side. */
+  max-width: 820px;
+  width: 100%;
+  margin: 0 auto;
+  font-size: clamp(1rem, 1.5vh + .5rem, 1.35rem);
+  line-height: 1.5;
+  text-align: center;
+}
+/* Inline-block shrink-wraps to the widest line, so the block centres on the
+   page while its text stays left-aligned. */
+.kanji-instr-content {
+  display: inline-block;
+  text-align: left;
+  max-width: 100%;
+  /* The white card the questionnaire pages put their questions in, so an
+     instruction screen and a survey page read as the same surface. */
+  background: #fff;
+  border-radius: 4px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+}
+.kanji-instr-content ul {
+  margin: .5rem 0 1rem;
+  padding-left: 1.5rem;
+}
+/* Centred on the text block above it, not on the page. */
+.kanji-instr-actions {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* The closing `<b>` is inline, so it wraps onto the last bullet's line. */
+.kanji-instr-body ul + b {
+  display: block;
+  margin-top: 1em;
+}
+.kanji-instr-body li { margin-bottom: .4em; }
+.kanji-instr-body p { margin: .6em 0; }
+.kanji-instr-img {
+  max-width: 100%;
+  max-height: 34vh;
+  height: auto;
+  object-fit: contain;
+  margin: .5em auto;
+  display: block;
+}
+
+/* Two images in one paragraph are a kanji/meaning pair: side by side, as the
+   learning trial shows them. */
+.kanji-instr-body p:has(img + img) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+}
+.kanji-instr-body p:has(img + img) .kanji-instr-img {
+  margin: 0;
+  max-width: 40%;
+}
+
+/* Matches the SurveyJS navigation button, which is what a parent sees on every
+   questionnaire page: filled in the study accent rather than outlined.
+   #2365c8 is the borderless theme's brand colour; SurveyJS derives its own
+   button colours from `--sjs2-*` variables the shipped CSS never defines, so
+   the value is pinned here rather than read from it.
+
+   `.selfHelp-lab-js` and `!important`: the lab plugin styles every button in
+   the study (lab.css, `.selfHelp-lab-js button`) with a white background, a
+   grey border and its own padding. That selector outranks a bare `.kanji-next`
+   and loads from the head, so the study rule has to outweigh it explicitly. */
+.selfHelp-lab-js .kanji-next,
+.kanji-next {
+  font: inherit !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  padding: .6em 2.4em !important;
+  border: none !important;
+  border-radius: 6px !important;
+  background-color: #2365c8 !important;
+  color: #fff !important;
+  cursor: pointer;
+  transition: background-color .15s ease, transform .1s ease;
+}
+.selfHelp-lab-js .kanji-next:hover,
+.kanji-next:hover { background-color: #1b4fa0 !important; }
+.kanji-next:active { transform: scale(.98); }
+.kanji-next:focus-visible { outline: 3px solid #2365c8 !important; outline-offset: 3px; }
+
+.kanji-wait { color: #999; font-size: 2rem; }
+
+/* Portrait / small screens: stack the learn pair and give the options
+   width-driven sizing, since height is the scarcer axis only in landscape. */
+@media (max-width: 768px) {
+  /* A column, not a wrapped row: wrapped rows align to the line start. */
+  .kanji-pair {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0;
+  }
+  /* The files are half white padding, so tune the gap against that. */
+  .kanji-pair .kanji-item { max-width: 70vw; max-height: 34vh; }
+  .kanji-pair .kanji-item + .kanji-item { margin-top: 6vh; }
+  .kanji-cue { max-width: 46vw; max-height: 18vh; }
+  .kanji-opt img { max-width: 30vw; max-height: 20vh; }
+  .kanji-cj .kanji-opt { width: clamp(88px, 24vw, 128px); }
+  /* Track the tile width above, so the reserved row is not taller than what
+     lands in it. */
+  .kanji-cj { min-height: calc(clamp(88px, 24vw, 128px) + 16px); }
+  /* svh: vh includes the address bar and pushes content down. */
+  .kanji-stage {
+    gap: 0;
+    min-height: 100svh;
+    padding: 1vh 1vw;
+  }
+  /* Learn pair only: its files pad the bottom, so centred reads low. */
+  .kanji-stage:has(.kanji-pair) {
+    justify-content: flex-start;
+    padding-top: 4vh;
+  }
+}
+
+/* Respect a reduced-motion preference: the transforms here are decorative. */
+@media (prefers-reduced-motion: reduce) {
+  .kanji-opt, .kanji-next { transition: none; }
+  .kanji-opt:active, .kanji-next:active { transform: none; }
+}
+
+/* The page keeps the site header and footer so a participant stopped here has
+   somewhere to go. While the experiment is on the page it is a timed task and
+   the stage is sized to the viewport, so the chrome is hidden for that case
+   only. */
+body:has(.selfHelp-lab-js-holder) #nav-menu,
+body:has(.selfHelp-lab-js-holder) .footer-holder {
+  /* !important because the footer carries bootstrap d-flex. */
+  display: none !important;
+}
+
+/* Hide the floating CMS box.
+   SectionPage renders `.cms-edit` on every page and only guards its contents,
+   so a participant still gets an empty bordered box pinned to the bottom of
+   the viewport holding a back-to-top arrow. On a study page that is clutter,
+   and during a timed task it overlaps the stimuli. Hidden here rather than in
+   core, which would affect every installation. Editors reach the CMS through
+   the admin area; the box is not the only route. */
+.cms-edit {
+  display: none;
+}

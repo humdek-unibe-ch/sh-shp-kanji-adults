@@ -22,23 +22,31 @@ on `labJS`.
 ## Install
 
 1. Install and migrate the two plugins above.
-2. Upload the study images (165 files) to a served folder. `@base_path` and
-   `@asset_base` at the top of the migration set the URL prefix; `@base_path`
-   must match `BASE_PATH` in `globals_untracked.php`. The default asset folder
-   is `/assets/kanji`.
+2. Put the questionnaire images and `kanji_labjs.css` in `/assets`. They ship
+   alongside the migration, not in this repo — ask the dev responsible if you
+   do not have them:
 
-   Put `kanji_labjs.css` in `/assets` while you are there. The migration already
-   links this stylesheet from the task pages rather than carrying a copy, so
-   without it the task renders unstyled; it is also what a researcher loads
-   into the lab.js Builder to preview a task the way participants see it.
+   ```
+   ID_Brief.png  Logo_Universitaet_Bern.png  aufmerksamkeit_2c_ausrufezeichen.png
+   Vignette_Franz.jpg  Vignette_Geo.jpg  Vignette_Math.jpg  Vignette_Deut.jpg
+   ```
+
+   `@base_path` and `@asset_base` at the top of the migration set the URL
+   prefix — `@asset_base` is `@base_path` + `/assets` — and `@base_path` must
+   match `BASE_PATH` in `globals_untracked.php`.
+
+   The migration links `kanji_labjs.css` from the task pages rather than
+   carrying a copy, so without it the task renders unstyled; it is also what a
+   researcher loads into the lab.js Builder to preview a task the way
+   participants see it.
+
+   The Kanji and instruction images need no upload. lab.js embeds them in the
+   study itself, so they arrive with the migration.
 3. Run the migration **with an explicit UTF-8 charset**:
 
    ```
    mysql --default-character-set=utf8mb4 -u root <database> < server/db/v1.0.0.sql
    ```
-
-   The MySQL client on Windows often defaults to `cp850`, which silently
-   corrupts every umlaut on import (`für` becomes `f─╝r`).
 
 4. Clear the CMS cache.
 
@@ -61,8 +69,8 @@ component writes to its own data table.
 | Keyword | Contents | Component | Name in the CMS | Data table |
 |---|---|---|---|---|
 | `home` | Welcome: logo, prompt, language picker | languagePicker | — | — |
-| `kanji-adults-survey` | Part 1: consent and code | surveyJS | Kanji – Part 1: Consent and Code | `Kanji_Part1` |
-| `kanji-adults-demographics` | Part 2: demographics | surveyJS | Kanji – Part 2: Demographics | `Kanji_Demographics` |
+| `kanji-adults-survey` | Part 1: consent and code | surveyJS | Kanji – Teil 1: Einverständnis und Code | `Kanji_Part1` |
+| `kanji-adults-demographics` | Part 2: demographics | surveyJS | Kanji – Teil 2: Angaben | `Kanji_Demographics` |
 | `kanji-adults-task-1` | Instructions, practice, learn A | labJS | Kanji Aufgabe 1: Instruktion, Übung, Lernen Liste A | `Kanji_Task1` |
 | `kanji-adults-pause-1` | Vignette: Französische Vokabeln | surveyJS | Kanji – Pause 1: Französische Vokabeln | `Kanji_Pause1` |
 | `kanji-adults-task-2` | Recall A | labJS | Kanji Aufgabe 2: Abfrage Liste A | `Kanji_Task2` |
@@ -73,10 +81,10 @@ component writes to its own data table.
 | `kanji-adults-questions` | Part 3: device, closing code | surveyJS | Kanji – Teil 2: Gerät und Abschlusscode | `Kanji_Part2` |
 | `kanji-adults-prize-draw` | Optional prize draw, e-mail only | surveyJS | Kanji – Verlosung | `Kanji_PrizeDraw` |
 
-The four lab.js entries are one study split across four pages. They are
-generated together by `php content/build_labjs.php` from `items_learn.csv`,
-`items_recall.csv` and `instructions.json` — edit those rather than the
-`.builder.json` files, which are build output.
+The four lab.js entries are one study split across four pages, generated
+together from a single set of sources. Editing them in the CMS works for one-off
+changes; a change to the trial items or the instruction screens is a rebuild,
+which the dev responsible runs.
 
 The order participants move through is the table order: each component's
 `redirect_at_end` names the next page and hands the code along with it.
@@ -89,11 +97,9 @@ fills the retention interval between learning a list and recalling it.
 
 Participants arrive from a letter without logging in, so every page grants
 access to all groups and carries an `acl_users` row for the guest user. Every
-page except the welcome page and the first task page is headless, so the study
-runs without the site header and footer. The first task page keeps the chrome
-because an already-finished task can stop a participant there, and a headless
-page would leave no way out; the task CSS hides it again while the experiment
-is running.
+page is headless, so the study runs without the site header and footer: once
+the run starts there is nothing to navigate to, and the chrome invites
+participants to wander off mid-task.
 
 ## How a run holds together
 
@@ -119,9 +125,14 @@ code, so filter part 1 on `triggerType` before joining it to anything.
 Nothing is kept in the session, so a run survives a dropped session, a new tab,
 a different device, and a login part-way through.
 
-An unfinished run can be resumed and writes into its existing row: a participant
-who stops and comes back replaces their earlier answers where the attempts
-overlap, and keeps the first attempt where the second did not reach.
+An unfinished page can be resumed and writes back into its existing row. The
+update is per column, not per row: `UserInput::update_data` upserts only the
+columns present in the new submission, so a second attempt replaces the answers
+it carries and leaves every earlier answer it does not mention untouched. A
+participant who stops half way and comes back keeps what they already entered.
+
+Part 1 is again the exception — with no code in the route there is no row to
+find, so it starts fresh every time.
 
 A refresh part-way through a page is handled per style. The surveys have
 `restart_on_refresh` off, so reloading one reopens the response already in
