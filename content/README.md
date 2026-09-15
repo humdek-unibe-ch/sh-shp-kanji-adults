@@ -35,6 +35,12 @@ The four `.builder.json` files are what Module LabJS holds, and what to open in
 the lab.js Builder to preview a task. They are build output — a change to the
 item CSVs or `instructions.json` means a rebuild, not an edit here.
 
+**The CSVs hold the full study; the committed segments do not.** `items_learn.csv`
+is 30 A + 30 B + 2 practice and `items_recall.csv` is 15 A + 15 B + 1 practice —
+93 trials. The shipped segments are a reduced test build of 11. Everything a
+production build needs is here: the CSVs, the 165 originals in the plugin's
+`assets/`, and these segments as the output shape to match.
+
 ## Worth knowing
 
 - **A rebuild reshuffles the recall trials.** Which side holds the correct

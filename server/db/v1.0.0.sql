@@ -21,9 +21,10 @@
 -- among them — those are base64-embedded in the study itself.
 --
 -- BASE_PATH in globals_untracked.php is '/' . PROJECT_NAME, so the served
--- prefix must include it. Change @base_path if this install differs.
+-- prefix must include it. Set KANJI_BASE_PATH when building for an install
+-- that is not served from /selfhelp.
 -- -----------------------------------------------------------------------
-SET @base_path  = '/selfhelp';
+SET @base_path  = '/kanjis';
 SET @asset_base = CONCAT(@base_path, '/assets');
 
 -- -----------------------------------------------------------------------

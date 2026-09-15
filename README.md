@@ -22,9 +22,8 @@ on `labJS`.
 ## Install
 
 1. Install and migrate the two plugins above.
-2. Put the questionnaire images and `kanji_labjs.css` in `/assets`. They ship
-   alongside the migration, not in this repo — ask the dev responsible if you
-   do not have them:
+2. Copy `content/kanji_labjs.css` and the seven questionnaire images into the
+   SelfHelp install's served `/assets` folder:
 
    ```
    ID_Brief.png  Logo_Universitaet_Bern.png  aufmerksamkeit_2c_ausrufezeichen.png
@@ -40,8 +39,10 @@ on `labJS`.
    researcher loads into the lab.js Builder to preview a task the way
    participants see it.
 
-   The Kanji and instruction images need no upload. lab.js embeds them in the
-   study itself, so they arrive with the migration.
+   The Kanji and instruction images need no upload — lab.js embeds them in the
+   study, so they arrive with the migration. This plugin's own `assets/` folder
+   holds those 165 originals; they are the source a rebuild embeds from, not
+   something the server serves.
 3. Run the migration **with an explicit UTF-8 charset**:
 
    ```
