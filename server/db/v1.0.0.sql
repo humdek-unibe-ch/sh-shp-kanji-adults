@@ -1214,3 +1214,700 @@ SELECT @kb_style_draw, get_field_id('text_md'), l.id, '0000000001',
   FROM languages l WHERE l.locale <> 'all'
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
 
+
+-- -----------------------------------------------------------------------
+-- Documentation page
+--
+-- An admin-only `documentation` page holding the research team handbook.
+-- Content is markdown sections; the styling is one scoped stylesheet so the
+-- page can be edited in the CMS without touching HTML.
+--
+-- Access is the admin group only. There is deliberately no `acl_users` row
+-- for the guest user: every study page has one, and its absence here is what
+-- keeps participants out.
+-- -----------------------------------------------------------------------
+-- -----------------------------------------------------------------------
+-- Page
+-- -----------------------------------------------------------------------
+
+INSERT IGNORE INTO `pages` (
+    `id`, `keyword`, `url`, `protocol`,
+    `id_actions`, `id_navigation_section`, `parent`,
+    `is_headless`, `nav_position`, `footer_position`,
+    `id_type`, `id_pageAccessTypes`
+) VALUES (
+    NULL, 'documentation', '/documentation', 'GET',
+    '0000000003', NULL, NULL,
+    '0', NULL, NULL,
+    (SELECT id FROM pageType WHERE name = 'intern'),
+    (SELECT id FROM lookups WHERE type_code = 'pageAccessTypes' AND lookup_code = 'web')
+);
+
+SET @doc_page = (SELECT id FROM pages WHERE keyword = 'documentation');
+
+-- Keep the site header: this page is reached by navigating, not by redirect,
+-- and an admin needs a way back out.
+UPDATE `pages` SET `is_headless` = 0, `nav_position` = 90
+ WHERE `keyword` = 'documentation';
+
+INSERT INTO `pages_fields_translation` (`id_pages`, `id_fields`, `id_languages`, `content`)
+VALUES
+    (@doc_page, get_field_id('label'), '0000000002', 'Documentation'),
+    (@doc_page, get_field_id('title'), '0000000002', 'Documentation'),
+    (@doc_page, get_field_id('label'), '0000000003', 'Documentation'),
+    (@doc_page, get_field_id('title'), '0000000003', 'Documentation')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+-- -----------------------------------------------------------------------
+-- Sections
+-- One container holding a heading and one markdown block per handbook
+-- section. Splitting them means a researcher can edit one part in the CMS
+-- without scrolling through the whole document.
+-- -----------------------------------------------------------------------
+
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`) VALUES
+    (get_style_id('container'), 'kanji-doc-container', NULL),
+    (get_style_id('markdown'),  'kanji-doc-style',     NULL),
+    (get_style_id('markdown'),  'kanji-doc-toc',       NULL),
+    (get_style_id('heading'),   'kanji-doc-title',     NULL),
+    (get_style_id('markdown'),  'kanji-doc-intro',     NULL),
+    (get_style_id('markdown'),  'kanji-doc-flow',      NULL),
+    (get_style_id('markdown'),  'kanji-doc-surveys',   NULL),
+    (get_style_id('markdown'),  'kanji-doc-labjs',     NULL),
+    (get_style_id('markdown'),  'kanji-doc-export',    NULL),
+    (get_style_id('markdown'),  'kanji-doc-columns',   NULL),
+    (get_style_id('markdown'),  'kanji-doc-trials',    NULL);
+
+SET @doc_container = (SELECT id FROM sections WHERE name = 'kanji-doc-container');
+SET @doc_style     = (SELECT id FROM sections WHERE name = 'kanji-doc-style');
+SET @doc_toc       = (SELECT id FROM sections WHERE name = 'kanji-doc-toc');
+SET @doc_title     = (SELECT id FROM sections WHERE name = 'kanji-doc-title');
+SET @doc_intro     = (SELECT id FROM sections WHERE name = 'kanji-doc-intro');
+SET @doc_flow      = (SELECT id FROM sections WHERE name = 'kanji-doc-flow');
+SET @doc_surveys   = (SELECT id FROM sections WHERE name = 'kanji-doc-surveys');
+SET @doc_labjs     = (SELECT id FROM sections WHERE name = 'kanji-doc-labjs');
+SET @doc_export    = (SELECT id FROM sections WHERE name = 'kanji-doc-export');
+SET @doc_columns   = (SELECT id FROM sections WHERE name = 'kanji-doc-columns');
+SET @doc_trials    = (SELECT id FROM sections WHERE name = 'kanji-doc-trials');
+
+DELETE FROM `pages_sections` WHERE `id_pages` = @doc_page;
+INSERT IGNORE INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
+    VALUES (@doc_page, @doc_container, 0);
+
+DELETE FROM `sections_hierarchy` WHERE `parent` = @doc_container;
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`) VALUES
+    (@doc_container, @doc_style,  -1),
+    (@doc_container, @doc_title,   0),
+    (@doc_container, @doc_intro,  10),
+    (@doc_container, @doc_toc,    15),
+    (@doc_container, @doc_flow,   20),
+    (@doc_container, @doc_surveys,30),
+    (@doc_container, @doc_labjs,  40),
+    (@doc_container, @doc_export, 50),
+    (@doc_container, @doc_columns,60),
+    (@doc_container, @doc_trials, 70);
+
+-- Bootstrap utilities only: readable measure, vertical rhythm, and tables that
+-- scroll rather than push the page sideways on a laptop.
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES
+    (@doc_container, get_field_id('css'),      '0000000001', '0000000001', 'kanji-doc'),
+    (@doc_container, get_field_id('is_fluid'), '0000000001', '0000000001', '0'),
+    (@doc_title,     get_field_id('level'),    '0000000001', '0000000001', '1'),
+    (@doc_title,     get_field_id('css'),      '0000000001', '0000000001', 'doc-h1'),
+    (@doc_intro,     get_field_id('css'),      '0000000001', '0000000001', 'doc-lede'),
+    (@doc_toc,       get_field_id('css'),      '0000000001', '0000000001', 'doc-toc'),
+    (@doc_flow,      get_field_id('css'),      '0000000001', '0000000001', 'doc-sec'),
+    (@doc_surveys,   get_field_id('css'),      '0000000001', '0000000001', 'doc-sec'),
+    (@doc_labjs,     get_field_id('css'),      '0000000001', '0000000001', 'doc-sec'),
+    (@doc_export,    get_field_id('css'),      '0000000001', '0000000001', 'doc-sec'),
+    (@doc_columns,   get_field_id('css'),      '0000000001', '0000000001', 'doc-sec'),
+    (@doc_trials,    get_field_id('css'),      '0000000001', '0000000001', 'doc-sec')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+VALUES (@doc_title, get_field_id('title'), '0000000002', '0000000001', 'Working with the Kanji study')
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+-- -----------------------------------------------------------------------
+-- Content
+-- German is the default locale (id 2); the handbook is written in English
+-- because the research team works in it. One language keeps a single source
+-- of truth rather than four drifting copies.
+-- -----------------------------------------------------------------------
+
+-- The page's own stylesheet, scoped to `.kanji-doc` so nothing here reaches the
+-- CMS chrome or any other page. Values are taken from docs/handbook.html so the
+-- two stay visually identical: 1080px canvas, 220px sticky sidebar, Source
+-- Serif 4 over IBM Plex Mono, the paper palette.
+--
+-- Fonts load from Google; the fallback stacks are named explicitly so the page
+-- still reads correctly if the server has no outbound access.
+SET @md_style = '
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+/* Paint the whole page, not just the container: SelfHelp''s stylesheet sets a
+   white body, so without this the paper ground stops at the grid edge and the
+   document floats on white. */
+body:has(.kanji-doc) { background:#FAF8F4 !important; }
+body:has(.kanji-doc) main,
+body:has(.kanji-doc) .container,
+body:has(.kanji-doc) #content { background:transparent !important; }
+
+.kanji-doc {
+  --paper:#FAF8F4; --sunk:#F2EEE6; --card:#FFF; --ink:#201D18; --soft:#4A443A;
+  --grey:#6E665A; --rule:#E6E1D7; --indigo:#2F4A7C; --indigo-dim:#E8EDF5;
+  --clay:#A85832; --clay-dim:#F7EBE4; --moss:#4A6741; --moss-dim:#EAF0E7;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",Consolas,"Courier New",monospace;
+  display:grid; grid-template-columns:220px minmax(0,1fr);
+  column-gap:56px; row-gap:0; align-items:start;
+  max-width:1080px; margin:0 auto; padding:0 32px 120px;
+  font-family:var(--serif); font-size:18.5px; line-height:1.65;
+  color:var(--ink); background:var(--paper);
+  -webkit-font-smoothing:antialiased;
+}
+.kanji-doc > * { min-width:0; }
+
+/* Masthead spans both columns, like the handbook. */
+.kanji-doc .doc-h1 {
+  grid-column:1 / -1; grid-row:1;
+  font-size:clamp(34px,5.2vw,52px); line-height:1.08; font-weight:700;
+  letter-spacing:-.02em; margin:0; padding:64px 0 40px;
+  border-bottom:2px solid var(--ink);
+}
+.kanji-doc .doc-lede {
+  grid-column:2; grid-row:2; margin:40px 0 24px;
+}
+.kanji-doc .doc-lede p {
+  font-size:21px; line-height:1.5; color:var(--soft); max-width:58ch; margin:0;
+}
+
+/* Sidebar: the first content section becomes the sticky table of contents. */
+/* The sidebar sits in column 1 and spans every section row, so it can stay
+   sticky beside the whole document rather than scrolling away after one. */
+.kanji-doc .doc-toc {
+  grid-column:1; grid-row:2 / span 8;
+  /* Same top offset as the lede beside it, so both columns start level. */
+  margin-top:40px;
+  position:sticky; top:24px; align-self:start;
+  font-family:var(--mono); font-size:13px; line-height:1.55;
+}
+.kanji-doc .doc-toc-title {
+  text-transform:uppercase; letter-spacing:.12em; font-size:10.5px;
+  color:var(--grey); margin-bottom:14px;
+}
+.kanji-doc .doc-toc ul { list-style:none; margin:0; padding:0; }
+.kanji-doc .doc-toc li { margin-bottom:2px; }
+.kanji-doc .doc-toc a {
+  color:var(--soft); text-decoration:none; display:block;
+  border-left:2px solid var(--rule); padding:5px 0 5px 12px;
+  transition:color .12s, border-color .12s;
+}
+.kanji-doc .doc-toc a:hover { color:var(--indigo); border-left-color:var(--indigo); }
+
+/* Body column holds every content section. */
+.kanji-doc .doc-sec {
+  grid-column:2; margin:0 0 48px; scroll-margin-top:24px;
+}
+.kanji-doc .doc-sec:first-of-type { margin-top:0; }
+.kanji-doc .doc-sec > :first-child { margin-top:0; }
+.kanji-doc .doc-sec:last-child { margin-bottom:0; }
+
+.kanji-doc .doc-eyebrow {
+  display:block; font-family:var(--mono); font-size:11px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--indigo);
+  margin-bottom:10px;
+}
+/* A section heading carries the break above it, so sections read as separate
+   documents rather than one long scroll. */
+.kanji-doc h2 {
+  font-size:32px; line-height:1.16; font-weight:700; letter-spacing:-.015em;
+  margin:0 0 6px; padding-bottom:14px; border-bottom:2px solid var(--ink);
+}
+/* The sentence under a section heading is the lede, as in the handbook. */
+.kanji-doc h2 + p {
+  font-size:20px; line-height:1.5; color:var(--soft);
+  max-width:62ch; margin:14px 0 26px;
+}
+.kanji-doc h3 {
+  font-size:22px; font-weight:600; letter-spacing:-.01em;
+  margin:52px 0 14px; padding-top:20px; border-top:1px solid var(--rule);
+}
+/* The first sub-heading follows the section lede, so it needs no rule. */
+.kanji-doc h2 + p + h3,
+.kanji-doc h2 + h3 { border-top:none; padding-top:0; margin-top:32px; }
+.kanji-doc h4 {
+  font-family:var(--mono); font-size:16px; font-weight:700; margin:26px 0 8px;
+}
+.kanji-doc p { margin:0 0 16px; max-width:68ch; }
+.kanji-doc ul, .kanji-doc ol { max-width:68ch; padding-left:22px; margin:0 0 18px; }
+.kanji-doc li { margin-bottom:8px; }
+.kanji-doc a { color:var(--indigo); }
+
+.kanji-doc code {
+  font-family:var(--mono); font-size:.84em; background:var(--sunk);
+  padding:1px 5px; border-radius:3px; word-break:break-word;
+  color:var(--ink);
+}
+.kanji-doc pre {
+  font-family:var(--mono); font-size:13.5px; line-height:1.62;
+  background:var(--sunk); border:1px solid var(--rule); border-radius:5px;
+  padding:16px 18px; overflow-x:auto; margin:0 0 20px;
+}
+.kanji-doc pre code { background:none; padding:0; font-size:inherit; }
+
+/* Callouts. Indigo for an aside worth knowing, clay for something that costs
+   data if ignored — the same split the handbook uses. */
+.kanji-doc .doc-note,
+.kanji-doc .doc-warn,
+.kanji-doc .doc-ok,
+.kanji-doc blockquote {
+  padding:15px 18px; margin:0 0 22px; max-width:68ch;
+  border-radius:0 4px 4px 0; border-left:3px solid;
+}
+.kanji-doc .doc-note { border-color:var(--indigo); background:var(--indigo-dim); }
+.kanji-doc .doc-warn,
+.kanji-doc blockquote { border-color:var(--clay); background:var(--clay-dim); }
+.kanji-doc .doc-ok { border-color:var(--moss); background:var(--moss-dim); }
+.kanji-doc .doc-tag {
+  display:block; font-family:var(--mono); font-size:10.5px; font-weight:600;
+  letter-spacing:.12em; text-transform:uppercase; margin-bottom:6px;
+}
+.kanji-doc .doc-note .doc-tag { color:var(--indigo); }
+.kanji-doc .doc-warn .doc-tag { color:var(--clay); }
+.kanji-doc .doc-ok   .doc-tag { color:var(--moss); }
+.kanji-doc .doc-note p:last-child,
+.kanji-doc .doc-warn p:last-child,
+.kanji-doc blockquote p:last-child { margin-bottom:0; }
+
+.kanji-doc table {
+  border-collapse:collapse; width:100%; font-size:15.5px; margin:0 0 32px;
+  display:block; overflow-x:auto;
+}
+.kanji-doc thead th {
+  text-align:left; font-family:var(--mono); font-size:11px; font-weight:500;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--grey);
+  border-bottom:1.5px solid var(--ink); padding:0 14px 7px 0;
+  vertical-align:bottom; white-space:nowrap;
+}
+.kanji-doc tbody td {
+  padding:9px 14px 9px 0; border-bottom:1px solid var(--rule);
+  vertical-align:top; line-height:1.45;
+}
+/* A cell that is nothing but a code span is an identifier: render it the way
+   the handbook renders its .var column, indigo mono, not a grey chip. */
+.kanji-doc tbody td > code:only-child {
+  background:none; padding:0; font-size:14px; color:var(--indigo); font-weight:500;
+}
+.kanji-doc tbody td:first-child { white-space:nowrap; }
+.kanji-doc tbody td:first-child:not(:has(code)) {
+  font-variant-numeric:tabular-nums; color:var(--soft);
+}
+/* Wide reference tables read better with a touch more air per row. */
+.kanji-doc tbody tr:hover td { background:var(--sunk); }
+
+/* Numbered steps get the handbook''s indigo circles. */
+.kanji-doc .doc-sec ol {
+  list-style:none; padding:0; counter-reset:step; max-width:68ch;
+}
+.kanji-doc .doc-sec ol > li {
+  counter-increment:step; position:relative; padding-left:44px; margin-bottom:22px;
+}
+.kanji-doc .doc-sec ol > li::before {
+  content:counter(step); position:absolute; left:0; top:1px;
+  width:27px; height:27px; border-radius:50%;
+  background:var(--indigo); color:var(--paper);
+  font-family:var(--mono); font-size:13px; font-weight:600;
+  display:flex; align-items:center; justify-content:center;
+}
+.kanji-doc .doc-sec ol ul { list-style:disc; padding-left:22px; counter-reset:none; }
+.kanji-doc .doc-sec ol ul > li { padding-left:0; margin-bottom:8px; }
+.kanji-doc .doc-sec ol ul > li::before { content:none; }
+
+@media (max-width:860px) {
+  .kanji-doc { grid-template-columns:1fr; gap:0; padding:0 22px 80px; }
+  .kanji-doc .doc-h1 { padding-top:44px; }
+  .kanji-doc .doc-sec { grid-column:1; margin-bottom:44px; }
+  .kanji-doc .doc-toc { position:static; margin-bottom:44px; }
+  .kanji-doc .doc-toc ul { columns:2; column-gap:22px; }
+}
+</style>
+';
+
+-- The sidebar. Anchors match the `<span id>` at the top of each section below.
+SET @md_toc = '
+<div class="doc-toc-title">Contents</div>
+
+- [1 The page flow](#doc-flow)
+- [2 Editing a questionnaire](#doc-surveys)
+- [3 Editing the memory task](#doc-labjs)
+- [4 Getting the data out](#doc-export)
+- [5 The columns explained](#doc-columns)
+- [6 The memory task columns](#doc-trials)
+';
+
+SET @md_intro = '
+Where each part of the study lives in the CMS, what every column in the exported
+data means, and how to change the questionnaires and the memory task yourself.
+';
+
+SET @md_flow = '
+<span id="doc-flow"></span>
+
+## The page flow
+
+Which CMS entry belongs to which step, and where each one saves its answers.
+
+| # | Step | Edit in | Entry name in the CMS | Data table |
+|---|---|---|---|---|
+| 1 | Consent + code | Module SurveyJS | Kanji – Teil 1: Einverständnis und Code | `Kanji_Part1` |
+| 2 | Demographics | Module SurveyJS | Kanji – Teil 2: Angaben | `Kanji_Demographics` |
+| 3 | Task 1 · learn A | Module LabJS | Kanji Aufgabe 1: Instruktion, Übung, Lernen Liste A | `Kanji_Task1` |
+| 4 | Pause 1 · French | Module SurveyJS | Kanji – Pause 1: Französische Vokabeln | `Kanji_Pause1` |
+| 5 | Task 2 · recall A | Module LabJS | Kanji Aufgabe 2: Abfrage Liste A | `Kanji_Task2` |
+| 6 | Pause 2 · Geography | Module SurveyJS | Kanji – Pause 2: Geografie Quiz | `Kanji_Pause2` |
+| 7 | Task 3 · learn B | Module LabJS | Kanji Aufgabe 3: Lernen Liste B | `Kanji_Task3` |
+| 8 | Pause 3 · Maths + essay | Module SurveyJS | Kanji – Pause 3: Mathematik und Aufsatz | `Kanji_Pause3` |
+| 9 | Task 4 · recall B | Module LabJS | Kanji Aufgabe 4: Abfrage Liste B, Abschluss | `Kanji_Task4` |
+| 10 | Device + closing code | Module SurveyJS | Kanji – Teil 2: Gerät und Abschlusscode | `Kanji_Part2` |
+| — | Prize draw | Module SurveyJS | Kanji – Verlosung | `Kanji_PrizeDraw` |
+
+To test a step directly, add a code to the page address — <code>kanji-adults-pause-1/TEST123</code>
+opens pause 1 as if that code had arrived there.
+
+<div class="doc-warn"><span class="doc-tag">Keep the prize draw separate</span>
+The prize draw file has no participant code attached. Never join it back to the study
+data.</div>
+';
+
+SET @md_surveys = '
+<span id="doc-surveys"></span>
+
+## Editing a questionnaire
+
+Consent, demographics and the three pause vignettes are all edited the same way,
+in the SelfHelp CMS.
+
+1. **Open Module SurveyJS** from the admin menu and pick the questionnaire by its
+   CMS name (see the table above).
+2. **Edit the question** directly in the Creator. To add an answer option, select
+   the question and use the Choices list on the right.
+3. **Check every language** — German, English, French, Italian, using the language
+   selector at the top. A language left blank shows an empty question to those
+   participants.
+4. **Save, then Publish.** Saving only stores a draft; Publish is what participants
+   see.
+
+<div class="doc-warn"><span class="doc-tag">Leave question names alone</span>
+Change the visible text freely, but leave question names (like <code>Demo_14</code>)
+alone once the study is collecting data — renaming splits old and new answers into
+different columns.</div>
+';
+
+SET @md_labjs = '
+<span id="doc-labjs"></span>
+
+## Editing the memory task
+
+The four Kanji blocks are built in lab.js. Editing them is copy out, change, copy
+back.
+
+1. **Open Module LabJS** and find the block by its CMS name. Copy its configuration
+   text.
+2. **Save it as a file** ending in `.json` — e.g. `task2.json`. Notepad adds `.txt`
+   unless you pick "All files" in the save dialog, and the Builder will not open a
+   `.txt`.
+3. **Open [labjs.felixhenninger.com](https://labjs.felixhenninger.com/)** and open
+   your file there. Press Preview to run the task as a participant sees it.
+4. **Make your change,** then export the study as a `.json` file from the Builder.
+5. **Paste it back** into Module LabJS over the old configuration, save, and test
+   the whole block with a test code.
+';
+
+SET @md_export = '
+<span id="doc-export"></span>
+
+## Getting the data out
+
+The R script from the developer downloads every step of the study into one Excel
+workbook, a tab per step.
+
+1. **Open RStudio.** Your token is already filled in. If you do not have a token,
+   ask the development team for one.
+2. **File → Source R Code…** and choose the script. The first run installs a few
+   packages and takes a few minutes; later runs take seconds.
+
+| File | Contents |
+|---|---|
+| `kanji_export.xlsx` | Eleven tabs: **Merged** with the whole study joined on the participant code, one row each, then **01_Part1** to **10_Part2**, one per step |
+| `kanji_prize_draw.xlsx` | E-mail address and date only |
+
+Running it again overwrites both files with fresh data. It only reads, so run it as
+often as you like.
+
+<div class="doc-note"><span class="doc-tag">Only need one table?</span>
+Each step already has its own tab in the workbook. The admin menu''s <strong>Data</strong>
+page exports a single table directly too, if you want it without running R.</div>
+
+<div class="doc-warn"><span class="doc-tag">If it stops with an error</span>
+<strong>Permission denied</strong> writing <code>kanji_export.xlsx</code> — the file is
+open in Excel, close it and run again. <strong>Could not reach the study website</strong>
+— connect the VPN. <strong>Server rejected the token</strong> — re-paste it, or ask for a
+new one.</div>
+
+<div class="doc-warn"><span class="doc-tag">Keep the token private</span>
+Do not e-mail the script with the token in it or put it in a shared folder. If someone
+else needs to export the data, ask the developer for a token of their own.</div>
+';
+
+SET @md_columns = '
+<span id="doc-columns"></span>
+
+## The columns explained
+
+The per-step tabs carry the plain question names. On the **Merged** tab the same
+columns are prefixed with the step they came from, so `Demo_14` on
+**02_Demographics** is `Demographics_Demo_14` there.
+
+<div class="doc-note"><span class="doc-tag">The key column</span>
+<code>extra_param_code</code> is the participant code — the one column with no prefix.
+One row per code is the normal case; a code submitted twice on the consent page produces
+two rows, so check for repeats before counting.</div>
+
+### Repeated on every step
+
+| Column | Meaning |
+|---|---|
+| `triggerType` | `finished` = page completed. `started` / `updated` = opened but not finished |
+| `entry_date` | When the row was last saved |
+| `record_id` | Internal row number. Empty if the participant never reached this page |
+
+### Timing and device — questionnaire steps only
+
+| Column | Meaning |
+|---|---|
+| `_meta_duration` | Seconds spent on the page |
+| `_meta_start_time`, `_meta_end_time` | UTC timestamps for opening and submitting |
+| `_meta_pages` | Per-page timings, packed as one cell |
+| `_meta_viewport_width`, `_meta_viewport_height` | Browser window size in pixels. Best indicator of phone vs laptop |
+| `_meta_screen_width`, `_meta_screen_height` | Whole screen size, not just the browser |
+| `_meta_pixel_ratio` | Display density (2 on most phones, 1 on older screens) |
+| `_meta_user_agent` | Browser and operating system as one long string |
+| `pageNo` | Last page number reached inside that questionnaire |
+
+### Part 1 — consent
+
+| Column | Question and values |
+|---|---|
+| `EV` | Do you consent to taking part? — 1 = yes · 2 = no |
+| `ID_1` | The code typed from the letter. Free text |
+
+### Demographics — responding parent
+
+| Column | Question and values |
+|---|---|
+| `Demo_2` | Relationship to the child — 1 = mother · 2 = father · 3 = other |
+| `Demo_2_other` | Free text, only when `Demo_2 = 3` |
+| `Demo_25` | Year of birth. Free text |
+| `Demo_3` | People in the household (including themselves) — 1–6 = that number · 7 = more than 6 |
+| `Demo_3_other` | Exact number, only when `Demo_3 = 7` |
+| `Demo_4` | Language(s) spoken at home with the child. **Multiple answers in one cell** |
+| `Demo_4_other` | Free-text language, only when `Demo_4` contains 27 |
+| `Demo_5` | Other children (0–17) in the household? — 1 = yes · 2 = no |
+| `Demo_6` | How many other children, only when `Demo_5 = 1` — 1–6 · 7 = mehr als 6 |
+| `Demo_6_other` | Exact number, only when `Demo_6 = 7` |
+| `Demo_6_count` | Hidden helper mirroring `Demo_6`, drives how many child entries show. Not a question |
+| `Demo_children` | One entry per other child: `jahrgang` (2009–2026) and `geschlecht` (w = female · m = male · d = diverse · a = other) |
+| `Demo_13` | Birth years and sexes as free text, asked instead when `Demo_6 = 7` |
+| `Demo_14` | Highest educational qualification — 1 = none completed · 2 = in-house training · 3 = vocational training · 4 = Matura · 5 = teaching certificate · 6 = higher vocational / technical college · 7 = university of applied sciences · 8 = university (UNI, ETH) |
+| `Demo_15` | Hours worked per week — 1 = 0% · 2 = up to 20% · 3 = 21–40% · 4 = 41–60% · 5 = 61–80% · 6 = 81–100% |
+| `Demo_16` | Occupation. Free text, not asked when `Demo_15 = 1` |
+| `Demo_17` | Language(s) they speak. **Multiple answers in one cell** |
+| `Demo_17_other` | Free-text language, only when `Demo_17` contains 27 |
+
+### Demographics — second parent
+
+All blank by design when `Demo_19 = 2` (no). That is "not applicable", not missing
+data.
+
+| Column | Question and values |
+|---|---|
+| `Demo_19` | Can they give details about the second parent? — 1 = yes · 2 = no |
+| `Demo_20` | Relationship to the child — same codes as `Demo_2` |
+| `Demo_20_other` | Free text, only when `Demo_20 = 3` |
+| `Demo_26` | Year of birth. Free text |
+| `Demo_21` | Educational qualification — same 1–8 codes as `Demo_14` |
+| `Demo_22` | Hours worked per week — same codes as `Demo_15` |
+| `Demo_23` | Occupation. Free text, not asked when `Demo_22 = 1` |
+| `Demo_24` | Language(s) the second parent speaks. **Multiple answers in one cell** |
+| `Demo_24_other` | Free-text language, only when `Demo_24` contains 27 |
+
+### Language codes
+
+Used by `Demo_4`, `Demo_17` and `Demo_24`, comma-separated when several apply.
+
+1 Swiss German · 2 German · 3 Albanian · 4 Arabic · 5 English · 6 Finnish ·
+7 French · 8 Italian · 9 Croatian · 10 Kurdish · 11 Macedonian · 12 Dutch ·
+13 Norwegian · 14 Persian · 15 Portuguese · 16 Romansh · 17 Russian · 18 Swedish ·
+19 Serbian · 20 Spanish · 21 Tamil · 22 Thai · 23 Tigrinya · 24 Turkish ·
+25 Hungarian · 26 Ukrainian · 27 Other
+
+### The pause vignettes
+
+Six statements each, rated 1–5: 1 = very unlikely · 2 = unlikely · 3 = maybe · 4 = likely · 5 = very likely.
+
+| Columns | Vignette |
+|---|---|
+| `P1_Vignette_Franz_1…6` | French vocabulary |
+| `P2_Vignette_Geo_1…6` | Geography quiz |
+| `P3_Vignette_Math_1…6` | Maths |
+| `P3_Vignette_Deut_1…6` | Essay writing |
+
+### Part 2 — closing
+
+| Column | Question and values |
+|---|---|
+| `Device` | Which device did they use? — 1 = laptop / computer · 2 = tablet · 3 = mobile phone |
+| `ID_2` | The code re-entered at the end. Compare with `ID_1` |
+| `Finished_Study` | `1` once the closing survey is submitted. Never `0` — a run that did not reach the end simply has no value |
+
+### Prize draw
+
+`kanji_prize_draw.xlsx` has two columns only: `email` and `entry_date`. It is a
+separate file, not a tab in the main workbook: there is no participant code, so a
+draw entry cannot be traced back to anyone''s answers — and must not be.
+';
+
+SET @md_trials = '
+<span id="doc-trials"></span>
+
+## The memory task columns
+
+The four task steps store their data differently from the questionnaires. Each
+carries a few summary numbers plus one packed cell holding every trial.
+
+### Summary columns
+
+| Column | Meaning |
+|---|---|
+| `extra_data_n_trials_practice` | Practice trials shown |
+| `extra_data_n_correct_practice` | Practice trials answered correctly |
+| `extra_data_n_trials_learn_A` | Learning trials, list A |
+| `extra_data_n_trials_recall_A` | Recall trials, list A |
+| `extra_data_n_correct_recall_A` | **Correct recalls, list A** |
+| `extra_data_n_trials_learn_B` | Learning trials, list B |
+| `extra_data_n_trials_recall_B` | Recall trials, list B |
+| `extra_data_n_correct_recall_B` | **Correct recalls, list B** |
+| `extra_data_UserLanguage` | Language the task ran in (DE, EN, FR, IT) |
+
+<div class="doc-warn"><span class="doc-tag">Check the trial count first</span>
+In the full study each list is <strong>30 learning trials and 15 recall trials</strong>,
+plus 2 practice learning and 1 practice recall — 93 in all. Recall is half of learning by
+design. If <code>extra_data_n_trials_learn_A</code> reads 3 rather than 30, the data came
+from the short test build, not a real run.</div>
+
+### Packed trial cells
+
+The columns ending in `_trials_…` hold every trial of that block inside one cell, so
+Excel shows a single long line. **Learning and recall blocks store different fields.**
+
+**Learning blocks** — `trials_learn_A`, `trials_learn_B`. Nothing is asked while
+learning, so each trial records only what was shown and for how long.
+
+| Field | Meaning |
+|---|---|
+| `trial` | Trial number within the block, starting at 1 |
+| `item` | Which Kanji–picture pair was shown |
+| `dauer_ms` | How long the pair stayed on screen, in milliseconds |
+
+**Recall blocks** — `trials_practice`, `trials_recall_A`, `trials_recall_B`. The
+participant answers and then rates their confidence, so every trial carries both
+responses and three timings.
+
+<div class="doc-warn"><span class="doc-tag">The field names differ per block</span>
+Each block kept the question numbers from the original Qualtrics study, so the same
+measurement has a different name per block: <strong>practice</strong> uses <code>Q22</code>/<code>Q23</code>,
+<strong>recall A</strong> uses <code>Q42</code>/<code>Q43</code>, <strong>recall B</strong> uses
+<code>Q2</code>/<code>Q3</code>. The first of each pair is the image choice, the second the
+confidence rating.</div>
+
+| Field | Meaning |
+|---|---|
+| `trial` | Trial number within the block |
+| `item` | Which pair was tested |
+| `Auswahl_Q42` | Image the participant chose. List B uses `Auswahl_Q2` |
+| `Auswahl_Q43` | **Confidence rating** for that answer |
+| `Reaktionszeit_Q42_ms` | **Answer reaction time** — trial appearing to answer locked in, ms |
+| `Reaktionszeit_Q43_ms` | **Confidence reaction time** — trial appearing to confidence locked in, ms |
+| `Reaktionszeit_Q43_ab_Q42_ms` | Gap between the two: time to rate confidence after answering |
+| `korrekt` | 1 = correct, 0 = wrong |
+| `korrekt_seite` | Which side held the correct image: `left` or `right` |
+| `gewaehlt` | Which side the participant clicked. Compare with `korrekt_seite` for a side bias |
+| `orig_pos` | Which side held the correct image in the original Qualtrics study. **Not** the side shown here — that is `korrekt_seite` |
+
+### Which column holds which block
+
+| Column | Shape | Block |
+|---|---|---|
+| `extra_data_trials_practice` | recall | Practice round, before the real study |
+| `extra_data_trials_learn_A` | learning | Learning list A |
+| `extra_data_trials_recall_A` | recall | Recall of list A |
+| `extra_data_trials_learn_B` | learning | Learning list B |
+| `extra_data_trials_recall_B` | recall | Recall of list B |
+
+### Reading a packed cell
+
+Each cell is a list of trials wrapped in `[ ]`. Every trial sits between its own
+`{ }` and reads as `"field":value`, separated by commas.
+
+```
+[{"trial":1,"item":"Herbst","Auswahl_Q42":"Ast.jpg","Auswahl_Q43":2,
+  "Reaktionszeit_Q42_ms":814,"Reaktionszeit_Q43_ms":1545,
+  "Reaktionszeit_Q43_ab_Q42_ms":732,"korrekt":0,
+  "korrekt_seite":"right","gewaehlt":"left","orig_pos":"1"}]
+```
+
+So that trial tested **Herbst**, the participant picked **Ast.jpg**, rated confidence
+**2**, took **814 ms** to answer and **732 ms** more to rate it, and was **wrong**
+because the correct image was on the right and they clicked left.
+
+A learning cell is shorter, because nothing is asked while learning:
+
+```
+[{"trial":1,"item":"Baumwolle","dauer_ms":4991},
+ {"trial":2,"item":"Herbst","dauer_ms":4975}]
+```
+
+The `_meta_pages` column on questionnaire steps is packed the same way, holding
+`pageNo`, `start_time` and `end_time` per page.
+';
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+SELECT s.id, get_field_id('text_md'), l.id, '0000000001', s.md
+FROM (
+    SELECT @doc_style   AS id, @md_style   AS md UNION ALL
+    SELECT @doc_toc,       @md_toc         UNION ALL
+    SELECT @doc_intro,     @md_intro       UNION ALL
+    SELECT @doc_flow,      @md_flow        UNION ALL
+    SELECT @doc_surveys,   @md_surveys     UNION ALL
+    SELECT @doc_labjs,     @md_labjs       UNION ALL
+    SELECT @doc_export,    @md_export      UNION ALL
+    SELECT @doc_columns,   @md_columns     UNION ALL
+    SELECT @doc_trials,    @md_trials
+) s
+CROSS JOIN `languages` l
+WHERE l.locale <> 'all'
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+
+-- -----------------------------------------------------------------------
+-- Access: admin only
+--
+-- No `acl_users` row for the guest user. Every study page has one, which is
+-- what makes those pages public; its absence here is what keeps participants
+-- out of the documentation.
+-- -----------------------------------------------------------------------
+
+INSERT IGNORE INTO `acl_groups` (`id_groups`, `id_pages`, `acl_select`, `acl_insert`, `acl_update`, `acl_delete`)
+    SELECT g.id, @doc_page, 1, 1, 1, 1
+    FROM `groups` g WHERE g.name = 'admin';
