@@ -1,12 +1,11 @@
 # Kanji Adults
 
-The Kanji Adults parent–child study: a paired-associate Kanji memory task with
-questionnaires, ported from Qualtrics.
+Parent–child paired-associate Kanji memory study with questionnaires, ported
+from Qualtrics.
 
-This is **not a plugin**. It is one SQL migration that builds the study out of
-components SelfHelp already has — the questionnaires are `surveyJS` sections,
-the memory task is `labJS` sections, the pages are ordinary CMS pages. There is
-no PHP and there are no hooks.
+**Not a plugin.** One SQL migration that builds the study from components
+SelfHelp already has: questionnaires are `surveyJS` sections, the memory task
+is `labJS` sections, the pages are ordinary CMS pages. No PHP, no hooks.
 
 ## Requirements
 
@@ -14,212 +13,161 @@ no PHP and there are no hooks.
 - [sh-shp-survey_js](https://github.com/humdek-unibe-ch/sh-shp-survey_js) **v1.7.0+**
 - [sh-shp-lab_js](https://github.com/humdek-unibe-ch/sh-shp-lab_js) **v1.3.0+**
 
-Both must be installed and migrated **before** this one runs. The versions
-matter: the study needs `url_params`, `{{name}}` templating in
-`redirect_at_end` and `update_based_on` on both styles, and `warning_on_reload`
-on `labJS`.
+Install and migrate both first. The study needs `url_params`, `{{name}}`
+templating in `redirect_at_end`, `update_based_on`, and `warning_on_reload`.
 
 ## Install
 
-1. Install and migrate the two plugins above.
-2. Copy `content/kanji_labjs.css` and the seven questionnaire images into the
-   SelfHelp install's served `/assets` folder:
+1. Copy `content/kanji_labjs.css` and these into the served `/assets` folder —
+   `@asset_base` in the migration is `@base_path` + `/assets`, and `@base_path`
+   must match `BASE_PATH` in `globals_untracked.php`:
 
    ```
    ID_Brief.png  Logo_Universitaet_Bern.png  aufmerksamkeit_2c_ausrufezeichen.png
    Vignette_Franz.jpg  Vignette_Geo.jpg  Vignette_Math.jpg  Vignette_Deut.jpg
    ```
 
-   `@base_path` and `@asset_base` at the top of the migration set the URL
-   prefix — `@asset_base` is `@base_path` + `/assets` — and `@base_path` must
-   match `BASE_PATH` in `globals_untracked.php`.
+   Without the CSS the task renders unstyled. Kanji and instruction images need
+   no upload — lab.js embeds them in the study. This plugin's `assets/` holds
+   those 165 originals as the source a rebuild embeds from.
 
-   The migration links `kanji_labjs.css` from the task pages rather than
-   carrying a copy, so without it the task renders unstyled; it is also what a
-   researcher loads into the lab.js Builder to preview a task the way
-   participants see it.
-
-   The Kanji and instruction images need no upload — lab.js embeds them in the
-   study, so they arrive with the migration. This plugin's own `assets/` folder
-   holds those 165 originals; they are the source a rebuild embeds from, not
-   something the server serves.
-3. Run the migration **with an explicit UTF-8 charset**:
+2. Run the migration **with an explicit UTF-8 charset**, or every umlaut
+   corrupts on import:
 
    ```
    mysql --default-character-set=utf8mb4 -u root <database> < server/db/v1.0.0.sql
    ```
 
-4. Clear the CMS cache.
+3. Clear the CMS cache.
 
-Re-running is safe. Pages and sections use `INSERT IGNORE`; questionnaires and
-task segments are matched on their title or name and updated in place, so ids
+Re-running is safe: `INSERT IGNORE` for pages and sections, and questionnaires
+and task segments are matched on title or name and updated in place, so ids
 stay stable and anyone mid-study is unaffected.
 
-> **The shipped migration is a reduced test build: at most 3 trials per block,
-> 11 in total** — 1 practice, 3 learn A, 2 recall A, 3 learn B, 2 recall B. It
-> is for walking the study end to end, not for data collection. The full study
-> is 93 trials (2 + 1 practice, 30 + 15 per list) — ask the dev responsible for
-> a production build.
+> **The shipped migration is a reduced test build — 11 trials** (1 practice,
+> 3 learn A, 2 recall A, 3 learn B, 2 recall B), for walking the study end to
+> end, not for collecting data. The full study is 93 trials (2 + 1 practice,
+> 30 + 15 per list); ask the dev responsible for a production build.
 
 ## Pages
 
-Every page below carries exactly one surveyJS or labJS component. The name is
-what the CMS lists it under — Module SurveyJS or Module LabJS — and each
-component writes to its own data table.
+Each page carries one surveyJS or labJS component writing to its own table.
+Participants move through in table order.
 
-| Keyword | Contents | Component | Name in the CMS | Data table |
-|---|---|---|---|---|
-| `home` | Welcome: logo, prompt, language picker | languagePicker | — | — |
-| `kanji-adults-survey` | Part 1: consent and code | surveyJS | Kanji – Teil 1: Einverständnis und Code | `Kanji_Part1` |
-| `kanji-adults-demographics` | Part 2: demographics | surveyJS | Kanji – Teil 2: Angaben | `Kanji_Demographics` |
-| `kanji-adults-task-1` | Instructions, practice, learn A | labJS | Kanji Aufgabe 1: Instruktion, Übung, Lernen Liste A | `Kanji_Task1` |
-| `kanji-adults-pause-1` | Vignette: Französische Vokabeln | surveyJS | Kanji – Pause 1: Französische Vokabeln | `Kanji_Pause1` |
-| `kanji-adults-task-2` | Recall A | labJS | Kanji Aufgabe 2: Abfrage Liste A | `Kanji_Task2` |
-| `kanji-adults-pause-2` | Vignette: Geografie Quiz | surveyJS | Kanji – Pause 2: Geografie Quiz | `Kanji_Pause2` |
-| `kanji-adults-task-3` | Learn B | labJS | Kanji Aufgabe 3: Lernen Liste B | `Kanji_Task3` |
-| `kanji-adults-pause-3` | Vignettes: Mathematik, Aufsatz | surveyJS | Kanji – Pause 3: Mathematik und Aufsatz | `Kanji_Pause3` |
-| `kanji-adults-task-4` | Recall B, closing screen | labJS | Kanji Aufgabe 4: Abfrage Liste B, Abschluss | `Kanji_Task4` |
-| `kanji-adults-questions` | Part 3: device, closing code | surveyJS | Kanji – Teil 2: Gerät und Abschlusscode | `Kanji_Part2` |
-| `kanji-adults-prize-draw` | Optional prize draw, e-mail only | surveyJS | Kanji – Verlosung | `Kanji_PrizeDraw` |
+| Keyword | Contents | CMS name | Table |
+|---|---|---|---|
+| `home` | Welcome, language picker | — | — |
+| `kanji-adults-survey` | Consent and code | Kanji – Teil 1: Einverständnis und Code | `Kanji_Part1` |
+| `kanji-adults-demographics` | Demographics | Kanji – Teil 2: Angaben | `Kanji_Demographics` |
+| `kanji-adults-task-1` | Instructions, practice, learn A | Kanji Aufgabe 1: Instruktion, Übung, Lernen Liste A | `Kanji_Task1` |
+| `kanji-adults-pause-1` | Vignette | Kanji – Pause 1: Französische Vokabeln | `Kanji_Pause1` |
+| `kanji-adults-task-2` | Recall A | Kanji Aufgabe 2: Abfrage Liste A | `Kanji_Task2` |
+| `kanji-adults-pause-2` | Vignette | Kanji – Pause 2: Geografie Quiz | `Kanji_Pause2` |
+| `kanji-adults-task-3` | Learn B | Kanji Aufgabe 3: Lernen Liste B | `Kanji_Task3` |
+| `kanji-adults-pause-3` | Vignettes | Kanji – Pause 3: Mathematik und Aufsatz | `Kanji_Pause3` |
+| `kanji-adults-task-4` | Recall B, closing | Kanji Aufgabe 4: Abfrage Liste B, Abschluss | `Kanji_Task4` |
+| `kanji-adults-questions` | Device, closing code | Kanji – Teil 2: Gerät und Abschlusscode | `Kanji_Part2` |
+| `kanji-adults-prize-draw` | Prize draw, e-mail only | Kanji – Verlosung | `Kanji_PrizeDraw` |
 
-The four lab.js entries are one study split across four pages, generated
-together from a single set of sources. Editing them in the CMS works for one-off
-changes; a change to the trial items or the instruction screens is a rebuild,
-which the dev responsible runs.
-
-The order participants move through is the table order: each component's
-`redirect_at_end` names the next page and hands the code along with it.
-
-    survey → demographics → task-1 → pause-1 → task-2 → pause-2
-           → task-3 → pause-3 → task-4 → questions
-
-The vignettes are interleaved with the memory task, as in the original: each
-fills the retention interval between learning a list and recalling it.
+The vignettes fill the retention interval between learning a list and recalling
+it, as in the original. The four lab.js entries are one study split across four
+pages; a change to the trial items or instruction screens is a rebuild, which
+the dev responsible runs.
 
 Participants arrive from a letter without logging in, so every page grants
-access to all groups and carries an `acl_users` row for the guest user. Every
-page is headless, so the study runs without the site header and footer: once
-the run starts there is nothing to navigate to, and the chrome invites
-participants to wander off mid-task.
+access to all groups and carries an `acl_users` row for the guest user, and
+every page is headless — once the run starts there is nothing to navigate to.
 
 ## How a run holds together
 
-The code is collected once, in part 1, and travels from page to page as a path
-segment: part 1 redirects to `kanji-adults-demographics/{{ID_1}}`, and every component
-after it has `url_params` on, so it saves the code it was opened with as
-`extra_param_code` and passes it to the next page. It is a path segment rather
-than a query parameter because only route parameters reach a style, which is
-what lets the guard below filter a row by it.
+The code is typed once in part 1, which redirects to
+`kanji-adults-demographics/{{ID_1}}`. Every later component has `url_params` on,
+so it stores the code it was opened with as `extra_param_code` and passes it
+along. It is a path segment, not a query parameter, because only route
+parameters reach a style — which is what lets the guards below filter by it.
 
-Each component keeps its own data table, the one its style names by default,
-and sets `update_based_on` to `extra_param_code`, so a component run twice
-updates its own row rather than opening a second. One participant is **one row
-per component**, and the code is what joins them at analysis time.
+Each component owns its table and sets `update_based_on` to `extra_param_code`,
+so running it twice updates its row rather than opening a second. One
+participant is **one row per component**, joined on the code.
 
-Part 1 is the exception. It sets `update_based_on` like the rest, but it is the
-page where the code is typed, so it is the one component without `url_params`
-— there is no code in the route to match a previous row against. The field has
-nothing to key on and every visit opens a new row: one per page open, most of
-them abandoned before the form is submitted. Only the `finished` rows carry a
-code, so filter part 1 on `triggerType` before joining it to anything.
+**Part 1 is the exception.** It sets `update_based_on` like the rest, but it is
+where the code is typed, so it is the one component without `url_params` —
+nothing in the route to match against. Every visit opens a new row, most
+abandoned before submit. Only `finished` rows carry a code, so filter part 1 on
+`triggerType` before joining it to anything.
 
 Nothing is kept in the session, so a run survives a dropped session, a new tab,
-a different device, and a login part-way through.
+a different device, or a login part-way through. An unfinished page resumes into
+its existing row: `UserInput::update_data` upserts only the columns present in
+the new submission, so a second attempt replaces what it carries and leaves
+earlier answers untouched.
 
-An unfinished page can be resumed and writes back into its existing row. The
-update is per column, not per row: `UserInput::update_data` upserts only the
-columns present in the new submission, so a second attempt replaces the answers
-it carries and leaves every earlier answer it does not mention untouched. A
-participant who stops half way and comes back keeps what they already entered.
-
-Part 1 is again the exception — with no code in the route there is no row to
-find, so it starts fresh every time.
-
-A refresh part-way through a page is handled per style. The surveys have
-`restart_on_refresh` off, so reloading one reopens the response already in
-progress instead of starting an empty one; the stored row carries the code, so
-resuming keeps it and the redirect at the end still builds a complete URL. An
-experiment cannot resume mid-way — a reload restarts it from the first trial —
-so the four task pages set `warning_on_reload` and the browser asks before the
-refresh throws the trials away.
+Surveys have `restart_on_refresh` off, so reloading reopens the response in
+progress. An experiment cannot resume mid-way — a reload restarts it from the
+first trial — so the task pages set `warning_on_reload`.
 
 ## A finished page is not repeated
 
-Every page that carries the code holds two conditional containers — one with
-the component, one with an "already completed" message in all four languages.
-Both read **that page's own data table**, filter it by the code in the URL, and
-test the row's `triggerType` from opposite sides.
+Every page carrying the code holds two conditional containers: one with the
+component, one with an "already completed" message in four languages. Both read
+that page's own table, filter by `{{__code__}}` from the URL, and test
+`triggerType` from opposite sides. A component writes `finished` only on submit,
+so a half-finished page still opens and resumes. This is CMS configuration —
+`condition` and `data_config` — not code.
 
-A component writes `finished` only when it is submitted, so a page shows its
-done message once its own survey or experiment has been completed, and a page
-left part way through still opens and can be resumed. Going back to a finished
-task therefore says so, while the next task opens normally.
+Part 1 has no container: no route parameter to filter on yet. It is deliberately
+short — consent and the code — so a finished page is caught on the next page
+rather than after the demographics.
 
-This is CMS configuration — `condition` and `data_config` on the containers —
-not code. The filter takes the code straight from the URL as `{{__code__}}`,
-which every style exposes for its route parameters.
-
-Part 1 has no container: it is where the code is typed, so there is no route
-parameter to filter on yet. It is deliberately short — two questions, consent
-and the code — so a finished page is caught on the very next page rather
-than after the demographics.
-
-Containers decide what renders, not what is written. A save is a POST straight
-to the component's controller and never passes through them, so a participant
-who reposts by hand can still write. Nothing in the study depends on stopping
-that: each component owns its own row, so a repeat overwrites only its own
-data.
+Containers decide what renders, not what is written: a save POSTs straight to
+the controller. Nothing depends on stopping that, since each component owns its
+own row.
 
 ## Recorded data
 
-Ten tables, one per component, each with one row per participant. Every row
-carries `extra_param_code`, which is what joins them.
+Ten tables, one per component, one row per participant, joined on
+`extra_param_code`.
 
 | Table | Contents |
 |---|---|
 | `Kanji_Part1` | `EV`, `ID_1` — consent and code |
 | `Kanji_Demographics` | `Demo_*` |
-| `Kanji_Task1` | `extra_data_trials_practice` — the practice round, with choice, confidence and accuracy; and `extra_data_trials_learn_A` — item shown, on-screen duration |
-| `Kanji_Pause1` | `P1_*` — Französische Vokabeln ratings |
+| `Kanji_Task1` | `extra_data_trials_practice` (choice, confidence, accuracy) and `extra_data_trials_learn_A` (item, duration) |
+| `Kanji_Pause1` | `P1_*` ratings |
 | `Kanji_Task2` | `extra_data_trials_recall_A` — choice, confidence, reaction times, accuracy |
-| `Kanji_Pause2` | `P2_*` — Geografie Quiz ratings |
+| `Kanji_Pause2` | `P2_*` ratings |
 | `Kanji_Task3` | `extra_data_trials_learn_B` |
-| `Kanji_Pause3` | `P3_*` — Mathematik and Aufsatz ratings |
+| `Kanji_Pause3` | `P3_*` ratings |
 | `Kanji_Task4` | `extra_data_trials_recall_B` |
-| `Kanji_Part2` | `Device`, `ID_2`, `Finished_Study` — set to `1` once the closing survey is done |
+| `Kanji_Part2` | `Device`, `ID_2`, `Finished_Study` — `1` once the closing survey is done |
 
-The task tables also carry `extra_data_n_*` (per-block trial and correct
-counts) and `extra_data_UserLanguage` (`DE` / `EN` / `FR` / `IT`).
+Task tables also carry `extra_data_n_*` (trial and correct counts) and
+`extra_data_UserLanguage`. Questionnaire columns keep the Qualtrics names
+without the language suffix (`Demo_2`, not `Demo_2_DE`) so the two waves line
+up; the task blocks stay as JSON with the original field numbers inside —
+`Q22`/`Q23` practice, `Q42`/`Q43` recall A, `Q2`/`Q3` recall B.
 
-Questionnaire columns carry the Qualtrics names without the per-language suffix
-(`Demo_2` here, `Demo_2_DE` there), so the two waves line up. The task blocks
-stay as JSON, keeping the original Qualtrics field
-names inside — the numbers differ per block (`Q22`/`Q23` practice,
-`Q42`/`Q43` recall A, `Q2`/`Q3` recall B). The practice round is stored, in `extra_data_trials_practice`.
+Each table also carries `_meta_*`, `response_id`, `_json` and `_raw_data`.
+`_raw_data` is the full lab.js event log and is by far the largest; `_json`
+repeats the flat columns as one nested blob. The R export drops both, so they
+are reachable only through the CMS Data page or the API.
 
-Each table also carries SelfHelp's own columns — `_meta_*`, `response_id`,
-`_json` and `_raw_data`. `_raw_data` is the complete lab.js event log, every
-screen including fixation crosses, and is by far the largest; `_json` repeats
-the flat answer columns as one nested blob. The R export drops both — they
-nest badly in a data frame — so they are reachable only through the CMS Data
-page or the API.
+Participants are not logged in, so every write belongs to the guest user and the
+code is the only thing separating them. A code given to two people merges them
+into the same row in every table.
 
-Because participants are not logged in, every write belongs to the guest user,
-so the code is the only thing separating one participant from another. A code
-given to two people would merge them into the same row in every table.
-
-`Kanji_PrizeDraw` sits outside that scheme: it stores an e-mail address and
-nothing else, with no participant code, so a draw entry cannot be tied back to
-anyone's answers. The export keeps it in its own file for the same reason.
+`Kanji_PrizeDraw` sits outside that scheme: an e-mail address and nothing else,
+no participant code, so a draw entry cannot be tied back to anyone's answers.
+The export keeps it in its own file for the same reason.
 
 ## Editing the study
 
-Demographic answer values are sequential `1..n` in display order. The
-conditional logic (`visibleIf`, `defaultValueExpression`) references those
-values, so renumbering an option means updating the expressions in the same
-edit or questions silently stop appearing.
+The database is the live system: questionnaires under **Module SurveyJS**, the
+task under **Module LabJS**, edits take effect immediately. Renaming a
+questionnaire or task segment breaks the match the migration uses, and the next
+run seeds a second copy alongside it.
 
-The database is the live system: the questionnaires are editable under **Module
-SurveyJS** and the task under **Module LabJS**, and an edit takes effect
-immediately. Renaming a questionnaire or task segment breaks the match the
-migration uses, and the next run seeds a second copy alongside it.
+Demographic answer values are sequential `1..n` in display order, and
+`visibleIf` / `defaultValueExpression` reference those values — renumbering an
+option means updating the expressions in the same edit, or questions silently
+stop appearing.

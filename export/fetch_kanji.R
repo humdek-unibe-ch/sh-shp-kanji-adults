@@ -20,7 +20,7 @@
 # --- SETTINGS: fill these in -----------------------------------------------
 
 # Your personal API token, from your SelfHelp profile page.
-api_key <- "2c311a33ad3011f1806f005056adc562f745e99454cb7f10"
+api_key <- ""
 
 # The SelfHelp address. Must be the server's real address, not localhost,
 # unless you are running this on the server itself.
