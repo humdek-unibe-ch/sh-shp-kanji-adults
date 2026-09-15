@@ -1239,11 +1239,16 @@ INSERT IGNORE INTO `pages` (
     NULL, 'documentation', '/documentation', 'GET',
     '0000000003', NULL, NULL,
     '0', NULL, NULL,
-    (SELECT id FROM pageType WHERE name = 'intern'),
+    (SELECT id FROM pageType WHERE name = 'open'),
     (SELECT id FROM lookups WHERE type_code = 'pageAccessTypes' AND lookup_code = 'web')
 );
 
 SET @doc_page = (SELECT id FROM pages WHERE keyword = 'documentation');
+
+-- Created above with INSERT IGNORE, so an install that already has the page
+-- from an earlier run keeps its old type. Set it explicitly.
+UPDATE `pages` SET `id_type` = (SELECT id FROM pageType WHERE name = 'open')
+ WHERE `keyword` = 'documentation';
 
 -- Keep the site header: this page is reached by navigating, not by redirect,
 -- and an admin needs a way back out.
@@ -1443,7 +1448,8 @@ body:has(.kanji-doc) #content { background:transparent !important; }
 .kanji-doc p { margin:0 0 16px; max-width:68ch; }
 .kanji-doc ul, .kanji-doc ol { max-width:68ch; padding-left:22px; margin:0 0 18px; }
 .kanji-doc li { margin-bottom:8px; }
-.kanji-doc a { color:var(--indigo); }
+.kanji-doc a { color:var(--indigo); text-decoration:underline; text-underline-offset:2px; }
+.kanji-doc a:hover { color:var(--clay); }
 
 .kanji-doc code {
   font-family:var(--mono); font-size:.84em; background:var(--sunk);
@@ -1550,7 +1556,13 @@ SET @md_toc = '
 SET @md_intro = '
 Where each part of the study lives in the CMS, what every column in the exported
 data means, and how to change the questionnaires and the memory task yourself.
+
+Everything described here is edited in the [SelfHelp CMS]({{CMS_URL}}).
 ';
+
+-- Relative to the install, so the link follows @base_path rather than pinning
+-- a hostname that breaks if the study moves.
+SET @md_intro = REPLACE(@md_intro, '{{CMS_URL}}', CONCAT(@base_path, '/admin/cms'));
 
 SET @md_flow = '
 <span id="doc-flow"></span>
@@ -1589,8 +1601,8 @@ SET @md_surveys = '
 Consent, demographics and the three pause vignettes are all edited the same way,
 in the SelfHelp CMS.
 
-1. **Open Module SurveyJS** from the admin menu and pick the questionnaire by its
-   CMS name (see the table above).
+1. **Open Module SurveyJS** and pick the questionnaire by its CMS name (see the
+   table above).
 2. **Edit the question** directly in the Creator. To add an answer option, select
    the question and use the Choices list on the right.
 3. **Check every language** — German, English, French, Italian, using the language
