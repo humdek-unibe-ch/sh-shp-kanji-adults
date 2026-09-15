@@ -6,7 +6,7 @@ components.
 
 ## Requirements
 
-- SelfHelp v7.8.1+
+- [SelfHelp](https://github.com/humdek-unibe-ch/sh-selfhelp) **v7.8.1+**
 - [sh-shp-survey_js](https://github.com/humdek-unibe-ch/sh-shp-survey_js) **v1.7.0+**
 - [sh-shp-lab_js](https://github.com/humdek-unibe-ch/sh-shp-lab_js) **v1.3.0+**
 
