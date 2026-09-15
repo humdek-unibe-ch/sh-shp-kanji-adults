@@ -416,8 +416,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td class="val">1</td><td>Consent + code</td><td>Module SurveyJS</td><td>Kanji – Teil 1: Einverständnis und Code</td><td class="var">Kanji_Part1</td></tr>
-            <tr><td class="val">2</td><td>Demographics</td><td>Module SurveyJS</td><td>Kanji – Teil 2: Angaben</td><td class="var">Kanji_Demographics</td></tr>
+            <tr><td class="val">1</td><td>Consent + code</td><td>Module SurveyJS</td><td>Kanji – Part 1: Consent and Code</td><td class="var">Kanji_Part1</td></tr>
+            <tr><td class="val">2</td><td>Demographics</td><td>Module SurveyJS</td><td>Kanji – Part 2: Demographics</td><td class="var">Kanji_Demographics</td></tr>
             <tr><td class="val">3</td><td>Task 1 · learn A</td><td>Module LabJS</td><td>Kanji Aufgabe 1: Instruktion, Übung, Lernen Liste A</td><td class="var">Kanji_Task1</td></tr>
             <tr><td class="val">4</td><td>Pause 1 · French</td><td>Module SurveyJS</td><td>Kanji – Pause 1: Französische Vokabeln</td><td class="var">Kanji_Pause1</td></tr>
             <tr><td class="val">5</td><td>Task 2 · recall A</td><td>Module LabJS</td><td>Kanji Aufgabe 2: Abfrage Liste A</td><td class="var">Kanji_Task2</td></tr>
@@ -525,6 +525,7 @@
       <div class="note">
         <span class="tag">The key column</span>
         <p><code>extra_param_code</code> is the participant code. It is the one column with no page prefix.</p>
+        <p>One row per code is the normal case. A code that was submitted twice on the consent page produces two rows for that participant — check for repeated codes before counting.</p>
       </div>
 
       <h3>Repeated on every page</h3>
@@ -578,6 +579,7 @@
           <thead><tr><th style="width:230px">Column</th><th>Question and values</th></tr></thead>
           <tbody>
             <tr><td class="var">Demographics_Demo_2</td><td>Verhältnis zum Kind<br><span style="color:var(--grey)">1 = Mutter · 2 = Vater · 3 = Anderes</span></td></tr>
+            <tr><td class="var">Demographics_Demo_2_other</td><td>Free text, filled only when <code>Demo_2 = 3</code> (Anderes).</td></tr>
             <tr><td class="var">Demographics_Demo_25</td><td>Geburtsjahr. Free text.</td></tr>
             <tr><td class="var">Demographics_Demo_3</td><td>Personen im Haushalt<br><span style="color:var(--grey)">1–6 = that number · 7 = mehr als 6</span></td></tr>
             <tr><td class="var">Demographics_Demo_3_other</td><td>Exact number, filled only when <code>Demo_3 = 7</code>.</td></tr>
@@ -585,12 +587,15 @@
             <tr><td class="var">Demographics_Demo_4_other</td><td>Free-text language, filled only when <code>Demo_4</code> contains 27 (Andere).</td></tr>
             <tr><td class="var">Demographics_Demo_5</td><td>Weitere Kinder im Haushalt?<br><span style="color:var(--grey)">1 = Ja · 2 = Nein</span></td></tr>
             <tr><td class="var">Demographics_Demo_6</td><td>Wie viele andere Kinder — only when <code>Demo_5 = 1</code><br><span style="color:var(--grey)">1–6 = that number · 7 = mehr als 6</span></td></tr>
-            <tr><td class="var">Demographics_Demo_6_count</td><td>Exact number, filled only when <code>Demo_6 = 7</code>.</td></tr>
-            <tr><td class="var">Demographics_Demo_children</td><td>Year of birth and sex per child, several entries packed in one cell. Not shown when <code>Demo_6 = 7</code>.</td></tr>
+            <tr><td class="var">Demographics_Demo_6_other</td><td>Exact number, filled only when <code>Demo_6 = 7</code>.</td></tr>
+            <tr><td class="var">Demographics_Demo_6_count</td><td>Hidden helper that mirrors <code>Demo_6</code> and drives how many child entries are shown. Not a question.</td></tr>
+            <tr><td class="var">Demographics_Demo_13</td><td>Birth years and sexes of the other children as free text, asked instead of the per-child entries when <code>Demo_6 = 7</code>.</td></tr>
+            <tr><td class="var">Demographics_Demo_children</td><td>One entry per other child, packed in one cell. Each entry holds <code>jahrgang</code> (year of birth, 2009–2026) and <code>geschlecht</code> (<code>w</code> = weiblich · <code>m</code> = männlich · <code>d</code> = divers · <code>a</code> = anderes). Not shown when <code>Demo_6 = 7</code> — <code>Demo_13</code> is asked instead.</td></tr>
             <tr><td class="var">Demographics_Demo_14</td><td>Höchster Ausbildungsabschluss<br><span style="color:var(--grey)">1 = keine abgeschlossene Ausbildung · 2 = unternehmensinterne Ausbildung · 3 = abgeschlossene Berufsausbildung · 4 = Matura · 5 = Lehrdiplom · 6 = höhere Berufsausbildung / Fachschule · 7 = FH / PH · 8 = Universität, ETH</span></td></tr>
             <tr><td class="var">Demographics_Demo_15</td><td>Arbeitspensum<br><span style="color:var(--grey)">1 = 0% · 2 = bis 20% · 3 = 21–40% · 4 = 41–60% · 5 = 61–80% · 6 = 81–100%</td></tr>
             <tr><td class="var">Demographics_Demo_16</td><td>Beruf. Free text, and not asked when <code>Demo_15 = 1</code> (0%).</td></tr>
             <tr><td class="var">Demographics_Demo_17</td><td>Sprache(n), die Sie sprechen. <strong>Multiple answers in one cell.</strong></td></tr>
+            <tr><td class="var">Demographics_Demo_17_other</td><td>Free-text language, filled only when <code>Demo_17</code> contains 27.</td></tr>
           </tbody>
         </table>
       </div>
@@ -603,11 +608,13 @@
           <tbody>
             <tr><td class="var">Demographics_Demo_19</td><td>Angaben zum zweiten Elternteil möglich?<br><span style="color:var(--grey)">1 = Ja · 2 = Nein</td></tr>
             <tr><td class="var">Demographics_Demo_20</td><td>Verhältnis zum Kind<br><span style="color:var(--grey)">1 = Mutter · 2 = Vater · 3 = Anderes</span></td></tr>
+            <tr><td class="var">Demographics_Demo_20_other</td><td>Free text, filled only when <code>Demo_20 = 3</code> (Anderes).</td></tr>
             <tr><td class="var">Demographics_Demo_26</td><td>Geburtsjahr. Free text.</td></tr>
             <tr><td class="var">Demographics_Demo_21</td><td>Ausbildungsabschluss — same 1–8 codes as <code>Demo_14</code>.</td></tr>
             <tr><td class="var">Demographics_Demo_22</td><td>Arbeitspensum — same codes as <code>Demo_15</code> (1 = 0%).</td></tr>
             <tr><td class="var">Demographics_Demo_23</td><td>Beruf. Free text, not asked when <code>Demo_22 = 1</code> (0%).</td></tr>
             <tr><td class="var">Demographics_Demo_24</td><td>Sprache(n). <strong>Multiple answers in one cell.</strong></td></tr>
+            <tr><td class="var">Demographics_Demo_24_other</td><td>Free-text language, filled only when <code>Demo_24</code> contains 27.</td></tr>
           </tbody>
         </table>
       </div>
@@ -691,14 +698,14 @@
 
       <div class="warn">
         <span class="tag">Check the trial count first</span>
-        <p>If <code>Task1_extra_data_n_trials_learn_A</code> reads 3, that is the short test build, not a real run. Recall counts are lower than learning counts by design — participants learn more pairs than they are tested on.</p>
+        <p>In the full study each list is <strong>30 learning trials and 15 recall trials</strong>, plus 2 practice learning and 1 practice recall — 93 in all. Recall is half of learning by design: participants learn more pairs than they are tested on. If <code>Task1_extra_data_n_trials_learn_A</code> reads 3 rather than 30, the data came from the short test build, not a real run.</p>
       </div>
 
       <h3>Packed trial cells</h3>
       <p>The columns ending in <code>_trials_…</code> hold every trial of that block inside one cell, so Excel shows a single long line instead of numbers. <strong>Learning and recall blocks store different fields.</strong></p>
 
       <h4>Learning blocks</h4>
-      <p class="fileline">Task1_extra_data_trials_practice · Task1_…_trials_learn_A · Task3_…_trials_learn_B</p>
+      <p class="fileline">Task1_…_trials_learn_A · Task3_…_trials_learn_B</p>
       <p>Nothing is asked while learning, so each trial records only what was shown and for how long.</p>
       <div class="tablewrap">
         <table class="tight">
@@ -712,11 +719,11 @@
       </div>
 
       <h4>Recall blocks</h4>
-      <p class="fileline">Task2_extra_data_trials_recall_A · Task4_…_trials_recall_B</p>
+      <p class="fileline">Task1_extra_data_trials_practice · Task2_…_trials_recall_A · Task4_…_trials_recall_B</p>
       <p>Here the participant answers and then rates their confidence, so every trial carries both responses and three timings.</p>
       <div class="warn">
         <span class="tag">The field names differ per block</span>
-        <p>Each block kept the question numbers from the original Qualtrics study, so the same measurement has a different name depending on the block: <strong>practice</strong> uses <code>Q22</code>/<code>Q23</code>, <strong>recall A</strong> uses <code>Q42</code>/<code>Q43</code>, and <strong>recall B</strong> uses <code>Q2</code>/<code>Q3</code>. The first number of each pair is the image choice, the second the confidence rating.</p>
+        <p>Each block kept the question numbers from the original Qualtrics study, so the same measurement has a different name depending on the block: <strong>practice</strong> uses <code>Q22</code>/<code>Q23</code>, <strong>recall A</strong> uses <code>Q42</code>/<code>Q43</code>, and <strong>recall B</strong> uses <code>Q2</code>/<code>Q3</code>. The practice round is a recall block and carries all the same fields. The first number of each pair is the image choice, the second the confidence rating.</p>
       </div>
       <div class="tablewrap">
         <table class="tight">
@@ -742,7 +749,7 @@
         <table class="tight">
           <thead><tr><th style="width:300px">Column</th><th style="width:110px">Shape</th><th>Block</th></tr></thead>
           <tbody>
-            <tr><td class="var">Task1_extra_data_trials_practice</td><td>learning</td><td>Practice round, before the real study</td></tr>
+            <tr><td class="var">Task1_extra_data_trials_practice</td><td>recall</td><td>Practice round, before the real study. Uses <code>Q22</code>/<code>Q23</code></td></tr>
             <tr><td class="var">Task1_extra_data_trials_learn_A</td><td>learning</td><td>Learning list A</td></tr>
             <tr><td class="var">Task2_extra_data_trials_recall_A</td><td>recall</td><td>Recall of list A</td></tr>
             <tr><td class="var">Task3_extra_data_trials_learn_B</td><td>learning</td><td>Learning list B</td></tr>

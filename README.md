@@ -22,7 +22,7 @@ on `labJS`.
 ## Install
 
 1. Install and migrate the two plugins above.
-2. Upload the study images (173 files) to a served folder. `@base_path` and
+2. Upload the study images (165 files) to a served folder. `@base_path` and
    `@asset_base` at the top of the migration set the URL prefix; `@base_path`
    must match `BASE_PATH` in `globals_untracked.php`. The default asset folder
    is `/assets/kanji`.
@@ -46,9 +46,11 @@ Re-running is safe. Pages and sections use `INSERT IGNORE`; questionnaires and
 task segments are matched on their title or name and updated in place, so ids
 stay stable and anyone mid-study is unaffected.
 
-> **The shipped migration is a reduced test build: 3 trials per block, 15 in
-> total.** It is for walking the study end to end, not for data collection. The
-> full study is 93 trials — ask the dev responsible for a production build.
+> **The shipped migration is a reduced test build: at most 3 trials per block,
+> 11 in total** — 1 practice, 3 learn A, 2 recall A, 3 learn B, 2 recall B. It
+> is for walking the study end to end, not for data collection. The full study
+> is 93 trials (2 + 1 practice, 30 + 15 per list) — ask the dev responsible for
+> a production build.
 
 ## Pages
 
@@ -59,8 +61,8 @@ component writes to its own data table.
 | Keyword | Contents | Component | Name in the CMS | Data table |
 |---|---|---|---|---|
 | `home` | Welcome: logo, prompt, language picker | languagePicker | — | — |
-| `kanji-adults-survey` | Part 1: consent and code | surveyJS | Kanji – Teil 1: Einverständnis und Code | `Kanji_Part1` |
-| `kanji-adults-demographics` | Part 2: demographics | surveyJS | Kanji – Teil 2: Angaben | `Kanji_Demographics` |
+| `kanji-adults-survey` | Part 1: consent and code | surveyJS | Kanji – Part 1: Consent and Code | `Kanji_Part1` |
+| `kanji-adults-demographics` | Part 2: demographics | surveyJS | Kanji – Part 2: Demographics | `Kanji_Demographics` |
 | `kanji-adults-task-1` | Instructions, practice, learn A | labJS | Kanji Aufgabe 1: Instruktion, Übung, Lernen Liste A | `Kanji_Task1` |
 | `kanji-adults-pause-1` | Vignette: Französische Vokabeln | surveyJS | Kanji – Pause 1: Französische Vokabeln | `Kanji_Pause1` |
 | `kanji-adults-task-2` | Recall A | labJS | Kanji Aufgabe 2: Abfrage Liste A | `Kanji_Task2` |
@@ -107,9 +109,12 @@ and sets `update_based_on` to `extra_param_code`, so a component run twice
 updates its own row rather than opening a second. One participant is **one row
 per component**, and the code is what joins them at analysis time.
 
-Part 1 is the exception: `update_based_on` is empty there because it is the
-page where the code is typed, so there is nothing to key on until it has been
-answered.
+Part 1 is the exception. It sets `update_based_on` like the rest, but it is the
+page where the code is typed, so it is the one component without `url_params`
+— there is no code in the route to match a previous row against. The field has
+nothing to key on and every visit opens a new row: one per page open, most of
+them abandoned before the form is submitted. Only the `finished` rows carry a
+code, so filter part 1 on `triggerType` before joining it to anything.
 
 Nothing is kept in the session, so a run survives a dropped session, a new tab,
 a different device, and a login part-way through.
@@ -143,8 +148,8 @@ not code. The filter takes the code straight from the URL as `{{__code__}}`,
 which every style exposes for its route parameters.
 
 Part 1 has no container: it is where the code is typed, so there is no route
-parameter to filter on yet. It is deliberately short — consent and the code,
-seven questions — so a finished page is caught on the very next page rather
+parameter to filter on yet. It is deliberately short — two questions, consent
+and the code — so a finished page is caught on the very next page rather
 than after the demographics.
 
 Containers decide what renders, not what is written. A save is a POST straight
@@ -162,7 +167,7 @@ carries `extra_param_code`, which is what joins them.
 |---|---|
 | `Kanji_Part1` | `EV`, `ID_1` — consent and code |
 | `Kanji_Demographics` | `Demo_*` |
-| `Kanji_Task1` | `extra_data_trials_learn_A` — item shown, on-screen duration |
+| `Kanji_Task1` | `extra_data_trials_practice` — the practice round, with choice, confidence and accuracy; and `extra_data_trials_learn_A` — item shown, on-screen duration |
 | `Kanji_Pause1` | `P1_*` — Französische Vokabeln ratings |
 | `Kanji_Task2` | `extra_data_trials_recall_A` — choice, confidence, reaction times, accuracy |
 | `Kanji_Pause2` | `P2_*` — Geografie Quiz ratings |
@@ -180,9 +185,12 @@ stay as JSON, keeping the original Qualtrics field
 names inside — the numbers differ per block (`Q22`/`Q23` practice,
 `Q42`/`Q43` recall A, `Q2`/`Q3` recall B). The practice round is stored, in `extra_data_trials_practice`.
 
-The export also carries SelfHelp's own columns — `_meta_*`, `_json`,
-`_raw_data`, `response_id` and similar. `_raw_data` is the complete lab.js event
-log and is by far the largest.
+Each table also carries SelfHelp's own columns — `_meta_*`, `response_id`,
+`_json` and `_raw_data`. `_raw_data` is the complete lab.js event log, every
+screen including fixation crosses, and is by far the largest; `_json` repeats
+the flat answer columns as one nested blob. The R export drops both — they
+nest badly in a data frame — so they are reachable only through the CMS Data
+page or the API.
 
 Because participants are not logged in, every write belongs to the guest user,
 so the code is the only thing separating one participant from another. A code
