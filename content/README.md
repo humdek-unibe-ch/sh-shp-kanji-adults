@@ -35,11 +35,11 @@ The four `.builder.json` files are what Module LabJS holds, and what to open in
 the lab.js Builder to preview a task. They are build output — a change to the
 item CSVs or `instructions.json` means a rebuild, not an edit here.
 
-**The CSVs hold the full study; the committed segments do not.** `items_learn.csv`
-is 30 A + 30 B + 2 practice and `items_recall.csv` is 15 A + 15 B + 1 practice —
-93 trials. The shipped segments are a reduced test build of 11. Everything a
-production build needs is here: the CSVs, the 165 originals in the plugin's
-`assets/`, and these segments as the output shape to match.
+**The segments are the full study.** `items_learn.csv` is 30 A + 30 B + 2
+practice and `items_recall.csv` is 15 A + 15 B + 1 practice — 93 trials, all of
+them in the segments. The CSVs follow `Lists_Kanji_Adults.xlsx` from the
+research team; only file names differ where the list spells an image
+differently (`Dunkel`, `Gefaehlich_Kanji`, `Tickets`).
 
 ## Worth knowing
 
@@ -51,7 +51,13 @@ production build needs is here: the CSVs, the 165 originals in the plugin's
   so write the placeholder, not a literal URL.
 - **Kanji and instruction images are embedded.** lab.js carries them inside the
   segments as `embedded/<hash>` entries, so they need no upload. Only the
-  questionnaire images and `kanji_labjs.css` go in `/assets`.
+  questionnaire images and `kanji_labjs.css` go in `/assets`. Each is the
+  original from `assets/` scaled to at most 800 px, flattened onto white and
+  saved as JPEG quality 72 (GD `imagecopyresampled`); the hash is the SHA-256 of
+  those bytes. Embed a new image the same way or it will not match the rest.
+- **List A repeats an image and skips one.** `Gefaehrlich.jpg` is the distractor
+  for `Vorsicht` and the target of its own trial, and `Fels` is learned but
+  never tested. Both come from the research team's list.
 - **The study registers no hooks.** Each component writes to its own table and
   matches its own row on `update_based_on`; there is no PHP in this study at
   all. The `extra_data_` prefix on the task columns is lab_js' own, not

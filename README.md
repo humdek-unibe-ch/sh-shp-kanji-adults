@@ -37,9 +37,10 @@ Safe to re-run, but a re-run resets the study content: pages use
 overwritten with this migration's copy. A change made in the CMS since is lost
 unless it was copied back into the migration first.
 
-> **Shipped as a test build — 11 trials** (1 practice, 3 learn A, 2 recall A,
-> 3 learn B, 2 recall B). The full study is 93; ask the dev responsible for a
-> production build.
+> **The full study — 93 trials:** 2 practice learning and 1 practice recall,
+> then 30 learning and 15 recall trials for each of lists A and B. The four
+> task segments add up to about 8 MB of SQL, the largest statement 2.5 MB, so
+> the server's `max_allowed_packet` must be above that.
 
 ## Pages
 
