@@ -451,8 +451,8 @@
       <ol class="steps">
         <li><strong>Open Module SurveyJS</strong> from the admin menu and pick the questionnaire by its CMS name (see the table above).</li>
         <li><strong>Edit the question</strong> directly in the Creator. To add an answer option, select the question and use the Choices list on the right.</li>
-        <li><strong>Check every language</strong> — German, English, French, Italian, using the language selector at the top. A language left blank shows an empty question to those participants.</li>
-        <li><strong>Save, then Publish.</strong> Saving only stores a draft — Publish is what participants see.</li>
+        <li><strong>Check every language</strong> — German, English, French and Italian side by side in the <strong>Translation</strong> tab. A language left blank shows those participants the German text instead.</li>
+        <li><strong>Publish.</strong> Your edits save on their own as a draft — participants only see them once you press <strong>Publish</strong>.</li>
       </ol>
 
       <div class="warn">
@@ -469,11 +469,11 @@
       <p class="lede">The four Kanji blocks are built in lab.js. Editing them is copy out, change, copy back.</p>
 
       <ol class="steps">
-        <li><strong>Open Module LabJS</strong> and find the block by its CMS name (see the table above). Copy its configuration text.</li>
+        <li><strong>Open Module LabJS</strong> and find the block by its CMS name (see the table above). Copy everything in the <strong>LabJS JSON</strong> box.</li>
         <li><strong>Save it as a file</strong> on your computer, ending in <code>.json</code> — e.g. <code>task2.json</code>. Notepad will add <code>.txt</code> unless you pick "All files" in the save dialog, and the Builder will not open a <code>.txt</code>.</li>
         <li><strong>Open <a href="https://labjs.felixhenninger.com/" target="_blank" rel="noopener">labjs.felixhenninger.com</a></strong> and open your file there. Press Preview to run the task as a participant sees it.</li>
-        <li><strong>Make your change,</strong> then export the study as a <code>.json</code> file from the Builder.</li>
-        <li><strong>Paste it back</strong> into Module LabJS over the old configuration, save, and test the whole block with a test code.</li>
+        <li><strong>Make your change,</strong> then save the study in the Builder. It downloads as a new <code>.json</code> file.</li>
+        <li><strong>Paste it back.</strong> Open the downloaded file in Notepad, copy everything, paste it into the <strong>LabJS JSON</strong> box over the old text and press <strong>Update LabJS</strong>. Then run the whole block with a test code.</li>
       </ol>
 
     </section>
@@ -482,33 +482,52 @@
     <section id="export">
       <span class="sec-num">Section 4</span>
       <h2>Getting the data out</h2>
-      <p class="lede">The R script from the developer downloads every step of the study into one Excel workbook, a tab per step.</p>
+      <p class="lede">The R script from the developer downloads the study into separate Excel files: the recall trials laid out like the example datafile, and one file per questionnaire.</p>
 
       <ol class="steps">
-        <li><strong>Open RStudio.</strong> Your token is already filled in, so there is nothing to edit. If you dont have a token, ask the develop team for one.</li>
-        <li><strong>File → Source R Code…</strong> and choose the script. It runs straight away — the first run installs a few packages and takes a few minutes, later runs take seconds.</li>
+        <li><strong>Open the script in RStudio.</strong> Your token is already filled in, so there is nothing to edit. If you do not have a token, ask the development team for one.</li>
+        <li><strong>Click Source</strong> at the top right of the script. The first run installs a few packages and takes a few minutes, later runs take seconds.</li>
       </ol>
 
+      <p>The files land next to the script, sorted into a <code>kanji_data</code> folder:</p>
       <div class="tablewrap">
         <table class="tight">
-          <thead><tr><th style="width:220px">File</th><th>Contents</th></tr></thead>
+          <thead><tr><th style="width:130px">Folder</th><th style="width:220px">File</th><th>Contents</th></tr></thead>
           <tbody>
-            <tr><td class="var">kanji_export.xlsx</td><td>Eleven tabs: <strong>Merged</strong> with the whole study joined on the participant code, one row each, then <strong>01_Part1</strong> to <strong>10_Part2</strong> — one per step, in the order participants go through them.</td></tr>
-            <tr><td class="var">kanji_prize_draw.xlsx</td><td>E-mail address and date only.</td></tr>
+            <tr><td class="var">recall</td><td class="var">kanji_recall.xlsx</td><td>Every recall trial, one row each, laid out like the example datafile: practice, then list A, then list B.</td></tr>
+            <tr><td class="var">recall</td><td class="var">kanji_practice.xlsx<br>kanji_recall_A.xlsx<br>kanji_recall_B.xlsx</td><td>The same trials and layout, one recall block per file.</td></tr>
+            <tr><td class="var">questionnaires</td><td class="var">kanji_part1.xlsx<br>kanji_demographics.xlsx<br>kanji_pause1.xlsx … kanji_pause3.xlsx<br>kanji_part2.xlsx</td><td>One file per questionnaire, one row per participant.</td></tr>
+            <tr><td class="val">—</td><td class="var">kanji_prize_draw.xlsx</td><td>E-mail address and date only. It sits next to <code>kanji_data</code>, not in it, so sharing that folder never shares an address.</td></tr>
           </tbody>
         </table>
       </div>
 
-      <p>Running it again overwrites both files with fresh data — it only reads, so run it as often as you like.</p>
+      <h3>How the recall files are filled</h3>
+      <p>All four recall files share the layout of the example datafile. Most columns are copied straight from the recall blocks described in Section 6. These are the ones that are worked out:</p>
+      <div class="tablewrap">
+        <table class="tight">
+          <thead><tr><th style="width:280px">Column</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td class="var">ID_1 · ID_2</td><td>The participant code, and the code typed again at the end of the study.</td></tr>
+            <tr><td class="var">Progress · Finished</td><td>How far through the ten steps the code got, in percent. <strong>Finished</strong> means the last step was submitted.</td></tr>
+            <tr><td class="var">Reaktionszeit_ms_Antwort</td><td>Trial appearing to answer confirmed, ms.</td></tr>
+            <tr><td class="var">Reaktionszeit_ms_Confidence_Judgement</td><td>Answer confirmed to confidence confirmed, ms.</td></tr>
+            <tr><td class="var">Zeit_sek_… · Click_Count</td><td>First click, last click and page submit in seconds from the trial appearing, and the number of clicks — as the Qualtrics timing question records them.</td></tr>
+            <tr><td class="var">Target · Antwort_recoded</td><td>Names as in the item list: the image <code>Dunkelheit</code> is <code>Dunkel</code>, and list A’s second <code>Gefaehrlich</code>, the one shown as a target, is <code>Gefaehrlich_2</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Running it again overwrites the files with fresh data — it only reads, so run it as often as you like.</p>
 
       <div class="note">
         <span class="tag">Only need one table?</span>
-        <p>Each step already has its own tab in the workbook. The admin menu’s <strong>Data</strong> page exports a single table directly too, if you want it without running R.</p>
+        <p>Each questionnaire and recall block is already its own file. The admin menu’s <strong>Data</strong> page exports a single table directly too, if you want it without running R.</p>
       </div>
 
       <div class="warn">
         <span class="tag">If it stops with an error</span>
-        <p><strong>Permission denied</strong> writing <code>kanji_export.xlsx</code> — the file is open in Excel. Close it and run again.</p>
+        <p><strong>Could not write</strong> one of the files — it is open in Excel. Close it and run again.</p>
         <p><strong>Could not reach the study website</strong> — connect the VPN. <strong>Server rejected the token</strong> — re-paste it, or ask for a new one. <strong>No API token set</strong> — the <code>api_key</code> line is empty.</p>
       </div>
 
@@ -523,53 +542,49 @@
     <section id="columns">
       <span class="sec-num">Section 5</span>
       <h2>The columns explained</h2>
-      <p class="lede">The per-step tabs carry the plain question names. On the <strong>Merged</strong> tab the same columns are prefixed with the step they came from, so <code>Demo_14</code> on <strong>02_Demographics</strong> is <code>Demographics_Demo_14</code> there. Everything below applies to both.</p>
+      <p class="lede">Each questionnaire file carries the plain question names, one row per participant — <code>Demo_14</code> in <code>kanji_demographics.xlsx</code>, for example.</p>
 
       <div class="note">
         <span class="tag">The key column</span>
-        <p><code>extra_param_code</code> is the participant code. It is the one column with no page prefix.</p>
+        <p><code>extra_param_code</code> is the participant code. It is in every file and is how the files join up.</p>
         <p>One row per code is the normal case. A code that was submitted twice on the consent page produces two rows for that participant — check for repeated codes before counting.</p>
       </div>
 
-      <h3>Repeated on every step</h3>
-      <p>These appear once per step, with each prefix, on the <strong>Merged</strong> tab.</p>
+      <h3>In every questionnaire file</h3>
       <div class="tablewrap">
         <table class="tight">
           <thead><tr><th style="width:240px">Column</th><th>Meaning</th></tr></thead>
           <tbody>
-            <tr><td class="var">*_triggerType</td><td><code>finished</code> = page completed. <code>started</code> / <code>updated</code> = opened but not finished.</td></tr>
-            <tr><td class="var">*_entry_date</td><td>When the row was last saved.</td></tr>
-            <tr><td class="var">*_record_id</td><td>Internal row number. Empty if the participant never reached this page.</td></tr>
-            
+            <tr><td class="var">triggerType</td><td>Always <code>finished</code>: the files keep only submitted pages. Pages opened but not submitted are on the CMS <strong>Data</strong> page.</td></tr>
+            <tr><td class="var">entry_date</td><td>When the row was last saved.</td></tr>
+            <tr><td class="var">record_id</td><td>Internal row number.</td></tr>
+            <tr><td class="var">response_id</td><td>Internal identifier for that submission.</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h3>Timing and device — questionnaire steps only</h3>
+      <h3>Timing</h3>
       <div class="tablewrap">
         <table class="tight">
           <thead><tr><th style="width:240px">Column</th><th>Meaning</th></tr></thead>
           <tbody>
-            <tr><td class="var">*__meta_duration</td><td>Seconds spent on the page.</td></tr>
-            <tr><td class="var">*__meta_start_time<br>*__meta_end_time</td><td>UTC timestamps for opening and submitting.</td></tr>
-            <tr><td class="var">*__meta_pages</td><td>Per-page timings, packed as one cell (see below).</td></tr>
-            <tr><td class="var">_meta_viewport_width<br>_meta_viewport_height</td><td>Browser window size in pixels. Best indicator of phone vs laptop.</td></tr>
-            <tr><td class="var">_meta_screen_width<br>_meta_screen_height</td><td>Whole screen size, not just the browser.</td></tr>
-            <tr><td class="var">_meta_pixel_ratio</td><td>Display density (2 on most phones, 1 on older screens).</td></tr>
-            <tr><td class="var">_meta_user_agent</td><td>Browser and operating system as one long text string.</td></tr>
-            <tr><td class="var">*_pageNo</td><td>Last page number reached inside that questionnaire.</td></tr>
-            <tr><td class="var">*_response_id</td><td>Internal identifier for that submission.</td></tr>
+            <tr><td class="var">_meta_duration</td><td>Seconds spent on the page.</td></tr>
+            <tr><td class="var">_meta_start_time<br>_meta_end_time</td><td>UTC timestamps for opening and submitting.</td></tr>
+            <tr><td class="var">_meta_pages</td><td>Per-page timings, packed as one cell (see below).</td></tr>
+            <tr><td class="var">pageNo</td><td>Last page reached inside that questionnaire, counting from 0.</td></tr>
           </tbody>
         </table>
       </div>
+
+      <p>Screen size and browser details are not in the files; the CMS <strong>Data</strong> page has them.</p>
 
       <h3>Part 1 — consent</h3>
       <div class="tablewrap">
         <table class="tight">
           <thead><tr><th style="width:190px">Column</th><th>Question and values</th></tr></thead>
           <tbody>
-            <tr><td class="var">Part1_EV</td><td>Do you consent to taking part?<br><span style="color:var(--grey)">1 = yes · 2 = no</span></td></tr>
-            <tr><td class="var">Part1_ID_1</td><td>The code typed from the letter. Free text.</td></tr>
+            <tr><td class="var">EV</td><td>Do you consent to taking part?<br><span style="color:var(--grey)">1 = yes · 2 = no</span></td></tr>
+            <tr><td class="var">ID_1</td><td>The code typed from the letter. Free text.</td></tr>
           </tbody>
         </table>
       </div>
@@ -579,24 +594,24 @@
         <table class="tight">
           <thead><tr><th style="width:230px">Column</th><th>Question and values</th></tr></thead>
           <tbody>
-            <tr><td class="var">Demographics_Demo_2</td><td>Relationship to the child<br><span style="color:var(--grey)">1 = mother · 2 = father · 3 = other</span></td></tr>
-            <tr><td class="var">Demographics_Demo_2_other</td><td>Free text, filled only when <code>Demo_2 = 3</code> (other).</td></tr>
-            <tr><td class="var">Demographics_Demo_25</td><td>Year of birth. Free text.</td></tr>
-            <tr><td class="var">Demographics_Demo_3</td><td>People in the household (including themselves)<br><span style="color:var(--grey)">1–6 = that number · 7 = more than 6</span></td></tr>
-            <tr><td class="var">Demographics_Demo_3_other</td><td>Exact number, filled only when <code>Demo_3 = 7</code>.</td></tr>
-            <tr><td class="var">Demographics_Demo_4</td><td>Language(s) spoken at home with the child. <strong>Multiple answers in one cell.</strong> See the language codes below.</td></tr>
-            <tr><td class="var">Demographics_Demo_4_other</td><td>Free-text language, filled only when <code>Demo_4</code> contains 27 (other).</td></tr>
-            <tr><td class="var">Demographics_Demo_5</td><td>Other children (0–17) in the household?<br><span style="color:var(--grey)">1 = yes · 2 = no</span></td></tr>
-            <tr><td class="var">Demographics_Demo_6</td><td>How many other children — only when <code>Demo_5 = 1</code><br><span style="color:var(--grey)">1–6 = that number · 7 = more than 6</span></td></tr>
-            <tr><td class="var">Demographics_Demo_6_other</td><td>Exact number, filled only when <code>Demo_6 = 7</code>.</td></tr>
-            <tr><td class="var">Demographics_Demo_6_count</td><td>Hidden helper that mirrors <code>Demo_6</code> and drives how many child entries are shown. Not a question.</td></tr>
-            <tr><td class="var">Demographics_Demo_13</td><td>Birth years and sexes of the other children as free text, asked instead of the per-child entries when <code>Demo_6 = 7</code>.</td></tr>
-            <tr><td class="var">Demographics_Demo_children</td><td>One entry per other child, packed in one cell. Each entry holds <code>jahrgang</code> (year of birth, 2009–2026) and <code>geschlecht</code> (<code>w</code> = female · <code>m</code> = male · <code>d</code> = diverse · <code>a</code> = other). Not shown when <code>Demo_6 = 7</code> — <code>Demo_13</code> is asked instead.</td></tr>
-            <tr><td class="var">Demographics_Demo_14</td><td>Highest educational qualification<br><span style="color:var(--grey)">1 = none completed · 2 = in-house training · 3 = vocational training · 4 = Matura · 5 = teaching certificate · 6 = higher vocational / technical college · 7 = university of applied sciences · 8 = university (UNI, ETH)</span></td></tr>
-            <tr><td class="var">Demographics_Demo_15</td><td>Hours worked per week<br><span style="color:var(--grey)">1 = 0% · 2 = up to 20% · 3 = 21–40% · 4 = 41–60% · 5 = 61–80% · 6 = 81–100%</td></tr>
-            <tr><td class="var">Demographics_Demo_16</td><td>Occupation. Free text, and not asked when <code>Demo_15 = 1</code> (0%).</td></tr>
-            <tr><td class="var">Demographics_Demo_17</td><td>Language(s) they speak. <strong>Multiple answers in one cell.</strong></td></tr>
-            <tr><td class="var">Demographics_Demo_17_other</td><td>Free-text language, filled only when <code>Demo_17</code> contains 27.</td></tr>
+            <tr><td class="var">Demo_2</td><td>Relationship to the child<br><span style="color:var(--grey)">1 = mother · 2 = father · 3 = other</span></td></tr>
+            <tr><td class="var">Demo_2_other</td><td>Free text, filled only when <code>Demo_2 = 3</code> (other).</td></tr>
+            <tr><td class="var">Demo_25</td><td>Year of birth. Free text.</td></tr>
+            <tr><td class="var">Demo_3</td><td>People in the household (including themselves)<br><span style="color:var(--grey)">1–6 = that number · 7 = more than 6</span></td></tr>
+            <tr><td class="var">Demo_3_other</td><td>Exact number, filled only when <code>Demo_3 = 7</code>.</td></tr>
+            <tr><td class="var">Demo_4</td><td>Language(s) spoken at home with the child. <strong>Multiple answers in one cell.</strong> See the language codes below.</td></tr>
+            <tr><td class="var">Demo_4_other</td><td>Free-text language, filled only when <code>Demo_4</code> contains 27 (other).</td></tr>
+            <tr><td class="var">Demo_5</td><td>Other children (0–17) in the household?<br><span style="color:var(--grey)">1 = yes · 2 = no</span></td></tr>
+            <tr><td class="var">Demo_6</td><td>How many other children — only when <code>Demo_5 = 1</code><br><span style="color:var(--grey)">1–6 = that number · 7 = more than 6</span></td></tr>
+            <tr><td class="var">Demo_6_other</td><td>Exact number, filled only when <code>Demo_6 = 7</code>.</td></tr>
+            <tr><td class="var">Demo_6_count</td><td>Hidden helper that mirrors <code>Demo_6</code> and drives how many child entries are shown. Not a question.</td></tr>
+            <tr><td class="var">Demo_13</td><td>Birth years and sexes of the other children as free text, asked instead of the per-child entries when <code>Demo_6 = 7</code>.</td></tr>
+            <tr><td class="var">Demo_children</td><td>One entry per other child, packed in one cell. Each entry holds <code>jahrgang</code> (year of birth, 2009–2026) and <code>geschlecht</code> (<code>w</code> = female · <code>m</code> = male · <code>d</code> = diverse · <code>a</code> = other). Not shown when <code>Demo_6 = 7</code> — <code>Demo_13</code> is asked instead.</td></tr>
+            <tr><td class="var">Demo_14</td><td>Highest educational qualification<br><span style="color:var(--grey)">1 = no completed vocational training · 2 = in-house training · 3 = completed vocational training · 4 = Matura · 5 = teaching certificate · 6 = higher vocational education / technical college · 7 = university of applied sciences (FH) / teacher training college (PH) · 8 = university (UNI, ETH)</span></td></tr>
+            <tr><td class="var">Demo_15</td><td>Average weekly workload<br><span style="color:var(--grey)">1 = 0% · 2 = up to 20% · 3 = 21–40% · 4 = 41–60% · 5 = 61–80% · 6 = 81–100%</span></td></tr>
+            <tr><td class="var">Demo_16</td><td>Occupation. Free text, and not asked when <code>Demo_15 = 1</code> (0%).</td></tr>
+            <tr><td class="var">Demo_17</td><td>Language(s) they speak. <strong>Multiple answers in one cell.</strong></td></tr>
+            <tr><td class="var">Demo_17_other</td><td>Free-text language, filled only when <code>Demo_17</code> contains 27.</td></tr>
           </tbody>
         </table>
       </div>
@@ -607,15 +622,15 @@
         <table class="tight">
           <thead><tr><th style="width:230px">Column</th><th>Question and values</th></tr></thead>
           <tbody>
-            <tr><td class="var">Demographics_Demo_19</td><td>Can they give details about the second parent?<br><span style="color:var(--grey)">1 = yes · 2 = no</td></tr>
-            <tr><td class="var">Demographics_Demo_20</td><td>Relationship to the child<br><span style="color:var(--grey)">1 = mother · 2 = father · 3 = other</span></td></tr>
-            <tr><td class="var">Demographics_Demo_20_other</td><td>Free text, filled only when <code>Demo_20 = 3</code> (other).</td></tr>
-            <tr><td class="var">Demographics_Demo_26</td><td>Year of birth. Free text.</td></tr>
-            <tr><td class="var">Demographics_Demo_21</td><td>Educational qualification — same 1–8 codes as <code>Demo_14</code>.</td></tr>
-            <tr><td class="var">Demographics_Demo_22</td><td>Hours worked per week — same codes as <code>Demo_15</code> (1 = 0%).</td></tr>
-            <tr><td class="var">Demographics_Demo_23</td><td>Occupation. Free text, not asked when <code>Demo_22 = 1</code> (0%).</td></tr>
-            <tr><td class="var">Demographics_Demo_24</td><td>Language(s) the second parent speaks. <strong>Multiple answers in one cell.</strong></td></tr>
-            <tr><td class="var">Demographics_Demo_24_other</td><td>Free-text language, filled only when <code>Demo_24</code> contains 27.</td></tr>
+            <tr><td class="var">Demo_19</td><td>Can they give details about the second parent?<br><span style="color:var(--grey)">1 = yes · 2 = no</span></td></tr>
+            <tr><td class="var">Demo_20</td><td>Relationship to the child<br><span style="color:var(--grey)">1 = mother · 2 = father · 3 = other</span></td></tr>
+            <tr><td class="var">Demo_20_other</td><td>Free text, filled only when <code>Demo_20 = 3</code> (other).</td></tr>
+            <tr><td class="var">Demo_26</td><td>Year of birth. Free text.</td></tr>
+            <tr><td class="var">Demo_21</td><td>Educational qualification — same 1–8 codes as <code>Demo_14</code>.</td></tr>
+            <tr><td class="var">Demo_22</td><td>Average weekly workload — same codes as <code>Demo_15</code> (1 = 0%).</td></tr>
+            <tr><td class="var">Demo_23</td><td>Occupation. Free text, not asked when <code>Demo_22 = 1</code> (0%).</td></tr>
+            <tr><td class="var">Demo_24</td><td>Language(s) the second parent speaks. <strong>Multiple answers in one cell.</strong></td></tr>
+            <tr><td class="var">Demo_24_other</td><td>Free-text language, filled only when <code>Demo_24</code> contains 27.</td></tr>
           </tbody>
         </table>
       </div>
@@ -644,10 +659,10 @@
         <table class="tight">
           <thead><tr><th style="width:300px">Columns</th><th>Vignette</th></tr></thead>
           <tbody>
-            <tr><td class="var">Pause1_P1_Vignette_Franz_1…6</td><td>French vocabulary</td></tr>
-            <tr><td class="var">Pause2_P2_Vignette_Geo_1…6</td><td>Geography quiz</td></tr>
-            <tr><td class="var">Pause3_P3_Vignette_Math_1…6</td><td>Maths</td></tr>
-            <tr><td class="var">Pause3_P3_Vignette_Deut_1…6</td><td>Essay writing</td></tr>
+            <tr><td class="var">P1_Vignette_Franz_1…6</td><td>French vocabulary</td></tr>
+            <tr><td class="var">P2_Vignette_Geo_1…6</td><td>Geography quiz</td></tr>
+            <tr><td class="var">P3_Vignette_Math_1…6</td><td>Maths</td></tr>
+            <tr><td class="var">P3_Vignette_Deut_1…6</td><td>Essay writing</td></tr>
           </tbody>
         </table>
       </div>
@@ -658,36 +673,36 @@
         <table class="tight">
           <thead><tr><th style="width:190px">Column</th><th>Question and values</th></tr></thead>
           <tbody>
-            <tr><td class="var">Part2_Device</td><td>Which device did they use?<br><span style="color:var(--grey)">1 = laptop / computer · 2 = tablet · 3 = mobile phone</span></td></tr>
-            <tr><td class="var">Part2_ID_2</td><td>The code re-entered at the end. Compare with <code>Part1_ID_1</code>.</td></tr>
-            <tr><td class="var">Part2_Finished_Study</td><td>Filled only for participants who reached the final page.</td></tr>
+            <tr><td class="var">Device</td><td>Which device did they use?<br><span style="color:var(--grey)">1 = laptop / computer · 2 = tablet · 3 = mobile phone</span></td></tr>
+            <tr><td class="var">ID_2</td><td>The code re-entered at the end. Compare with <code>ID_1</code> in <code>kanji_part1.xlsx</code>.</td></tr>
+            <tr><td class="var">Finished_Study</td><td>Always <code>1</code>. A participant who did not submit this last page has no row in this file.</td></tr>
           </tbody>
         </table>
       </div>
 
       <h3>Prize draw file</h3>
-      <p><code>kanji_prize_draw.xlsx</code> has two columns only: <code>email</code> and <code>entry_date</code>. It is a separate file, not a tab in the main workbook: there is no participant code, so a draw entry cannot be traced back to anyone’s answers — and must not be.</p>
+      <p><code>kanji_prize_draw.xlsx</code> has two columns only: <code>email</code> and <code>entry_date</code>. It is never joined to the other files: there is no participant code, so a draw entry cannot be traced back to anyone’s answers — and must not be.</p>
     </section>
 
     <!-- ============ 6 ============ -->
     <section id="trials">
       <span class="sec-num">Section 6</span>
       <h2>The memory task columns</h2>
-      <p class="lede">The four task pages store their data differently from the questionnaires. Each one carries a few summary numbers plus one packed cell holding every trial.</p>
+      <p class="lede">The recall files already give one row per trial. Underneath, on the CMS <strong>Data</strong> page, each of the four task pages stores a few summary numbers plus one packed cell holding every trial.</p>
 
       <h3>Summary columns</h3>
       <div class="tablewrap">
         <table class="tight">
           <thead><tr><th style="width:300px">Column</th><th>Meaning</th></tr></thead>
           <tbody>
-            <tr><td class="var">Task1_extra_data_n_trials_practice</td><td>Practice trials shown.</td></tr>
-            <tr><td class="var">Task1_extra_data_n_correct_practice</td><td>Practice trials answered correctly.</td></tr>
-            <tr><td class="var">Task1_extra_data_n_trials_learn_A</td><td>Learning trials, list A.</td></tr>
-            <tr><td class="var">Task2_extra_data_n_trials_recall_A</td><td>Recall trials, list A.</td></tr>
-            <tr><td class="var">Task2_extra_data_n_correct_recall_A</td><td><strong>Correct recalls, list A.</strong></td></tr>
-            <tr><td class="var">Task3_extra_data_n_trials_learn_B</td><td>Learning trials, list B.</td></tr>
-            <tr><td class="var">Task4_extra_data_n_trials_recall_B</td><td>Recall trials, list B.</td></tr>
-            <tr><td class="var">Task4_extra_data_n_correct_recall_B</td><td><strong>Correct recalls, list B.</strong></td></tr>
+            <tr><td class="var">extra_data_n_trials_practice</td><td>Practice trials shown.</td></tr>
+            <tr><td class="var">extra_data_n_correct_practice</td><td>Practice trials answered correctly.</td></tr>
+            <tr><td class="var">extra_data_n_trials_learn_A</td><td>Learning trials, list A.</td></tr>
+            <tr><td class="var">extra_data_n_trials_recall_A</td><td>Recall trials, list A.</td></tr>
+            <tr><td class="var">extra_data_n_correct_recall_A</td><td><strong>Correct recalls, list A.</strong></td></tr>
+            <tr><td class="var">extra_data_n_trials_learn_B</td><td>Learning trials, list B.</td></tr>
+            <tr><td class="var">extra_data_n_trials_recall_B</td><td>Recall trials, list B.</td></tr>
+            <tr><td class="var">extra_data_n_correct_recall_B</td><td><strong>Correct recalls, list B.</strong></td></tr>
             <tr><td class="var">extra_data_UserLanguage</td><td>Language the task ran in (DE, EN, FR, IT).</td></tr>
             <tr><td class="var">labjs_response_id</td><td>Identifies one sitting of the memory task.</td></tr>
           </tbody>
@@ -696,20 +711,22 @@
 
       <div class="warn">
         <span class="tag">Check the trial count first</span>
-        <p>In the full study each list is <strong>30 learning trials and 15 recall trials</strong>, plus 2 practice learning and 1 practice recall — 93 in all. Recall is half of learning by design: participants learn more pairs than they are tested on. If <code>Task1_extra_data_n_trials_learn_A</code> reads 3 rather than 30, the data came from the short test build, not a real run.</p>
+        <p>In the full study each list is <strong>30 learning trials and 15 recall trials</strong>, plus 2 practice learning and 1 practice recall — 93 in all. Recall is half of learning by design: participants learn more pairs than they are tested on. That is 31 rows per participant in <code>kanji_recall.xlsx</code>; 5 rows means the data came from the short test build, not a real run.</p>
       </div>
 
       <h3>Packed trial cells</h3>
-      <p>The columns ending in <code>_trials_…</code> hold every trial of that block inside one cell, so Excel shows a single long line instead of numbers. <strong>Learning and recall blocks store different fields.</strong></p>
+      <p>The columns ending in <code>_trials_…</code> hold every trial of that block inside one cell, so Excel shows a single long line instead of numbers. You only meet them on the CMS <strong>Data</strong> page — the recall files have them unpacked, one row per trial, and the learning blocks are not exported. <strong>Learning and recall blocks store different fields.</strong></p>
 
       <h4>Learning blocks</h4>
-      <p class="fileline">Task1_…_trials_learn_A · Task3_…_trials_learn_B</p>
+      <p class="fileline">extra_data_trials_learn_A · extra_data_trials_learn_B</p>
       <p>Nothing is asked while learning, so each trial records only what was shown and for how long.</p>
       <div class="tablewrap">
         <table class="tight">
           <thead><tr><th style="width:150px">Field</th><th>Meaning</th></tr></thead>
           <tbody>
+            <tr><td class="var">stage</td><td><code>experiment</code> for both learning lists.</td></tr>
             <tr><td class="var">trial</td><td>Trial number within the block, starting at 1.</td></tr>
+            <tr><td class="var">list</td><td><code>A</code> or <code>B</code>.</td></tr>
             <tr><td class="var">item</td><td>Which Kanji–picture pair was shown, e.g. <code>Baumwolle</code>.</td></tr>
             <tr><td class="var">dauer_ms</td><td>How long the pair stayed on screen, in milliseconds.</td></tr>
           </tbody>
@@ -717,8 +734,8 @@
       </div>
 
       <h4>Recall blocks</h4>
-      <p class="fileline">Task1_extra_data_trials_practice · Task2_…_trials_recall_A · Task4_…_trials_recall_B</p>
-      <p>Here the participant answers and then rates their confidence, so every trial carries both responses and three timings.</p>
+      <p class="fileline">extra_data_trials_practice · extra_data_trials_recall_A · extra_data_trials_recall_B</p>
+      <p>Here the participant answers and then rates their confidence, so every trial carries both responses, three reaction times and the click timings.</p>
       <div class="warn">
         <span class="tag">The field names differ per block</span>
         <p>Each block kept the question numbers from the original Qualtrics study, so the same measurement has a different name depending on the block: <strong>practice</strong> uses <code>Q22</code>/<code>Q23</code>, <strong>recall A</strong> uses <code>Q42</code>/<code>Q43</code>, and <strong>recall B</strong> uses <code>Q2</code>/<code>Q3</code>. The practice round is a recall block and carries all the same fields. The first number of each pair is the image choice, the second the confidence rating.</p>
@@ -727,7 +744,9 @@
         <table class="tight">
           <thead><tr><th style="width:250px">Field</th><th>Meaning</th></tr></thead>
           <tbody>
-            <tr><td class="var">trial</td><td>Trial number within the block.</td></tr>
+            <tr><td class="var">stage</td><td><code>practice</code> or <code>experiment</code>.</td></tr>
+            <tr><td class="var">trial</td><td>Trial number within the block, in the order shown.</td></tr>
+            <tr><td class="var">list</td><td><code>A</code> or <code>B</code>; empty for practice.</td></tr>
             <tr><td class="var">item</td><td>Which pair was tested, e.g. <code>Herbst</code>.</td></tr>
             <tr><td class="var">Auswahl_Q42</td><td>Image the participant chose, e.g. <code>Ast.jpg</code>. <strong>List B uses <code>Auswahl_Q2</code>.</strong></td></tr>
             <tr><td class="var">Auswahl_Q43</td><td><strong>Confidence rating</strong> for that answer. List B uses <code>Auswahl_Q3</code>.</td></tr>
@@ -737,7 +756,11 @@
             <tr><td class="var">korrekt</td><td>1 = correct, 0 = wrong.</td></tr>
             <tr><td class="var">korrekt_seite</td><td>Which side held the correct image: <code>left</code> or <code>right</code>.</td></tr>
             <tr><td class="var">gewaehlt</td><td>Which side the participant clicked. Compare with <code>korrekt_seite</code> to check for a side bias.</td></tr>
-            <tr><td class="var">orig_pos</td><td>Position of the item in the original list order.</td></tr>
+            <tr><td class="var">orig_pos</td><td>Side of the correct image in the item list: <code>1</code> left, <code>2</code> right. Always agrees with <code>korrekt_seite</code>.</td></tr>
+            <tr><td class="var">Zeit_First_Click_ms</td><td>Trial appearing to the first click anywhere on the page, ms.</td></tr>
+            <tr><td class="var">Zeit_Last_Click_ms</td><td>Trial appearing to the last click, ms.</td></tr>
+            <tr><td class="var">Zeit_Page_Submit_ms</td><td>Trial appearing to the page moving on, ms.</td></tr>
+            <tr><td class="var">Click_Count</td><td>Clicks during the trial. Answering straight away takes 4 — select and confirm, for the answer and for the confidence rating.</td></tr>
           </tbody>
         </table>
       </div>
@@ -747,11 +770,11 @@
         <table class="tight">
           <thead><tr><th style="width:300px">Column</th><th style="width:110px">Shape</th><th>Block</th></tr></thead>
           <tbody>
-            <tr><td class="var">Task1_extra_data_trials_practice</td><td>recall</td><td>Practice round, before the real study. Uses <code>Q22</code>/<code>Q23</code></td></tr>
-            <tr><td class="var">Task1_extra_data_trials_learn_A</td><td>learning</td><td>Learning list A</td></tr>
-            <tr><td class="var">Task2_extra_data_trials_recall_A</td><td>recall</td><td>Recall of list A</td></tr>
-            <tr><td class="var">Task3_extra_data_trials_learn_B</td><td>learning</td><td>Learning list B</td></tr>
-            <tr><td class="var">Task4_extra_data_trials_recall_B</td><td>recall</td><td>Recall of list B</td></tr>
+            <tr><td class="var">extra_data_trials_practice</td><td>recall</td><td>Practice round, before the real study. Uses <code>Q22</code>/<code>Q23</code></td></tr>
+            <tr><td class="var">extra_data_trials_learn_A</td><td>learning</td><td>Learning list A</td></tr>
+            <tr><td class="var">extra_data_trials_recall_A</td><td>recall</td><td>Recall of list A</td></tr>
+            <tr><td class="var">extra_data_trials_learn_B</td><td>learning</td><td>Learning list B</td></tr>
+            <tr><td class="var">extra_data_trials_recall_B</td><td>recall</td><td>Recall of list B</td></tr>
           </tbody>
         </table>
       </div>
@@ -759,21 +782,24 @@
       <h3>Reading a packed cell</h3>
       <p>Each cell is a list of trials wrapped in <code>[ ]</code>. Every trial sits between its own <code>{ }</code> and reads as <code>"field":value</code>, separated by commas. One recall cell with two trials looks like this:</p>
 
-      <pre><code>[{"trial":1,"item":"Herbst","Auswahl_Q42":"Ast.jpg","Auswahl_Q43":2,
+      <pre><code>[{"stage":"experiment","trial":1,"list":"A","item":"Herbst",
+  "Auswahl_Q42":"Ast.jpg","Auswahl_Q43":2,
   "Reaktionszeit_Q42_ms":814,"Reaktionszeit_Q43_ms":1545,
   "Reaktionszeit_Q43_ab_Q42_ms":732,"korrekt":0,
-  "korrekt_seite":"right","gewaehlt":"left","orig_pos":"1"},
- {"trial":2,"item":"Baumwolle","Auswahl_Q42":"Pflanze.jpg",...}]</code></pre>
+  "korrekt_seite":"left","gewaehlt":"right","orig_pos":"1",
+  "Zeit_First_Click_ms":402,"Zeit_Last_Click_ms":1545,
+  "Zeit_Page_Submit_ms":1849,"Click_Count":4},
+ {"stage":"experiment","trial":2,"list":"A","item":"Baumwolle",...}]</code></pre>
 
-      <p>So the first trial above tested <strong>Herbst</strong>, the participant picked <strong>Ast.jpg</strong>, rated confidence <strong>2</strong>, took <strong>814 ms</strong> to answer and <strong>732 ms</strong> more to rate it, and was <strong>wrong</strong> (<code>korrekt: 0</code>) because the correct image was on the right and they clicked left.</p>
+      <p>So the first trial above tested <strong>Herbst</strong>, the participant picked <strong>Ast.jpg</strong>, rated confidence <strong>2</strong>, took <strong>814 ms</strong> to answer and <strong>732 ms</strong> more to rate it, and was <strong>wrong</strong> (<code>korrekt: 0</code>) because the correct image was on the left and they clicked right.</p>
 
       <p>A learning cell is shorter, because nothing is asked while learning:</p>
 
-      <pre><code>[{"trial":1,"item":"Baumwolle","dauer_ms":4991},
- {"trial":2,"item":"Herbst","dauer_ms":4975},
- {"trial":3,"item":"Ast","dauer_ms":4983}]</code></pre>
+      <pre><code>[{"stage":"experiment","trial":1,"list":"A","item":"Baumwolle","dauer_ms":4991},
+ {"stage":"experiment","trial":2,"list":"A","item":"Herbst","dauer_ms":4975},
+ {"stage":"experiment","trial":3,"list":"A","item":"Ast","dauer_ms":4983}]</code></pre>
 
-      <p>The <code>*__meta_pages</code> column on questionnaire pages is packed the same way, holding <code>pageNo</code>, <code>start_time</code> and <code>end_time</code> per page.</p>
+      <p>The <code>_meta_pages</code> column on questionnaire pages is packed the same way, holding <code>pageNo</code>, <code>start_time</code>, <code>end_time</code> and <code>duration</code> per page.</p>
     </section>
 
   </main>

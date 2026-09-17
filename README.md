@@ -32,8 +32,10 @@ components.
 
 3. Clear the CMS cache.
 
-Safe to re-run: pages use `INSERT IGNORE`, surveys and task segments match on
-title or name and update in place.
+Safe to re-run, but a re-run resets the study content: pages use
+`INSERT IGNORE`, while surveys and task segments match on title or name and are
+overwritten with this migration's copy. A change made in the CMS since is lost
+unless it was copied back into the migration first.
 
 > **Shipped as a test build — 11 trials** (1 practice, 3 learn A, 2 recall A,
 > 3 learn B, 2 recall B). The full study is 93; ask the dev responsible for a
@@ -117,8 +119,12 @@ Ten tables, one row per participant, joined on `extra_param_code`.
 | `Kanji_Task4` | `extra_data_trials_recall_B` |
 | `Kanji_Part2` | `Device`, `ID_2`, `Finished_Study` |
 
-Recall blocks record choice, confidence, reaction times and accuracy; learning
-blocks record item and on-screen duration. Task tables also carry
+Recall blocks record choice, confidence, reaction times, accuracy and the
+Qualtrics timing-question clicks; learning blocks record item and on-screen
+duration. The R export writes separate Excel files into `kanji_data/`: under
+`recall/` the recall trials one row per trial, a file per block plus one
+stacking all three, and under `questionnaires/` a file per questionnaire. Task
+tables also carry
 `extra_data_n_*` counts and `extra_data_UserLanguage`.
 
 Questionnaire columns keep the Qualtrics names without the language suffix
@@ -126,16 +132,16 @@ Questionnaire columns keep the Qualtrics names without the language suffix
 `Q22`/`Q23` practice, `Q42`/`Q43` recall A, `Q2`/`Q3` recall B.
 
 Every table also has `_meta_*`, `response_id`, `_json` and `_raw_data`. The R
-export drops the last two, so they are reachable only through the CMS Data page
-or the API.
+export drops the last two, along with the screen, browser and account columns,
+so those are reachable only through the CMS Data page or the API.
 
 Participants are not logged in, so every write belongs to the guest user and the
 code is the only thing separating them. A code given to two people merges them
 into one row in every table.
 
 `Kanji_PrizeDraw` has an e-mail address and no participant code, so a draw entry
-cannot be tied back to anyone's answers. The export keeps it in its own file for
-the same reason.
+cannot be tied back to anyone's answers. The export keeps it in its own file,
+outside `kanji_data/`, for the same reason.
 
 ## Editing the study
 

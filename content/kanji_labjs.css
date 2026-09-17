@@ -94,10 +94,13 @@
    pre-line` keeps the three lines the text is written on without needing
    markup for them, and the max-width stops the longest line running out
    to both edges of a wide screen - the text should read as a column under
-   the kanji, not as a banner across the page. */
+   the kanji, not as a banner across the page.
+
+   The cap has to clear the longest sentence in any language (69 chars, in
+   French) or a sentence wraps and the block reads as four lines. */
 .kanji-prompt {
   margin: 0 auto 2vh;
-  max-width: min(52ch, 80vw);
+  max-width: min(72ch, 92vw);
   text-align: center;
   white-space: pre-line;
   font-size: clamp(0.9rem, 1.6vh, 1.15rem);

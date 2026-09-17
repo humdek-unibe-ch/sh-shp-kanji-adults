@@ -4,3 +4,4 @@ server/service/globals_untracked.php
 # Generated export output
 export/*.csv
 export/*.xlsx
+export/kanji_data/

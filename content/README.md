@@ -43,10 +43,10 @@ production build needs is here: the CSVs, the 165 originals in the plugin's
 
 ## Worth knowing
 
-- **A rebuild reshuffles the recall trials.** Which side holds the correct
-  answer is drawn at build time and stored per row, so the assignment changes
-  each time the segments are regenerated. The committed segments are the fixed
-  assignment.
+- **The correct image's side is fixed per item.** `correct_pos_original` in
+  `items_recall.csv` (1 left, 2 right) is the side from the researchers' item
+  list, and each recall row's `left_img`, `right_img` and `correct_side` must
+  follow it. Only the trial order is shuffled, at runtime.
 - **Image paths use `{{ASSET_BASE}}`.** The migration substitutes the real path,
   so write the placeholder, not a literal URL.
 - **Kanji and instruction images are embedded.** lab.js carries them inside the
@@ -60,10 +60,11 @@ production build needs is here: the CSVs, the 165 originals in the plugin's
   but part 1 is the page where the code is typed and so carries no `url_params`
   — nothing in the route to match against. Every open writes a row, most of them
   abandoned. Only the `finished` rows hold a code.
-- **Re-running the migration is safe.** Surveys and studies are seeded only
-  when absent, matched on their title (surveys) or name (labjs), so a re-run
-  keeps the existing ids. Renaming a survey in the CMS breaks the match, and the
-  next migration then seeds a second copy alongside it.
+- **Re-running the migration overwrites CMS edits.** Surveys and studies are
+  matched on their title (surveys) or name (labjs) and rewritten from the
+  migration, so their ids stay the same but a change made in the CMS since is
+  lost. Renaming a survey in the CMS breaks the match, and the next migration
+  then seeds a second copy alongside it.
 - **`kanji_labjs.css` is delivered by a markdown section**, which renders a
   `<link>` to the copy served from `@asset_base`. It cannot be the labJS `css`
   field — that field is a class-name list — and a `<style>` inside the study is
