@@ -21,9 +21,10 @@
 #       kanji_part1.xlsx         one per questionnaire, one row per participant:
 #       kanji_demographics.xlsx    part1, demographics, pause1, pause2, pause3
 #       kanji_pause1.xlsx …        and part2
-#     kanji_prize_draw.xlsx      the prize draw e-mail addresses, outside
-#                                  kanji_data/ so sharing that folder never
-#                                  shares them
+#     kanji_data/
+#       kanji_timing.xlsx        when each participant started and finished the
+#                                  study, and how long they took
+#       kanji_prize_draw.xlsx    the prize draw e-mail addresses
 
 # --- SETTINGS: fill these in -----------------------------------------------
 
@@ -299,6 +300,41 @@ if (nrow(kanji_recall) > 0) {
 message("\nrecall: ", nrow(kanji_recall), " trials from ",
         if (nrow(kanji_recall) > 0) n_distinct(kanji_recall$ID_1) else 0, " participant codes")
 
+# --- Timing: one row per participant ----------------------------------------
+# Part 1 opens the study and part 2 closes it, so their SurveyJS stamps bracket
+# the whole run. The task pages in between write no stamps of their own.
+iso_utc <- function(x) as.POSIXct(x, format = "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
+
+# writexl stores every datetime as UTC, so local time is re-parsed as UTC.
+as_local <- function(x) as.POSIXct(format(x, tz = "Europe/Zurich"), tz = "UTC")
+
+# `take` is min or max. Not named `pick`: dplyr masks that inside summarise().
+edge_time <- function(table, column, take) {
+  d <- finished[[table]]
+  if (is.null(d) || !column %in% names(d)) {
+    return(tibble(extra_param_code = character(), t = iso_utc(character())))
+  }
+  d %>%
+    transmute(extra_param_code, t = iso_utc(.data[[column]])) %>%
+    filter(!is.na(t)) %>%
+    group_by(extra_param_code) %>%
+    summarise(t = take(t), .groups = "drop")
+}
+
+# A code that never reached part 2 keeps its start and leaves the rest empty.
+timing <- full_join(
+    edge_time("Kanji_Part1", "_meta_start_time", min) %>% rename(Start_Time = t),
+    edge_time("Kanji_Part2", "_meta_end_time",   max) %>% rename(End_Time = t),
+    by = "extra_param_code"
+  ) %>%
+  # From the true instants, so the October clock change cannot skew it.
+  mutate(
+    Total_Duration_min = round(as.numeric(difftime(End_Time, Start_Time, units = "mins")), 1),
+    across(c(Start_Time, End_Time), as_local)
+  ) %>%
+  transmute(ID_1 = extra_param_code, Start_Time, End_Time, Total_Duration_min) %>%
+  arrange(ID_1)
+
 # --- One file per recall block and per questionnaire ------------------------
 # Each file holds one sheet named like the file. Excel caps a sheet name at 31
 # characters and forbids : \ / ? * [ ], so the names are kept short.
@@ -317,8 +353,6 @@ save_xlsx <- function(x, path) {
 # Recall_A -> kanji_recall_A.xlsx
 file_name <- function(name) paste0("kanji_", tolower(substr(name, 1, 1)), substring(name, 2), ".xlsx")
 
-# The prize draw is written outside this folder, so sharing it never shares
-# e-mail addresses.
 data_dir <- file.path(out_dir, "kanji_data")
 
 write_folder <- function(files, folder) {
@@ -334,6 +368,11 @@ write_folder <- function(files, folder) {
 message("\nFiles written:")
 write_folder(recall_out, "recall")
 write_folder(survey_out, "questionnaires")
+
+# Alongside the two folders rather than in either: it belongs to neither.
+dir.create(data_dir, recursive = TRUE, showWarnings = FALSE)
+save_xlsx(list(Timing = timing), file.path(data_dir, "kanji_timing.xlsx"))
+message(sprintf("  %-40s %3d rows, %3d cols", "kanji_timing.xlsx", nrow(timing), ncol(timing)))
 message("in ", data_dir)
 
 # --- Prize draw, exported on its own ----------------------------------------
@@ -352,7 +391,7 @@ if (is.null(draw) || nrow(draw) == 0) {
     select(email, entry_date) %>%
     distinct(email, .keep_all = TRUE)
 
-  draw_file <- file.path(out_dir, "kanji_prize_draw.xlsx")
+  draw_file <- file.path(data_dir, "kanji_prize_draw.xlsx")
   save_xlsx(list(PrizeDraw = draw), draw_file)
   message("prize draw: ", nrow(draw), " e-mail addresses")
   message("wrote ", draw_file)

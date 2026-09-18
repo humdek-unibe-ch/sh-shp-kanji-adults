@@ -757,6 +757,92 @@ INSERT IGNORE INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
 VALUES (@kanji_draw, @ks_draw, 0);
 
 -- -----------------------------------------------------------------------
+-- The same open/done guard on the remaining code-bearing pages
+--
+-- Demographics and task 1 build theirs above; these seven differ only in the
+-- table and the component, so one pass replaces seven copies. Part 1 is
+-- unguarded (the code is typed there, so there is no url parameter yet) and so
+-- is the prize draw, which carries no code at all.
+-- -----------------------------------------------------------------------
+
+DROP TEMPORARY TABLE IF EXISTS kanji_guards;
+CREATE TEMPORARY TABLE kanji_guards (
+    page VARCHAR(100), component VARCHAR(100), tbl VARCHAR(100), guard VARCHAR(100)
+);
+INSERT INTO kanji_guards VALUES
+    ('kanji-adults-pause-1',   'kanji-pause-1',      'Kanji_Pause1', 'kanji-pause-1'),
+    ('kanji-adults-task-2',    'kanji-task-labjs-2', 'Kanji_Task2',  'kanji-task-2'),
+    ('kanji-adults-pause-2',   'kanji-pause-2',      'Kanji_Pause2', 'kanji-pause-2'),
+    ('kanji-adults-task-3',    'kanji-task-labjs-3', 'Kanji_Task3',  'kanji-task-3'),
+    ('kanji-adults-pause-3',   'kanji-pause-3',      'Kanji_Pause3', 'kanji-pause-3'),
+    ('kanji-adults-task-4',    'kanji-task-labjs-4', 'Kanji_Task4',  'kanji-task-4'),
+    ('kanji-adults-questions', 'kanji-survey-part2', 'Kanji_Part2',  'kanji-questions');
+
+-- Both containers per page.
+INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
+SELECT get_style_id('conditionalContainer'), CONCAT(g.guard, s.suffix), NULL
+  FROM kanji_guards g
+  JOIN (SELECT '-open' AS suffix UNION ALL SELECT '-done') s;
+
+-- data_config reads the page's own row for the code in the url; condition
+-- tests triggerType from opposite sides, as on the two pages above.
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+SELECT * FROM (
+    SELECT sec.id AS s_id, get_field_id('data_config') AS f_id,
+           '0000000001' AS lang, '0000000001' AS gender,
+           CONCAT('[{"table": "', g.tbl, '", "retrieve": "first", "current_user": false, "all_fields": false,',
+                  ' "filter": "AND extra_param_code = ''{{__code__}}''",',
+                  ' "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]') AS val
+      FROM kanji_guards g
+      JOIN (SELECT '-open' AS suffix UNION ALL SELECT '-done') s
+      JOIN `sections` sec ON sec.name = CONCAT(g.guard, s.suffix)
+) cfg
+ON DUPLICATE KEY UPDATE `content` = cfg.val;
+
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+SELECT * FROM (
+    SELECT sec.id AS s_id, get_field_id('condition') AS f_id,
+           '0000000001' AS lang, '0000000001' AS gender,
+           IF(s.suffix = '-open', '{"and":[{"!=":["@page_state","finished"]}]}',
+                                  '{"and":[{"==":["@page_state","finished"]}]}') AS val
+      FROM kanji_guards g
+      JOIN (SELECT '-open' AS suffix UNION ALL SELECT '-done') s
+      JOIN `sections` sec ON sec.name = CONCAT(g.guard, s.suffix)
+) cnd
+ON DUPLICATE KEY UPDATE `content` = cnd.val;
+
+-- The component goes in `open`, the shared "already completed" text in `done`.
+-- DELETE first: earlier versions attached the component straight to the page.
+DELETE ps FROM `pages_sections` ps
+  JOIN `pages` p ON p.id = ps.id_pages
+  JOIN `sections` s ON s.id = ps.id_sections
+  JOIN kanji_guards g ON g.page = p.keyword AND g.component = s.name;
+
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+SELECT o.id, c.id, 0
+  FROM kanji_guards g
+  JOIN `sections` o ON o.name = CONCAT(g.guard, '-open')
+  JOIN `sections` c ON c.name = g.component;
+
+INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
+SELECT d.id, @kt1_done_text, 0
+  FROM kanji_guards g
+  JOIN `sections` d ON d.name = CONCAT(g.guard, '-done')
+ WHERE @kt1_done_text IS NOT NULL;
+
+INSERT INTO `pages_sections` (`id_pages`, `id_sections`, `position`)
+SELECT * FROM (
+    SELECT p.id AS p_id, sec.id AS s_id, IF(s.suffix = '-open', 10, 5) AS pos
+      FROM kanji_guards g
+      JOIN (SELECT '-open' AS suffix UNION ALL SELECT '-done') s
+      JOIN `pages` p ON p.keyword = g.page
+      JOIN `sections` sec ON sec.name = CONCAT(g.guard, s.suffix)
+) pl
+ON DUPLICATE KEY UPDATE `position` = pl.pos;
+
+DROP TEMPORARY TABLE kanji_guards;
+
+-- -----------------------------------------------------------------------
 -- Carry the code from page to page
 --
 -- Every component after part 1 reads the query string of the page it was
@@ -1659,7 +1745,8 @@ The files land next to the script, sorted into a `kanji_data` folder:
 | `recall` | `kanji_recall.xlsx` | Every recall trial, one row each, laid out like the example datafile: practice, then list A, then list B |
 | `recall` | `kanji_practice.xlsx` · `kanji_recall_A.xlsx` · `kanji_recall_B.xlsx` | The same trials and layout, one recall block per file |
 | `questionnaires` | `kanji_part1.xlsx` · `kanji_demographics.xlsx` · `kanji_pause1.xlsx` … `kanji_pause3.xlsx` · `kanji_part2.xlsx` | One file per questionnaire, one row per participant |
-| — | `kanji_prize_draw.xlsx` | E-mail address and date only. It sits next to `kanji_data`, not in it, so sharing that folder never shares an address |
+| — | `kanji_timing.xlsx` | One row per participant: `ID_1`, `Start_Time`, `End_Time` and `Total_Duration_min`. Swiss local time. The span runs from opening part 1 to submitting part 2, so it covers the memory task as well |
+| — | `kanji_prize_draw.xlsx` | E-mail address and date only, in its own file and never joined to the rest, so a draw entry cannot be tied to anyone''s answers |
 
 ### How the recall files are filled
 

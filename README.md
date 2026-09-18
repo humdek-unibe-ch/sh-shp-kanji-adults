@@ -124,8 +124,9 @@ Recall blocks record choice, confidence, reaction times, accuracy and the
 Qualtrics timing-question clicks; learning blocks record item and on-screen
 duration. The R export writes separate Excel files into `kanji_data/`: under
 `recall/` the recall trials one row per trial, a file per block plus one
-stacking all three, and under `questionnaires/` a file per questionnaire. Task
-tables also carry
+stacking all three, under `questionnaires/` a file per questionnaire, and
+alongside both `kanji_timing.xlsx`, one row per participant holding when they
+started, when they finished and the total in minutes. Task tables also carry
 `extra_data_n_*` counts and `extra_data_UserLanguage`.
 
 Questionnaire columns keep the Qualtrics names without the language suffix
@@ -142,7 +143,7 @@ into one row in every table.
 
 `Kanji_PrizeDraw` has an e-mail address and no participant code, so a draw entry
 cannot be tied back to anyone's answers. The export keeps it in its own file,
-outside `kanji_data/`, for the same reason.
+never joined to the rest, for the same reason.
 
 ## Editing the study
 
