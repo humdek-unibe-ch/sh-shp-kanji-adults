@@ -132,6 +132,18 @@
   object-fit: contain;
   border-radius: 10px;
   display: block;
+  /* Clicks belong to the tile, not the image inside it. */
+  pointer-events: none;
+}
+
+/* An <img> is draggable by default, and a spam-click nudges the mouse enough
+   to start one. Edge then wedges building the drag ghost for these 2048px
+   data URIs: input stops everywhere while JS and timers keep running, and only
+   a reload clears it. */
+.kanji-stage, .kanji-stage * {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .kanji-opt:hover { border-color: #2365c8; }
 .kanji-opt:active { transform: scale(.98); }
