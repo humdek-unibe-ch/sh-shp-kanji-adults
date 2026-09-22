@@ -349,27 +349,33 @@ VALUES (@kanji_task_1, @kt_style_1, 0);
 --
 -- `current_user` is false: participants are not logged in, so the row
 -- belongs to the guest user rather than to whoever is visiting.
+--
+-- `content` is the JSON-logic the runtime reads; `meta` the same rule in the
+-- Condition Builder's format. Without it the CMS dialog opens empty.
 -- -----------------------------------------------------------------------
+
+SET @cond_meta_open = '{"condition":"AND","rules":[{"id":"field","field":"field","type":"string","input":"text","operator":"field_not_equal","value":["@page_state","finished"]}],"valid":true}';
+SET @cond_meta_done = '{"condition":"AND","rules":[{"id":"field","field":"field","type":"string","input":"text","operator":"field_equal","value":["@page_state","finished"]}],"valid":true}';
 
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
     VALUES (get_style_id('conditionalContainer'), 'kanji-task-1-open', NULL);
 SET @kt1_open = (SELECT id FROM sections WHERE name = 'kanji-task-1-open');
 
-INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`, `meta`)
 VALUES
-    (@kt1_open, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Task1", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}''", "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]'),
-    (@kt1_open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@page_state","finished"]}]}')
-ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+    (@kt1_open, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Task1", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}''", "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]', NULL),
+    (@kt1_open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@page_state","finished"]}]}', @cond_meta_open)
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`), `meta` = VALUES(`meta`);
 
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
     VALUES (get_style_id('conditionalContainer'), 'kanji-task-1-done', NULL);
 SET @kt1_done = (SELECT id FROM sections WHERE name = 'kanji-task-1-done');
 
-INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`, `meta`)
 VALUES
-    (@kt1_done, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Task1", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}''", "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]'),
-    (@kt1_done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@page_state","finished"]}]}')
-ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+    (@kt1_done, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Task1", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}''", "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]', NULL),
+    (@kt1_done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@page_state","finished"]}]}', @cond_meta_done)
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`), `meta` = VALUES(`meta`);
 
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
     VALUES (get_style_id('markdown'), 'kanji-task-1-done-text', NULL);
@@ -439,21 +445,21 @@ INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
     VALUES (get_style_id('conditionalContainer'), 'kanji-demo-open', NULL);
 SET @kd_open = (SELECT id FROM sections WHERE name = 'kanji-demo-open');
 
-INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`, `meta`)
 VALUES
-    (@kd_open, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Demographics", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}''", "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]'),
-    (@kd_open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@page_state","finished"]}]}')
-ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+    (@kd_open, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Demographics", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}''", "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]', NULL),
+    (@kd_open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@page_state","finished"]}]}', @cond_meta_open)
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`), `meta` = VALUES(`meta`);
 
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
     VALUES (get_style_id('conditionalContainer'), 'kanji-demo-done', NULL);
 SET @kd_done = (SELECT id FROM sections WHERE name = 'kanji-demo-done');
 
-INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`, `meta`)
 VALUES
-    (@kd_done, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Demographics", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}''", "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]'),
-    (@kd_done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@page_state","finished"]}]}')
-ON DUPLICATE KEY UPDATE `content` = VALUES(`content`);
+    (@kd_done, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Demographics", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}''", "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]', NULL),
+    (@kd_done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@page_state","finished"]}]}', @cond_meta_done)
+ON DUPLICATE KEY UPDATE `content` = VALUES(`content`), `meta` = VALUES(`meta`);
 
 INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
 VALUES (@kd_open, @ks_demo, 0),
@@ -799,17 +805,18 @@ SELECT * FROM (
 ) cfg
 ON DUPLICATE KEY UPDATE `content` = cfg.val;
 
-INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`)
+INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`, `meta`)
 SELECT * FROM (
     SELECT sec.id AS s_id, get_field_id('condition') AS f_id,
            '0000000001' AS lang, '0000000001' AS gender,
            IF(s.suffix = '-open', '{"and":[{"!=":["@page_state","finished"]}]}',
-                                  '{"and":[{"==":["@page_state","finished"]}]}') AS val
+                                  '{"and":[{"==":["@page_state","finished"]}]}') AS val,
+           IF(s.suffix = '-open', @cond_meta_open, @cond_meta_done) AS meta_val
       FROM kanji_guards g
       JOIN (SELECT '-open' AS suffix UNION ALL SELECT '-done') s
       JOIN `sections` sec ON sec.name = CONCAT(g.guard, s.suffix)
 ) cnd
-ON DUPLICATE KEY UPDATE `content` = cnd.val;
+ON DUPLICATE KEY UPDATE `content` = cnd.val, `meta` = cnd.meta_val;
 
 -- The component goes in `open`, the shared "already completed" text in `done`.
 -- DELETE first: earlier versions attached the component straight to the page.
