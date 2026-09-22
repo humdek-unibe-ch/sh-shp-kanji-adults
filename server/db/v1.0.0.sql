@@ -354,8 +354,8 @@ VALUES (@kanji_task_1, @kt_style_1, 0);
 -- Condition Builder's format. Without it the CMS dialog opens empty.
 -- -----------------------------------------------------------------------
 
-SET @cond_meta_open = '{"condition":"AND","rules":[{"id":"field","field":"field","type":"string","input":"text","operator":"field_not_equal","value":["@page_state","finished"]}],"valid":true}';
-SET @cond_meta_done = '{"condition":"AND","rules":[{"id":"field","field":"field","type":"string","input":"text","operator":"field_equal","value":["@page_state","finished"]}],"valid":true}';
+SET @cond_meta_open = '{"condition":"AND","rules":[{"id":"field","field":"field","type":"string","input":"text","operator":"field_equal","value":["@page_state","not-finished"]}],"valid":true}';
+SET @cond_meta_done = '{"condition":"AND","rules":[{"id":"field","field":"field","type":"string","input":"text","operator":"field_not_equal","value":["@page_state","not-finished"]}],"valid":true}';
 
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
     VALUES (get_style_id('conditionalContainer'), 'kanji-task-1-open', NULL);
@@ -363,8 +363,8 @@ SET @kt1_open = (SELECT id FROM sections WHERE name = 'kanji-task-1-open');
 
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`, `meta`)
 VALUES
-    (@kt1_open, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Task1", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}''", "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]', NULL),
-    (@kt1_open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@page_state","finished"]}]}', @cond_meta_open)
+    (@kt1_open, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Task1", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}'' AND triggerType = ''finished''", "fields": [{"field_name": "extra_param_code", "field_holder": "@page_state", "not_found_text": "not-finished"}]}]', NULL),
+    (@kt1_open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@page_state","not-finished"]}]}', @cond_meta_open)
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`), `meta` = VALUES(`meta`);
 
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
@@ -373,8 +373,8 @@ SET @kt1_done = (SELECT id FROM sections WHERE name = 'kanji-task-1-done');
 
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`, `meta`)
 VALUES
-    (@kt1_done, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Task1", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}''", "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]', NULL),
-    (@kt1_done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@page_state","finished"]}]}', @cond_meta_done)
+    (@kt1_done, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Task1", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}'' AND triggerType = ''finished''", "fields": [{"field_name": "extra_param_code", "field_holder": "@page_state", "not_found_text": "not-finished"}]}]', NULL),
+    (@kt1_done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@page_state","not-finished"]}]}', @cond_meta_done)
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`), `meta` = VALUES(`meta`);
 
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
@@ -447,8 +447,8 @@ SET @kd_open = (SELECT id FROM sections WHERE name = 'kanji-demo-open');
 
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`, `meta`)
 VALUES
-    (@kd_open, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Demographics", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}''", "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]', NULL),
-    (@kd_open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@page_state","finished"]}]}', @cond_meta_open)
+    (@kd_open, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Demographics", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}'' AND triggerType = ''finished''", "fields": [{"field_name": "extra_param_code", "field_holder": "@page_state", "not_found_text": "not-finished"}]}]', NULL),
+    (@kd_open, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@page_state","not-finished"]}]}', @cond_meta_open)
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`), `meta` = VALUES(`meta`);
 
 INSERT IGNORE INTO `sections` (`id_styles`, `name`, `owner`)
@@ -457,8 +457,8 @@ SET @kd_done = (SELECT id FROM sections WHERE name = 'kanji-demo-done');
 
 INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_languages`, `id_genders`, `content`, `meta`)
 VALUES
-    (@kd_done, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Demographics", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}''", "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]', NULL),
-    (@kd_done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"==":["@page_state","finished"]}]}', @cond_meta_done)
+    (@kd_done, get_field_id('data_config'), '0000000001', '0000000001', '[{"table": "Kanji_Demographics", "retrieve": "first", "current_user": false, "all_fields": false, "filter": "AND extra_param_code = ''{{__code__}}'' AND triggerType = ''finished''", "fields": [{"field_name": "extra_param_code", "field_holder": "@page_state", "not_found_text": "not-finished"}]}]', NULL),
+    (@kd_done, get_field_id('condition'),   '0000000001', '0000000001', '{"and":[{"!=":["@page_state","not-finished"]}]}', @cond_meta_done)
 ON DUPLICATE KEY UPDATE `content` = VALUES(`content`), `meta` = VALUES(`meta`);
 
 INSERT IGNORE INTO `sections_hierarchy` (`parent`, `child`, `position`)
@@ -797,8 +797,8 @@ SELECT * FROM (
     SELECT sec.id AS s_id, get_field_id('data_config') AS f_id,
            '0000000001' AS lang, '0000000001' AS gender,
            CONCAT('[{"table": "', g.tbl, '", "retrieve": "first", "current_user": false, "all_fields": false,',
-                  ' "filter": "AND extra_param_code = ''{{__code__}}''",',
-                  ' "fields": [{"field_name": "triggerType", "field_holder": "@page_state", "not_found_text": "none"}]}]') AS val
+                  ' "filter": "AND extra_param_code = ''{{__code__}}'' AND triggerType = ''finished''",',
+                  ' "fields": [{"field_name": "extra_param_code", "field_holder": "@page_state", "not_found_text": "not-finished"}]}]') AS val
       FROM kanji_guards g
       JOIN (SELECT '-open' AS suffix UNION ALL SELECT '-done') s
       JOIN `sections` sec ON sec.name = CONCAT(g.guard, s.suffix)
@@ -809,8 +809,8 @@ INSERT INTO `sections_fields_translation` (`id_sections`, `id_fields`, `id_langu
 SELECT * FROM (
     SELECT sec.id AS s_id, get_field_id('condition') AS f_id,
            '0000000001' AS lang, '0000000001' AS gender,
-           IF(s.suffix = '-open', '{"and":[{"!=":["@page_state","finished"]}]}',
-                                  '{"and":[{"==":["@page_state","finished"]}]}') AS val,
+           IF(s.suffix = '-open', '{"and":[{"==":["@page_state","not-finished"]}]}',
+                                  '{"and":[{"!=":["@page_state","not-finished"]}]}') AS val,
            IF(s.suffix = '-open', @cond_meta_open, @cond_meta_done) AS meta_val
       FROM kanji_guards g
       JOIN (SELECT '-open' AS suffix UNION ALL SELECT '-done') s
