@@ -127,7 +127,8 @@ duration. The R export writes separate Excel files into `kanji_data/`: under
 stacking all three, under `questionnaires/` a file per questionnaire, and
 alongside both `kanji_timing.xlsx`, one row per participant holding when they
 started, when they finished and the total in minutes. Task tables also carry
-`extra_data_n_*` counts and `extra_data_UserLanguage`.
+`extra_data_n_*` counts and `extra_data_UserLanguage`; the Part 1 file carries
+`UserLanguage`, the language the parent chose on the consent page.
 
 Questionnaire columns keep the Qualtrics names without the language suffix
 (`Demo_2`, not `Demo_2_DE`); the task JSON keeps the original field numbers —

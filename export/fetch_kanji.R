@@ -343,6 +343,14 @@ survey_tables <- intersect(c("Kanji_Part1", "Kanji_Demographics", "Kanji_Pause1"
 recall_out <- c(if (nrow(kanji_recall) > 0) list(Recall = kanji_recall), recall_files)
 survey_out <- set_names(finished[survey_tables], sub("^Kanji_", "", survey_tables))
 
+# The language is metadata on every survey; the consent page is where the
+# parent chose it, so it gets a named column there like the tasks have.
+if ("Part1" %in% names(survey_out) && "_meta_language" %in% names(survey_out$Part1)) {
+  survey_out$Part1 <- survey_out$Part1 %>%
+    mutate(UserLanguage = `_meta_language`) %>%
+    relocate(UserLanguage, .after = extra_param_code)
+}
+
 # Excel locks a workbook while it is open, and writexl's error does not say so.
 save_xlsx <- function(x, path) {
   tryCatch(write_xlsx(x, path), error = function(e) stop(
