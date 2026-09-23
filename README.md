@@ -39,7 +39,7 @@ unless it was copied back into the migration first.
 
 > **The full study — 93 trials:** 2 practice learning and 1 practice recall,
 > then 30 learning and 15 recall trials for each of lists A and B. The four
-> task segments add up to about 8 MB of SQL, the largest statement 2.5 MB, so
+> task segments add up to about 15 MB of SQL, the largest statement 4.5 MB, so
 > the server's `max_allowed_packet` must be above that.
 
 ## Pages
@@ -68,6 +68,25 @@ items or instruction screens is a rebuild, which the dev responsible runs.
 Participants arrive from a letter without logging in, so every page grants
 access to all groups, carries an `acl_users` row for the guest user, and is
 headless.
+
+## Counterbalancing
+
+The CMS names say list A on tasks 1–2 and list B on tasks 3–4, but that holds
+only for order `AB`. A participant with order `BA` learns and recalls list B on
+tasks 1–2 and list A on tasks 3–4. Instructions say "first round" / "second
+round", so they read right either way.
+
+Every task segment carries both lists and its loop keeps the one its position
+plays. Task 1 assigns the order once per code and stores it as
+`extra_data_counterbalance`; the section's `data_config` hands it the orders
+already given out, and tasks 2–4 read the code's order back from `Kanji_Task1`
+the same way. The order given out less often wins, counting everyone who started
+task 1, finished or not. A tie goes to `AB`, so participants alternate AB, BA,
+AB, BA by when they start. Drop-outs count too, so the groups of participants
+who finish can end up uneven.
+
+A code keeps its order on reload. A task page opened without a task 1 row runs
+`AB`, the order every run had before counterbalancing.
 
 ## How a run holds together
 
@@ -111,20 +130,25 @@ Ten tables, one row per participant, joined on `extra_param_code`.
 |---|---|
 | `Kanji_Part1` | `EV`, `ID_1` — consent and code |
 | `Kanji_Demographics` | `Demo_*` |
-| `Kanji_Task1` | `extra_data_trials_practice`, `extra_data_trials_learn_A` |
+| `Kanji_Task1` | `extra_data_trials_practice`, the first list's `extra_data_trials_learn_*`, `extra_data_counterbalance` |
 | `Kanji_Pause1` | `P1_*` ratings |
-| `Kanji_Task2` | `extra_data_trials_recall_A` |
+| `Kanji_Task2` | the first list's `extra_data_trials_recall_*` |
 | `Kanji_Pause2` | `P2_*` ratings |
-| `Kanji_Task3` | `extra_data_trials_learn_B` |
+| `Kanji_Task3` | the second list's `extra_data_trials_learn_*` |
 | `Kanji_Pause3` | `P3_*` ratings |
-| `Kanji_Task4` | `extra_data_trials_recall_B` |
+| `Kanji_Task4` | the second list's `extra_data_trials_recall_*` |
 | `Kanji_Part2` | `Device`, `ID_2`, `Finished_Study` |
+
+Block columns are named after the list shown (`recall_A` is list A wherever
+it ran), so which task table holds a list depends on the order. Tasks 1–4 also
+store `extra_data_counterbalance` on their finished row.
 
 Recall blocks record choice, confidence, reaction times, accuracy and the
 Qualtrics timing-question clicks; learning blocks record item and on-screen
 duration. The R export writes separate Excel files into `kanji_data/`: under
 `recall/` the recall trials one row per trial, a file per block plus one
-stacking all three, under `questionnaires/` a file per questionnaire, and
+stacking all three, under `questionnaires/` a file per questionnaire with
+every row, submitted or not (`triggerType` says which), and
 alongside both `kanji_timing.xlsx`, one row per participant holding when they
 started, when they finished and the total in minutes. Task tables also carry
 `extra_data_n_*` counts and `extra_data_UserLanguage`; the Part 1 file carries

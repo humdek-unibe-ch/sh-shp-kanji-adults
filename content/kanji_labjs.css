@@ -125,8 +125,8 @@
   line-height: 0;
 }
 .kanji-opt img {
-  max-height: 28vh;
-  max-width: 24vw;
+  max-height: 24vh;
+  max-width: 21vw;
   width: auto;
   height: auto;
   object-fit: contain;
@@ -196,10 +196,10 @@
      reserved height the row is 0px until then and the trial jumps when
      the images arrive. Hold the tallest case: a square tile plus its
      6px padding and 2px border on each side. */
-  min-height: calc(clamp(120px, 13vw, 168px) + 16px);
+  min-height: calc(clamp(140px, 15vw, 200px) + 16px);
 }
 .kanji-cj .kanji-opt {
-  width: clamp(120px, 13vw, 168px);
+  width: clamp(140px, 15vw, 200px);
   flex: 0 0 auto;
 }
 .kanji-cj .kanji-opt img {
@@ -329,11 +329,11 @@
   .kanji-pair .kanji-item { max-width: 70vw; max-height: 34vh; }
   .kanji-pair .kanji-item + .kanji-item { margin-top: 6vh; }
   .kanji-cue { max-width: 46vw; max-height: 18vh; }
-  .kanji-opt img { max-width: 30vw; max-height: 20vh; }
-  .kanji-cj .kanji-opt { width: clamp(88px, 24vw, 128px); }
+  .kanji-opt img { max-width: 26vw; max-height: 17vh; }
+  .kanji-cj .kanji-opt { width: clamp(100px, 27vw, 148px); }
   /* Track the tile width above, so the reserved row is not taller than what
      lands in it. */
-  .kanji-cj { min-height: calc(clamp(88px, 24vw, 128px) + 16px); }
+  .kanji-cj { min-height: calc(clamp(100px, 27vw, 148px) + 16px); }
   /* svh: vh includes the address bar and pushes content down. */
   .kanji-stage {
     gap: 0;

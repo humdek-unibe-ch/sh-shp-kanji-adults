@@ -18,9 +18,9 @@
 #       kanji_recall_A.xlsx        per file
 #       kanji_recall_B.xlsx
 #     kanji_data/questionnaires/
-#       kanji_part1.xlsx         one per questionnaire, one row per participant:
-#       kanji_demographics.xlsx    part1, demographics, pause1, pause2, pause3
-#       kanji_pause1.xlsx …        and part2
+#       kanji_part1.xlsx         one per questionnaire: part1, demographics,
+#       kanji_demographics.xlsx    pause1, pause2, pause3 and part2. Every row,
+#       kanji_pause1.xlsx …        finished or not; triggerType says which
 #     kanji_data/
 #       kanji_timing.xlsx        when each participant started and finished the
 #                                  study, and how long they took
@@ -156,12 +156,6 @@ raw <- lapply(set_names(tables), function(t) {
 })
 raw <- compact(raw)
 
-# Keep only completed submissions. `started` and `updated` rows are in-progress
-# saves; most carry no code at all and cannot be joined to anything.
-finished <- raw %>%
-  map(~ filter(.x, triggerType == "finished")) %>%
-  map(~ filter(.x, !is.na(extra_param_code), extra_param_code != ""))
-
 # --- Drop the bookkeeping that repeats on every table -----------------------
 # Every table arrives with the same block of columns that say nothing about the
 # answers. Two kinds are dropped:
@@ -182,7 +176,14 @@ session <- c("id_users", "user_name", "user_code", "extra_data_slice",
              "_meta_viewport_width", "_meta_viewport_height", "_meta_user_agent",
              "mobile", "mobile_web")
 
-finished <- map(finished, ~ select(.x, -any_of(c(derivable, session))))
+# Every row is exported, finished or not; triggerType says which. `started` and
+# `updated` rows are pages left part-way, and part 1's often carry no code yet.
+all_rows <- map(raw, ~ select(.x, -any_of(c(derivable, session))))
+
+# Submitted pages with a code: what counts as having completed a step.
+finished <- all_rows %>%
+  map(~ filter(.x, triggerType == "finished")) %>%
+  map(~ filter(.x, !is.na(extra_param_code), extra_param_code != ""))
 
 dup <- imap(finished, ~ mutate(select(.x, extra_param_code), step = .y)) %>%
   bind_rows() %>% count(step, extra_param_code) %>% filter(n > 1)
@@ -193,12 +194,49 @@ if (nrow(dup) > 0) {
 
 # --- Recall: one row per trial, laid out like Example_Datafile_Kanji.xlsx ----
 # The task pages store each recall block as one JSON array. Each block gets its
-# own file, and all three are stacked in the Recall file.
+# own file, and all three are stacked in the Recall file. With counterbalancing
+# a list is recalled on task 2 (first) or task 4 (second), so both are searched.
 recall_blocks <- tribble(
-  ~file,      ~table,        ~column,                      ~Stage,       ~List,
-  "Practice", "Kanji_Task1", "extra_data_trials_practice", "practice",   NA_character_,
-  "Recall_A", "Kanji_Task2", "extra_data_trials_recall_A", "experiment", "A",
-  "Recall_B", "Kanji_Task4", "extra_data_trials_recall_B", "experiment", "B"
+  ~file,      ~table,                        ~column,                      ~Stage,       ~List,
+  "Practice", "Kanji_Task1",                 "extra_data_trials_practice", "practice",   NA_character_,
+  "Recall_A", "Kanji_Task2,Kanji_Task4",     "extra_data_trials_recall_A", "experiment", "A",
+  "Recall_B", "Kanji_Task2,Kanji_Task4",     "extra_data_trials_recall_B", "experiment", "B"
+)
+
+# The distractor shown beside each target, from items_recall.csv. P is practice.
+distractors <- tribble(
+  ~list, ~item,         ~Distractor,
+  "P",   "Baer",        "Fisch",
+  "A",   "Herbst",      "Ast",
+  "A",   "Baumwolle",   "Pflanze",
+  "A",   "Welt",        "Stock",
+  "A",   "Zeit",        "Dunkelheit",
+  "A",   "Nebel",       "Wald",
+  "A",   "See",         "Klippe",
+  "A",   "Nacht",       "Mittag",
+  "A",   "Schwarz",     "Gelb",
+  "A",   "Kalt",        "Eiszapfen",
+  "A",   "Vorsicht",    "Gefaehrlich",
+  "A",   "Gefaehrlich", "Rot",
+  "A",   "Asien",       "Afrika",
+  "A",   "Insel",       "Sommer",
+  "A",   "Hoehle",      "Berg",
+  "A",   "Leben",       "Weiss",
+  "B",   "Palme",       "Strand",
+  "B",   "Bakterium",   "Sueden",
+  "B",   "Huegel",      "Rechts",
+  "B",   "Schnee",      "Regen",
+  "B",   "Wolke",       "Winter",
+  "B",   "Fruehling",   "Klima",
+  "B",   "Braun",       "Gruen",
+  "B",   "Violett",     "Dunkelblau",
+  "B",   "Meer",        "Teich",
+  "B",   "Wasser",      "Baum",
+  "B",   "Wind",        "Regenbogen",
+  "B",   "Ticket",      "Osten",
+  "B",   "Arzt",        "Europa",
+  "B",   "Westen",      "Vier",
+  "B",   "Jahr",        "Links"
 )
 
 na_if_absent <- function(t, name) if (is.null(t[[name]])) NA else t[[name]]
@@ -241,8 +279,21 @@ id2 <- if (is.null(part2)) tibble(extra_param_code = character(), ID_2 = charact
   part2 %>% group_by(extra_param_code) %>%
     summarise(ID_2 = first(na.omit(na_if(ID_2, ""))), .groups = "drop")
 
+# AB learned and recalled list A first, BA list B first; assigned on task 1.
+# Runs from before counterbalancing have none and were all AB. Any task 1 row
+# counts, so a drop-out during task 1 still shows the order they got.
+task1 <- all_rows[["Kanji_Task1"]]
+cb_order <- if (is.null(task1) || !"extra_data_counterbalance" %in% names(task1)) {
+  tibble(extra_param_code = character(), CounterBalance = character())
+} else {
+  task1 %>% filter(!is.na(extra_param_code), extra_param_code != "") %>%
+    group_by(extra_param_code) %>%
+    summarise(CounterBalance = first(na.omit(na_if(extra_data_counterbalance, ""))), .groups = "drop")
+}
+
 participant <- progress %>%
   left_join(id2, by = "extra_param_code") %>%
+  left_join(cb_order, by = "extra_param_code") %>%
   mutate(Finished = extra_param_code %in% id2$extra_param_code)
 
 side_de <- c(left = "links", right = "rechts")
@@ -251,10 +302,15 @@ side_de <- c(left = "links", right = "rechts")
 list_name <- function(x) if_else(x == "Dunkelheit", "Dunkel", x)
 
 recall_block <- function(table, column, Stage, List) {
-  d <- finished[[table]]
-  if (is.null(d) || !column %in% names(d)) return(NULL)
+  d <- all_rows[strsplit(table, ",")[[1]]] %>%
+    compact() %>%
+    keep(~ column %in% names(.x)) %>%
+    map(~ select(.x, extra_param_code, record_id, all_of(column))) %>%
+    bind_rows()
+  if (nrow(d) == 0) return(NULL)
   rows <- d %>%
-    filter(!is.na(.data[[column]]), .data[[column]] != "") %>%
+    filter(!is.na(extra_param_code), extra_param_code != "",
+           !is.na(.data[[column]]), .data[[column]] != "") %>%
     # A task page is done once per code, so a second finished row is a retest.
     group_by(extra_param_code) %>%
     slice_max(record_id, n = 1, with_ties = FALSE) %>%
@@ -265,22 +321,26 @@ recall_block <- function(table, column, Stage, List) {
 
   rows %>%
     left_join(participant, by = "extra_param_code") %>%
+    mutate(list = if (is.na(List)) "P" else List) %>%
+    left_join(distractors, by = c("list", "item")) %>%
     mutate(
       ID_1 = extra_param_code, Stage = Stage, List = List,
       # List A shows Gefaehrlich twice, as the distractor for Vorsicht and as a
       # target; the target is Gefaehrlich_2, as in Qualtrics.
       Target = if_else(List %in% "A" & item == "Gefaehrlich", "Gefaehrlich_2", item),
-      Antwort_recoded = list_name(sub("\\.jpg$", "", chosen)),
-      Antwort_recoded = if_else(Target == "Gefaehrlich_2" & Antwort_recoded == "Gefaehrlich",
-                                "Gefaehrlich_2", Antwort_recoded),
+      # The picture the participant chose.
+      Choose_Answer = list_name(sub("\\.jpg$", "", chosen)),
+      Choose_Answer = if_else(Target == "Gefaehrlich_2" & Choose_Answer == "Gefaehrlich",
+                               "Gefaehrlich_2", Choose_Answer),
+      Distractor = list_name(Distractor),
       Seite_Antwort = unname(side_de[side_chose]),
       Seite_Target  = unname(side_de[side_right]),
       across(starts_with("Zeit_sek_"), ~ round(.x, 3))
     ) %>%
     arrange(ID_1, Trial) %>%
     transmute(
-      ID_1, ID_2, Progress, Finished, Stage, Trial, List, Target,
-      Antwort_recoded, Seite_Antwort, Seite_Target, Punkte, Confidence_Judgement,
+      ID_1, ID_2, Progress, Finished, CounterBalance, Stage, Trial, List, Target,
+      Choose_Answer, Distractor, Seite_Antwort, Seite_Target, Punkte, Confidence_Judgement,
       Reaktionszeit_ms_Antwort, Reaktionszeit_ms_Confidence_Judgement,
       Zeit_sek_First_Click, Zeit_sek_Last_Click, Zeit_sek_Page_Submit, Click_Count
     )
@@ -339,9 +399,9 @@ timing <- full_join(
 # Each file holds one sheet named like the file. Excel caps a sheet name at 31
 # characters and forbids : \ / ? * [ ], so the names are kept short.
 survey_tables <- intersect(c("Kanji_Part1", "Kanji_Demographics", "Kanji_Pause1",
-                             "Kanji_Pause2", "Kanji_Pause3", "Kanji_Part2"), names(finished))
+                             "Kanji_Pause2", "Kanji_Pause3", "Kanji_Part2"), names(all_rows))
 recall_out <- c(if (nrow(kanji_recall) > 0) list(Recall = kanji_recall), recall_files)
-survey_out <- set_names(finished[survey_tables], sub("^Kanji_", "", survey_tables))
+survey_out <- set_names(all_rows[survey_tables], sub("^Kanji_", "", survey_tables))
 
 # The language is metadata on every survey; the consent page is where the
 # parent chose it, so it gets a named column there like the tasks have.

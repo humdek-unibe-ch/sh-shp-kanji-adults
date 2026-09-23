@@ -37,7 +37,11 @@ item CSVs or `instructions.json` means a rebuild, not an edit here.
 
 **The segments are the full study.** `items_learn.csv` is 30 A + 30 B + 2
 practice and `items_recall.csv` is 15 A + 15 B + 1 practice — 93 trials, all of
-them in the segments. The CSVs follow `Lists_Kanji_Adults.xlsx` from the
+them in the segments. For counterbalancing each learning and recall loop holds
+both lists, with both lists' images, and keeps one at runtime by the
+participant's order (see Counterbalancing in the plugin README). Loop titles
+still say A or B from before; the save names the block after the list shown.
+The CSVs follow `Lists_Kanji_Adults.xlsx` from the
 research team; only file names differ where the list spells an image
 differently (`Dunkel`, `Gefaehlich_Kanji`, `Tickets`).
 
