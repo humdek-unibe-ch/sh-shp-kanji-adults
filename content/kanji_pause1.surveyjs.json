@@ -1,224 +1,181 @@
 {
-    "title": {
-        "default": "Kanji – Pause 1: Französische Vokabeln",
-        "en": "Kanji – Break 1: French Vocabulary",
-        "fr": "Kanji – Pause 1: vocabulaire français",
-        "it": "Kanji – Pausa 1: vocaboli francesi"
-    },
-    "locale": "de",
-    "showQuestionNumbers": "off",
-    "showProgressBar": "off",
-    "pages": [
+  "locale": "de",
+  "title": {
+    "default": "Kanji – Pause 1: Französische Vokabeln",
+    "en": "Kanji – Break 1: French Vocabulary",
+    "fr": "Kanji – Pause 1: vocabulaire français",
+    "it": "Kanji – Pausa 1: vocaboli francesi"
+  },
+  "completedHtml": {
+    "default": "",
+    "en": "",
+    "fr": "",
+    "it": ""
+  },
+  "pages": [
+    {
+      "name": "pause1_intro",
+      "elements": [
         {
-            "name": "pause1_intro",
-            "elements": [
-                {
-                    "type": "html",
-                    "name": "P1_1",
-                    "html": {
-                        "default": "<div><p><strong>Super, Sie haben jetzt alle Kanjis aus der ersten Runde gelernt!</strong></p>\n<p>Es kommt jetzt eine kleine Pause, in welcher Sie Fragen zu Ihrem Kind beantworten werden.</p></div><style>.sd-body:has([data-name=\"P1_1\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "en": "<div><p><strong>Great, you have now learned all the kanji from the first round!</strong></p>\n<p>There will now be a short break during which you will answer questions about your child.</p></div><style>.sd-body:has([data-name=\"P1_1\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "fr": "<div><p><strong>Super! Vous avez maintenant appris tous les kanjis de la première série.</strong></p>\n<p>Il y aura maintenant une courte pause, pendant laquelle vous répondrez à quelques questions sur votre enfant.</p></div><style>.sd-body:has([data-name=\"P1_1\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "it": "<div><p><strong>Bene! Ora ha imparato tutti i kanji della prima serie!</strong></p>\n<p>Ci sarà ora una breve pausa, durante la quale risponderà ad alcune domande sul suo bambino.</p></div><style>.sd-body:has([data-name=\"P1_1\"]) .sd-body__navigation { justify-content: center; }</style>"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "pause1_instructions",
-            "elements": [
-                {
-                    "type": "html",
-                    "name": "P1_2",
-                    "html": {
-                        "default": "<div><p>Es folgt nun eine kurze Geschichte aus dem Familienalltag. Diese beschreibt eine Situation mit Ihrem Kind. Nach der Geschichte stehen mehrere Sätze. Diese zeigen mögliche Vorgehensweisen von Eltern.</p>\n<p>Bitte sagen Sie wie oft jeder Satz auf Sie zutrifft. Es gibt dabei keine falsche oder richtige Antwort.</p>\n<p>Wichtig ist nur, dass Sie ehrlich einschätzen, wie <em>Sie selbst</em> <em>typischerweise </em>handeln.</p></div><style>.sd-body:has([data-name=\"P1_2\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "en": "<div><p>Below are some short stories from everyday family life. They describe situations involving your child. After each story, there are several sentences. These show possible ways for parents to respond.</p>\n<p>Please say how often each sentence applies to you.</p>\n<p>There are no right or wrong answers.</p>\n<p>The important thing is that you honestly assess how <em>you typically </em>behave.</p></div><style>.sd-body:has([data-name=\"P1_2\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "fr": "<div><p>Voici maintenant de courtes histoires de la vie familiale. Elles décrivent des situations avec votre enfant. Après chaque histoire, vous trouverez plusieurs phrases qui montrent des façons possibles d'agir des parents.</p>\n<p>Veuillez indiquer à quelle fréquence chaque phrase vous correspond.<br>Il n’y a pas de bonne ou de mauvaise réponse.<br>L’important est seulement d’évaluer honnêtement comment vous agissez <em>habituellement</em>.</p></div><style>.sd-body:has([data-name=\"P1_2\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "it": "<div><p>Ora seguono brevi racconti dalla vita quotidiana di una famiglia. Queste descrivono situazioni con il proprio figlio.</p>\n<p>Dopo ogni racconto seguono diverse frasi che indicano possibili comportamenti dei genitori.</p>\n<p>Vi preghiamo di indicare con quale frequenza ogni frase si applica al vostro caso. Non esistono risposte giuste o sbagliate.</p>\n<p>L'importante è che valutiate onestamente come vi comportate di <em>solito</em>.</p></div><style>.sd-body:has([data-name=\"P1_2\"]) .sd-body__navigation { justify-content: center; }</style>"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "pause1_questions",
-            "elements": [
-                {
-                    "type": "matrix",
-                    "name": "P1_Vignette_Franz",
-                    "title": {
-                        "default": "<div style=\"display:flex;align-items:flex-start;gap:1em;flex-wrap:wrap;\"><div style=\"flex:1 1 20em;min-width:14em;\"><p><strong>Französische Vokabeln lernen</strong></p><p>Ihr Kind muss innerhalb einer Woche viele französische Vokabeln lernen. Das Thema ist \"Zoo\". Manche Wörter kann Ihr Kind schon gut. Manche Wörter sind ähnlich zu den deutschen Wörtern. Manche Wörter sind schwierig.</p>\n<p>Wie wahrscheinlich ist es, dass Sie Folgendes sagen oder tun:</p></div><img style=\"width:200px;max-width:30%;height:auto;object-fit:contain;flex:0 0 auto;\" src=\"{{ASSET_BASE}}/Vignette_Franz.jpg\" alt=\"\"></div>",
-                        "en": "<div style=\"display:flex;align-items:flex-start;gap:1em;flex-wrap:wrap;\"><div style=\"flex:1 1 20em;min-width:14em;\"><p><strong>Learning French Vocabulary</strong></p><p>Your child has to learn a lot of French vocabulary within a week. The topic is ‘zoo’. Your child already knows some of the words well. Some words are similar to the german words. Some words are difficult.</p>\n<p>How likely is it that you would do or say the following?</p></div><img style=\"width:200px;max-width:30%;height:auto;object-fit:contain;flex:0 0 auto;\" src=\"{{ASSET_BASE}}/Vignette_Franz.jpg\" alt=\"\"></div>",
-                        "fr": "<div style=\"display:flex;align-items:flex-start;gap:1em;flex-wrap:wrap;\"><div style=\"flex:1 1 20em;min-width:14em;\"><p><strong>Apprendre du vocabulaire français</strong></p><p>Votre enfant doit apprendre beaucoup de vocabulaire nouveau en une semaine. Le thème est \"le zoo\". Certains mots, votre enfant les sait déjà bien. Certains mots ressemblent aux mots français. Certains mots sont difficiles.</p>\n<p>Quelle est la probabilité que vous disiez ou faisiez ce qui suit?</p></div><img style=\"width:200px;max-width:30%;height:auto;object-fit:contain;flex:0 0 auto;\" src=\"{{ASSET_BASE}}/Vignette_Franz.jpg\" alt=\"\"></div>",
-                        "it": "<div style=\"display:flex;align-items:flex-start;gap:1em;flex-wrap:wrap;\"><div style=\"flex:1 1 20em;min-width:14em;\"><p><strong>Imparare vocaboli francesi</strong></p><p>Suo figlio/a deve imparare molti vocaboli francesi entro una settimana. Il tema è \"lo zoo\". Alcune parole le sa già bene. Alcune parole sono simili alle parole tedesche. Alcune parole sono difficili.</p>\n<p>Quanto è probabile che lei dica o faccia quanto segue:</p></div><img style=\"width:200px;max-width:30%;height:auto;object-fit:contain;flex:0 0 auto;\" src=\"{{ASSET_BASE}}/Vignette_Franz.jpg\" alt=\"\"></div>"
-                    },
-                    "isAllRowRequired": true,
-                    "columns": [
-                        {
-                            "value": "1",
-                            "text": {
-                                "default": "Sehr unwahrscheinlich",
-                                "en": "Very unlikely",
-                                "fr": "Très improbable",
-                                "it": "Molto improbabile"
-                            }
-                        },
-                        {
-                            "value": "2",
-                            "text": {
-                                "default": "Unwahrscheinlich",
-                                "en": "Unlikely",
-                                "fr": "Improbable",
-                                "it": "Improbabile"
-                            }
-                        },
-                        {
-                            "value": "3",
-                            "text": {
-                                "default": "Vielleicht",
-                                "en": "Maybe",
-                                "fr": "Peut-être",
-                                "it": "Forse"
-                            }
-                        },
-                        {
-                            "value": "4",
-                            "text": {
-                                "default": "Wahrscheinlich",
-                                "en": "Likely",
-                                "fr": "Probable",
-                                "it": "Probabile"
-                            }
-                        },
-                        {
-                            "value": "5",
-                            "text": {
-                                "default": "Sehr wahrscheinlich",
-                                "en": "Very likely",
-                                "fr": "Très probable",
-                                "it": "Molto probabile"
-                            }
-                        }
-                    ],
-                    "rows": [
-                        {
-                            "value": "1",
-                            "text": {
-                                "default": "Ich schlage meinem Kind vor, sich Teilziele zu setzen, bevor es mit dem Üben beginnt",
-                                "en": "I suggest that my child set small goals before starting to practice",
-                                "fr": "Je propose à mon enfant de se fixer des objectifs intermédiaires avant de commencer à s'exercer.",
-                                "it": "Suggerisco a mio figlio di fissarsi degli obiettivi intermedi prima di iniziare a esercitarsi."
-                            }
-                        },
-                        {
-                            "value": "2",
-                            "text": {
-                                "default": "Wenn mein Kind ein Wort nicht kennt, ermutige ich es, im Französisch Wörterbuch nachzuschlagen, um die richtige Lösung zu finden.",
-                                "en": "If my child doesn't know a word, I encourage them to look it up in a French dictionary to find the correct answer. ",
-                                "fr": "Lorsque mon enfant ne connaît pas un mot, je l'encourage à le chercher dans le dictionnaire de français pour trouver la bonne réponse.",
-                                "it": "Se mio figlio non conosce una parola, lo incoraggio a consultare il dizionario di francese per trovare la soluzione giusta. "
-                            }
-                        },
-                        {
-                            "value": "3",
-                            "text": {
-                                "default": "Wenn mein Kind beim Abfragen ein Wort sofort weiss, sage ich ihm, dass es bestimmt richtig ist, weil es ihm so schnell eingefallen ist.",
-                                "en": "When my child immediately knows a word during a quiz, I tell them that it must be correct because it came to mind so quickly. ",
-                                "fr": "Lorsque mon enfant connaît immédiatement un mot lors d'un test, je lui dis que c'est sûrement la bonne réponse, car cela lui est venu si vite à l'esprit.",
-                                "it": "Quando mio figlio sa subito una parola durante il test, gli dico che sicuramente è quella giusta, visto che gli è venuta in mente così in fretta. "
-                            }
-                        },
-                        {
-                            "value": "4",
-                            "text": {
-                                "default": "Ich fordere mein Kind auf, sich selbst zu testen, um zu überprüfen, welche Wörter es noch weiterüben muss",
-                                "en": "I encourage my child to test themselves to see which words they still need to practice further.",
-                                "fr": "J'invite mon enfant à s'auto-évaluer pour vérifier quels mots il doit encore réviser.",
-                                "it": "Chiedo a mio figlio di mettersi alla prova da solo per vedere quali parole deve ripassare ancora."
-                            }
-                        },
-                        {
-                            "value": "5",
-                            "text": {
-                                "default": "Ich ermutige mein Kind an sich Hilfen wie z.B. Eselsbrücken zu überlegen, um sich schwierige Wörter besser merken zu können. ",
-                                "en": "I encourage my child to come up with their own aids, such as mnemonics, to help them remember difficult words better. ",
-                                "fr": "J'encourage mon enfant à trouver lui-même des aides, comme des moyens mnémotechniques, pour mieux mémoriser les mots difficiles. ",
-                                "it": "Incoraggio mio figlio a pensare a dei trucchi mnemonici, come ad esempio i “espedienti mnemonici”, per ricordare meglio le parole difficili.  "
-                            }
-                        },
-                        {
-                            "value": "6",
-                            "text": {
-                                "default": "Nach einer Übungsrunde frage ich mein Kind, wie viele Wörter es schon kann.",
-                                "en": "After a practice session, I ask my child how many words they already know. ",
-                                "fr": "Après une série d'exercices, je demande à mon enfant combien de mots il connaît déjà. ",
-                                "it": "Dopo una sessione di esercizi chiedo a mio figlio quante parole conosce già. "
-                            }
-                        }
-                    ]
-                }
-            ]
+          "type": "html",
+          "name": "P1_1",
+          "html": {
+            "default": "<div><p><strong>Super, Sie haben jetzt alle Kanjis aus der ersten Runde gelernt!</strong></p>\n<p>Es kommt jetzt eine kleine Pause, in welcher Sie Fragen zu Ihrem Kind beantworten werden.</p></div><style>.sd-body:has([data-name=\"P1_1\"]) .sd-body__navigation { justify-content: center; }</style>",
+            "en": "<div><p><strong>Great, you have now learned all the kanji from the first round!</strong></p>\n<p>There will now be a short break during which you will answer questions about your child.</p></div><style>.sd-body:has([data-name=\"P1_1\"]) .sd-body__navigation { justify-content: center; }</style>",
+            "fr": "<div><p><strong>Super! Vous avez maintenant appris tous les kanjis de la première série.</strong></p>\n<p>Il y aura maintenant une courte pause, pendant laquelle vous répondrez à quelques questions sur votre enfant.</p></div><style>.sd-body:has([data-name=\"P1_1\"]) .sd-body__navigation { justify-content: center; }</style>",
+            "it": "<div><p><strong>Bene! Ora ha imparato tutti i kanji della prima serie!</strong></p>\n<p>Ci sarà ora una breve pausa, durante la quale risponderà ad alcune domande sul suo bambino.</p></div><style>.sd-body:has([data-name=\"P1_1\"]) .sd-body__navigation { justify-content: center; }</style>"
+          }
         }
-    ],
-    "completedHtml": {
-        "default": "",
-        "en": "",
-        "fr": "",
-        "it": ""
+      ]
     },
-    "checkErrorsMode": "onValueChanged",
-    "showPrevButton": false,
-    "pageNextText": {
-        "en": "Continue",
-        "fr": "Continuer",
-        "it": "Continua",
-        "default": "Weiter"
-    },
-    "completeText": {
-        "en": "Continue",
-        "fr": "Continuer",
-        "it": "Continua",
-        "default": "Weiter"
-    },
-    "theme": {
-        "themeName": "borderless",
-        "colorPalette": "light",
-        "isPanelless": false,
-        "cssVariables": {
-            "--sjs2-color-project-brand-600": "rgba(35, 101, 200, 1)",
-            "--sjs2-color-utility-surface-survey": "rgba(231, 240, 255, 1)",
-            "--sjs2-color-utility-surface-designer": "rgba(231, 240, 255, 1)",
-            "--sjs2-color-bg-basic-secondary": "rgba(238, 245, 255, 1)",
-            "--sjs2-color-bg-basic-primary-dim": "rgba(241, 246, 255, 1)",
-            "--sjs2-color-bg-basic-secondary-dim": "rgba(223, 233, 250, 1)",
-            "--sjs2-color-bg-neutral-tertiary-dim": "rgba(231, 240, 255, 1)",
-            "--sjs2-color-bg-brand-secondary": "rgba(35, 101, 200, 0.1)",
-            "--sjs2-color-bg-brand-primary-dim": "rgba(26, 86, 175, 1)",
-            "--sjs2-color-bg-note-secondary": "rgba(67, 127, 217, 0.1)",
-            "--sjs2-color-bg-positive-secondary": "rgba(25, 179, 148, 0.1)",
-            "--sjs2-color-bg-warning-secondary": "rgba(255, 152, 20, 0.1)",
-            "--sjs2-color-bg-alert-secondary": "rgba(229, 10, 62, 0.1)",
-            "--sjs2-color-fg-basic-primary": "#010915",
-            "--sjs2-color-fg-brand-primary-disabled": "rgba(255, 255, 255, 0.25)",
-            "--sjs2-color-border-basic-secondary": "rgba(220, 229, 241, 1)",
-            "--sjs2-color-border-basic-secondary-overlay": "rgba(4,7,10,0.16)",
-            "--sjs2-color-component-buttongroup-item-false-readonly-bg": "rgba(from var(--sjs2-color-bg-basic-secondary) r g b / var(--sjs2-opacity-hidden))",
-            "--sjs2-color-component-buttongroup-item-true-default-border": "rgba(from var(--sjs2-color-border-basic-secondary) r g b / var(--sjs2-opacity-hidden))",
-            "--sjs2-color-component-buttongroup-item-true-readonly-bg": "rgba(from var(--sjs2-color-bg-basic-secondary) r g b / var(--sjs2-opacity-hidden))",
-            "--sjs2-border-spread-form-default": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-form-hovered": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-form-pressed": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-form-design": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-surface-default": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-surface-disabled": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-effect-component-formbox-focused": "var(--sjs2-border-offset-x-form-focused) var(--sjs2-border-offset-y-form-focused) var(--sjs2-border-blur-form-focused) var(--sjs2-border-spread-form-focused) var(--sjs2-color-component-formbox-focused-border)",
-            "--sjs2-border-effect-component-formbox-invalid-focused": "var(--sjs2-border-offset-x-form-invalid-focused) var(--sjs2-border-offset-y-form-invalid-focused) var(--sjs2-border-blur-form-invalid-focused) var(--sjs2-border-spread-form-invalid-focused) var(--sjs2-color-component-formbox-invalid-focused-border)",
-            "--sjs2-border-effect-component-formbox-highlighted": "var(--sjs2-border-offset-x-form-highlighted) var(--sjs2-border-offset-y-form-highlighted) var(--sjs2-border-blur-form-highlighted) var(--sjs2-border-spread-form-highlighted) var(--sjs2-color-component-formbox-highlighted-border)",
-            "--sjs2-border-effect-surface-default": "0px 0px 0px 0px rgba(0, 0, 0, 0.15)",
-            "--sjs2-border-effect-floating-default": "0px 2px 6px 0px rgba(0, 0, 0, 0.1), 0px 8px 16px 0px rgba(0, 0, 0, 0.1)",
-            "--sjs2-typography-font-size-component-question-title": "20px",
-            "--sjs2-typography-font-size-component-label-content": "16px"
+    {
+      "name": "pause1_instructions",
+      "elements": [
+        {
+          "type": "html",
+          "name": "P1_2",
+          "html": {
+            "default": "<div><p>Es folgt nun eine kurze Geschichte aus dem Familienalltag. Diese beschreibt eine Situation mit Ihrem Kind. Nach der Geschichte stehen mehrere Sätze. Diese zeigen mögliche Vorgehensweisen von Eltern.</p>\n<p>Bitte sagen Sie wie oft jeder Satz auf Sie zutrifft. Es gibt dabei keine falsche oder richtige Antwort.</p>\n<p>Wichtig ist nur, dass Sie ehrlich einschätzen, wie <em>Sie selbst</em> <em>typischerweise </em>handeln.</p></div><style>.sd-body:has([data-name=\"P1_2\"]) .sd-body__navigation { justify-content: center; }</style>",
+            "en": "<div><p>Below are some short stories from everyday family life. They describe situations involving your child. After each story, there are several sentences. These show possible ways for parents to respond.</p>\n<p>Please say how often each sentence applies to you.</p>\n<p>There are no right or wrong answers.</p>\n<p>The important thing is that you honestly assess how <em>you typically </em>behave.</p></div><style>.sd-body:has([data-name=\"P1_2\"]) .sd-body__navigation { justify-content: center; }</style>",
+            "fr": "<div><p>Voici maintenant de courtes histoires de la vie familiale. Elles décrivent des situations avec votre enfant. Après chaque histoire, vous trouverez plusieurs phrases qui montrent des façons possibles d'agir des parents.</p>\n<p>Veuillez indiquer à quelle fréquence chaque phrase vous correspond.<br>Il n’y a pas de bonne ou de mauvaise réponse.<br>L’important est seulement d’évaluer honnêtement comment vous agissez <em>habituellement</em>.</p></div><style>.sd-body:has([data-name=\"P1_2\"]) .sd-body__navigation { justify-content: center; }</style>",
+            "it": "<div><p>Ora seguono brevi racconti dalla vita quotidiana di una famiglia. Queste descrivono situazioni con il proprio figlio.</p>\n<p>Dopo ogni racconto seguono diverse frasi che indicano possibili comportamenti dei genitori.</p>\n<p>Vi preghiamo di indicare con quale frequenza ogni frase si applica al vostro caso. Non esistono risposte giuste o sbagliate.</p>\n<p>L'importante è che valutiate onestamente come vi comportate di <em>solito</em>.</p></div><style>.sd-body:has([data-name=\"P1_2\"]) .sd-body__navigation { justify-content: center; }</style>"
+          }
         }
+      ]
     },
-    "showTitle": false,
-    "requiredText": "*"
+    {
+      "name": "pause1_questions",
+      "elements": [
+        {
+          "type": "matrix",
+          "name": "P1_Vignette_Franz",
+          "title": {
+            "default": "<div style=\"display:flex;align-items:flex-start;gap:1em;flex-wrap:wrap;\"><div style=\"flex:1 1 20em;min-width:14em;\"><p><strong>Französische Vokabeln lernen</strong></p><p>Ihr Kind muss innerhalb einer Woche viele französische Vokabeln lernen. Das Thema ist \"Zoo\". Manche Wörter kann Ihr Kind schon gut. Manche Wörter sind ähnlich zu den deutschen Wörtern. Manche Wörter sind schwierig.</p>\n<p>Wie wahrscheinlich ist es, dass Sie Folgendes sagen oder tun:</p></div><img style=\"width:200px;max-width:30%;height:auto;object-fit:contain;flex:0 0 auto;\" src=\"/kanjis/assets/Vignette_Franz.jpg\" alt=\"\"></div>",
+            "en": "<div style=\"display:flex;align-items:flex-start;gap:1em;flex-wrap:wrap;\"><div style=\"flex:1 1 20em;min-width:14em;\"><p><strong>Learning French Vocabulary</strong></p><p>Your child has to learn a lot of French vocabulary within a week. The topic is ‘zoo’. Your child already knows some of the words well. Some words are similar to the german words. Some words are difficult.</p>\n<p>How likely is it that you would do or say the following?</p></div><img style=\"width:200px;max-width:30%;height:auto;object-fit:contain;flex:0 0 auto;\" src=\"/kanjis/assets/Vignette_Franz.jpg\" alt=\"\"></div>",
+            "fr": "<div style=\"display:flex;align-items:flex-start;gap:1em;flex-wrap:wrap;\"><div style=\"flex:1 1 20em;min-width:14em;\"><p><strong>Apprendre du vocabulaire français</strong></p><p>Votre enfant doit apprendre beaucoup de vocabulaire nouveau en une semaine. Le thème est \"le zoo\". Certains mots, votre enfant les sait déjà bien. Certains mots ressemblent aux mots français. Certains mots sont difficiles.</p>\n<p>Quelle est la probabilité que vous disiez ou faisiez ce qui suit?</p></div><img style=\"width:200px;max-width:30%;height:auto;object-fit:contain;flex:0 0 auto;\" src=\"/kanjis/assets/Vignette_Franz.jpg\" alt=\"\"></div>",
+            "it": "<div style=\"display:flex;align-items:flex-start;gap:1em;flex-wrap:wrap;\"><div style=\"flex:1 1 20em;min-width:14em;\"><p><strong>Imparare vocaboli francesi</strong></p><p>Suo figlio/a deve imparare molti vocaboli francesi entro una settimana. Il tema è \"lo zoo\". Alcune parole le sa già bene. Alcune parole sono simili alle parole tedesche. Alcune parole sono difficili.</p>\n<p>Quanto è probabile che lei dica o faccia quanto segue:</p></div><img style=\"width:200px;max-width:30%;height:auto;object-fit:contain;flex:0 0 auto;\" src=\"/kanjis/assets/Vignette_Franz.jpg\" alt=\"\"></div>"
+          },
+          "columns": [
+            {
+              "value": "1",
+              "text": {
+                "default": "Sehr unwahrscheinlich",
+                "en": "Very unlikely",
+                "fr": "Très improbable",
+                "it": "Molto improbabile"
+              }
+            },
+            {
+              "value": "2",
+              "text": {
+                "default": "Unwahrscheinlich",
+                "en": "Unlikely",
+                "fr": "Improbable",
+                "it": "Improbabile"
+              }
+            },
+            {
+              "value": "3",
+              "text": {
+                "default": "Vielleicht",
+                "en": "Maybe",
+                "fr": "Peut-être",
+                "it": "Forse"
+              }
+            },
+            {
+              "value": "4",
+              "text": {
+                "default": "Wahrscheinlich",
+                "en": "Likely",
+                "fr": "Probable",
+                "it": "Probabile"
+              }
+            },
+            {
+              "value": "5",
+              "text": {
+                "default": "Sehr wahrscheinlich",
+                "en": "Very likely",
+                "fr": "Très probable",
+                "it": "Molto probabile"
+              }
+            }
+          ],
+          "rows": [
+            {
+              "value": "1",
+              "text": {
+                "default": "Ich schlage meinem Kind vor, sich Teilziele zu setzen, bevor es mit dem Üben beginnt.",
+                "en": "I suggest that my child set small goals before starting to practice.",
+                "fr": "Je propose à mon enfant de se fixer des objectifs intermédiaires avant de commencer à s'exercer.",
+                "it": "Suggerisco a mio figlio di fissarsi degli obiettivi intermedi prima di iniziare a esercitarsi."
+              }
+            },
+            {
+              "value": "2",
+              "text": {
+                "default": "Wenn mein Kind ein Wort nicht kennt, ermutige ich es, im französisch Wörterbuch nachzuschlagen, um die richtige Lösung zu finden.",
+                "en": "If my child doesn't know a word, I encourage them to look it up in a French dictionary to find the correct answer. ",
+                "fr": "Lorsque mon enfant ne connaît pas un mot, je l'encourage à le chercher dans le dictionnaire de français pour trouver la bonne réponse.",
+                "it": "Se mio figlio non conosce una parola, lo incoraggio a consultare il dizionario di francese per trovare la soluzione giusta. "
+              }
+            },
+            {
+              "value": "3",
+              "text": {
+                "default": "Wenn mein Kind beim Abfragen ein Wort sofort weiss, sage ich ihm, dass es bestimmt richtig ist, weil es ihm so schnell eingefallen ist.",
+                "en": "When my child immediately knows a word during a quiz, I tell them that it must be correct because it came to mind so quickly. ",
+                "fr": "Lorsque mon enfant connaît immédiatement un mot lors d'un test, je lui dis que c'est sûrement la bonne réponse, car cela lui est venu si vite à l'esprit.",
+                "it": "Quando mio figlio sa subito una parola durante il test, gli dico che sicuramente è quella giusta, visto che gli è venuta in mente così in fretta. "
+              }
+            },
+            {
+              "value": "4",
+              "text": {
+                "default": "Ich fordere mein Kind auf, sich selbst zu testen, um zu überprüfen, welche Wörter es noch weiterüben muss.",
+                "en": "I encourage my child to test themselves to see which words they still need to practice further.",
+                "fr": "J'invite mon enfant à s'auto-évaluer pour vérifier quels mots il doit encore réviser.",
+                "it": "Chiedo a mio figlio di mettersi alla prova da solo per vedere quali parole deve ripassare ancora."
+              }
+            },
+            {
+              "value": "5",
+              "text": {
+                "default": "Ich ermutige mein Kind sich Hilfen wie z.B. Eselsbrücken zu überlegen, um sich schwierige Wörter besser merken zu können. ",
+                "en": "I encourage my child to come up with their own aids, such as mnemonics, to help them remember difficult words better. ",
+                "fr": "J'encourage mon enfant à trouver lui-même des aides, comme des moyens mnémotechniques, pour mieux mémoriser les mots difficiles. ",
+                "it": "Incoraggio mio figlio a pensare a dei trucchi mnemonici, come ad esempio i “espedienti mnemonici”, per ricordare meglio le parole difficili.  "
+              }
+            },
+            {
+              "value": "6",
+              "text": {
+                "default": "Nach einer Übungsrunde frage ich mein Kind, wie viele Wörter es schon kann.",
+                "en": "After a practice session, I ask my child how many words they already know. ",
+                "fr": "Après une série d'exercices, je demande à mon enfant combien de mots il connaît déjà. ",
+                "it": "Dopo una sessione di esercizi chiedo a mio figlio quante parole conosce già. "
+              }
+            }
+          ],
+          "eachRowRequired": true
+        }
+      ]
+    }
+  ],
+  "showPrevButton": false,
+  "showTitle": false,
+  "checkErrorsMode": "onValueChanged",
+  "pageNextText": {
+    "en": "Continue",
+    "fr": "Continuer",
+    "it": "Continua",
+    "default": "Weiter"
+  },
+  "completeText": {
+    "en": "Continue",
+    "fr": "Continuer",
+    "it": "Continua",
+    "default": "Weiter"
+  }
 }

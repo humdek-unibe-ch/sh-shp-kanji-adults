@@ -1,191 +1,148 @@
 {
-    "pages": [
+  "locale": "de",
+  "title": {
+    "en": "Kanji – Part 1: Consent and Code",
+    "fr": "Kanji – Partie 1: consentement et code",
+    "it": "Kanji – Parte 1: consenso e codice",
+    "default": "Kanji – Teil 1: Einverständnis und Code"
+  },
+  "completedHtml": {
+    "en": "",
+    "fr": "",
+    "it": "",
+    "default": ""
+  },
+  "pages": [
+    {
+      "name": "consent",
+      "elements": [
         {
-            "name": "consent",
-            "elements": [
-                {
-                    "html": {
-                        "default": "<div style=\"text-align:left;margin-bottom:16px;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/Logo_Universitaet_Bern.png\" alt=\"Universität Bern\"></div><p><strong>Liebe Eltern/ Liebe Erziehungsberechtigte</strong></p>\n<p>Wir freuen uns, Ihnen im Rahmen unserer aktuellen Forschung eine Lernaufgabe vorlegen zu dürfen. Ihr Kind hat in der Schule bereits die gleiche Aufgabe lösen dürfen.</p>\n<p>Das Lösen der Aufgabe und die Beantwortung der Fragen ist freiwillig und dauert etwa 30 Minuten.</p>\n<p>Ihre Antworten sind pseudonymisiert, das bedeutet, Ihnen wird ein persönlicher Code zugewiesen. Dadurch wissen wir nicht, welche Daten zu welcher Person gehören. Die Verbindung zwischen Code und Familie ist nur der Projektleitung zugänglich und wird nach 14 Tagen nach ausfüllen des Fragebogens gelöscht. Die erhobenen Daten werden nur für die Forschung genutzt und nicht an andere weitergegeben.</p>\n<p>Sie können bis 14 Tage nach ausfüllen des Fragebogens ohne Angabe von Gründen eine Löschung ihrer Daten verlangen. Danach ist eine Löschung nicht mehr möglich, weil die Verbindung zwischen Familie und persönlichen Code gelöscht wird.</p>\n<p>Ihre Teilnahme ist von grosser Bedeutung von uns - Vielen Dank</p>\n<p>Herzliche Grüsse,</p>\n<p>Das Team der Abteilung Entwicklungspsychologie der Universität Bern</p>",
-                        "en": "<div style=\"text-align:left;margin-bottom:16px;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/Logo_Universitaet_Bern.png\" alt=\"Universität Bern\"></div><p><strong>Dear Parents / Legal Guardians,</strong></p>\n<p>We are pleased to present you with a learning task as part of our current research. Your child has already had the opportunity to complete the same task at school.</p>\n<p>Completing the task and answering the questions is voluntary and takes approximately 30 minutes.</p>\n<p>Your answers will be pseudonymized, which means that you will be assigned a personal code. This means that we will not know which data belongs to which person. The link between the code and the family is only accessible to the project management and will be deleted 14 days after completing the questionnaire. The data collected will only be used for research purposes and will not be shared with others.</p>\n<p>You may request the deletion of your data without giving a reason up to 14 days after completing the questionnaire. After this period, deletion will no longer be possible because the link between the family and the personal code will be deleted.</p>\n<p>Your participation is of great importance to us – thank you very much.</p>\n<p>Kind regards,</p>\n<p>The Team of the Developmental Psychology Department<br>University of Bern</p>",
-                        "fr": "<div style=\"text-align:left;margin-bottom:16px;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/Logo_Universitaet_Bern.png\" alt=\"Universität Bern\"></div><p><strong>Chers parents / représentants légaux,</strong></p>\n<p>Dans le cadre de notre recherche actuelle, nous avons le plaisir de vous proposer une tâche d’apprentissage. Votre enfant a déjà eu l’occasion de réaliser la même tâche à l’école.</p>\n<p>La réalisation de la tâche et la réponse aux questions sont volontaires et durent environ 30 minutes.</p>\n<p>Vos réponses seront pseudonymisées, ce qui signifie qu’un code personnel vous sera attribué. Ainsi, nous ne saurons pas quelles données appartiennent à quelle personne. Le lien entre le code et la famille sera uniquement accessible à la direction du projet et sera supprimé 14 jours après que vous aurez rempli le questionnaire. Les données recueillies seront utilisées uniquement à des fins de recherche et ne seront pas transmises à des tiers.</p>\n<p>Vous pouvez demander la suppression de vos données, sans avoir à en indiquer la raison, jusqu’à 14 jours après avoir rempli le questionnaire. Passé ce délai, la suppression ne sera plus possible, car le lien entre la famille et le code personnel sera supprimé.</p>\n<p>Votre participation est très importante pour nous – nous vous en remercions vivement.</p>\n<p>Meilleures salutations,</p>\n<p>L’équipe du Département de psychologie du développement<br>Université de Berne</p>",
-                        "it": "<div style=\"text-align:left;margin-bottom:16px;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/Logo_Universitaet_Bern.png\" alt=\"Universität Bern\"></div><p><strong>Gentili genitori / rappresentanti legali,</strong></p>\n<p>Nell’ambito della nostra ricerca attuale, siamo lieti di potervi presentare un’attività di apprendimento. Vostro/a figlio/a ha già avuto l’opportunità di svolgere la stessa attività a scuola.</p>\n<p>Lo svolgimento dell’attività e la risposta alle domande sono volontari e richiedono circa 30 minuti.</p>\n<p>Le vostre risposte saranno pseudonimizzate, il che significa che vi verrà assegnato un codice personale. In questo modo, non sapremo quali dati appartengono a quale persona. Il collegamento tra il codice e la famiglia sarà accessibile esclusivamente alla direzione del progetto e verrà cancellato 14 giorni dopo la compilazione del questionario. I dati raccolti saranno utilizzati esclusivamente per scopi di ricerca e non saranno trasmessi a terzi.</p>\n<p>Potete richiedere la cancellazione dei vostri dati, senza dover fornire alcuna motivazione, entro 14 giorni dalla compilazione del questionario. Trascorso questo periodo, la cancellazione non sarà più possibile, poiché il collegamento tra la famiglia e il codice personale sarà stato cancellato.</p>\n<p>La vostra partecipazione è di grande importanza per noi – vi ringraziamo molto.</p>\n<p>Cordiali saluti,</p>\n<p>Il team del Dipartimento di Psicologia dello sviluppo<br>Università di Berna</p>"
-                    },
-                    "name": "A1",
-                    "type": "html"
-                },
-                {
-                    "name": "EV",
-                    "type": "radiogroup",
-                    "title": {
-                        "en": "Do you consent to participating in the learning task?",
-                        "fr": "Acceptez-vous de participer à l'exercice d'apprentissage?",
-                        "it": "Acconsente alla partecipazione al compito di apprendimento?",
-                        "default": "Sind Sie mit der Teilnahme an der Aufgabe einverstanden?"
-                    },
-                    "choices": [
-                        {
-                            "text": {
-                                "en": "Yes",
-                                "fr": "Oui",
-                                "it": "Si",
-                                "default": "Ja"
-                            },
-                            "value": "1"
-                        },
-                        {
-                            "text": {
-                                "en": "No",
-                                "fr": "Non",
-                                "it": "No",
-                                "default": "Nein"
-                            },
-                            "value": "2"
-                        }
-                    ],
-                    "isRequired": true
-                }
-            ]
+          "type": "html",
+          "name": "A1",
+          "html": {
+            "default": "<div style=\"text-align:left;margin-bottom:16px;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/Logo_Universitaet_Bern.png\" alt=\"Universität Bern\"></div><p><strong>Liebe Eltern/ Liebe Erziehungsberechtigte</strong></p>\n<p>Wir freuen uns, Ihnen im Rahmen unserer aktuellen Forschung eine Lernaufgabe vorlegen zu dürfen. Ihr Kind hat in der Schule bereits die gleiche Aufgabe lösen dürfen.</p>\n<p>Das Lösen der Aufgabe und die Beantwortung der Fragen ist freiwillig und dauert etwa 30 Minuten.</p>\n<p>Ihre Antworten sind pseudonymisiert, das bedeutet, Ihnen wird ein persönlicher Code zugewiesen. Dadurch wissen wir nicht, welche Daten zu welcher Person gehören. Die Verbindung zwischen Code und Familie ist nur der Projektleitung zugänglich und wird nach 14 Tagen nach ausfüllen des Fragebogens gelöscht. Die erhobenen Daten werden nur für die Forschung genutzt und nicht an andere weitergegeben.</p>\n<p>Sie können bis 14 Tage nach ausfüllen des Fragebogens ohne Angabe von Gründen eine Löschung ihrer Daten verlangen. Danach ist eine Löschung nicht mehr möglich, weil die Verbindung zwischen Familie und persönlichen Code gelöscht wird.</p>\n<p>Ihre Teilnahme ist von grosser Bedeutung von uns – Vielen Dank</p>\n<p>Herzliche Grüsse,</p>\n<p>Das Team der Abteilung Entwicklungspsychologie der Universität Bern</p>",
+            "en": "<div style=\"text-align:left;margin-bottom:16px;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/Logo_Universitaet_Bern.png\" alt=\"Universität Bern\"></div><p><strong>Dear Parents / Legal Guardians,</strong></p>\n<p>We are pleased to present you with a learning task as part of our current research. Your child has already had the opportunity to complete the same task at school.</p>\n<p>Completing the task and answering the questions is voluntary and takes approximately 30 minutes.</p>\n<p>Your answers will be pseudonymized, which means that you will be assigned a personal code. This means that we will not know which data belongs to which person. The link between the code and the family is only accessible to the project management and will be deleted 14 days after completing the questionnaire. The data collected will only be used for research purposes and will not be shared with others.</p>\n<p>You may request the deletion of your data without giving a reason up to 14 days after completing the questionnaire. After this period, deletion will no longer be possible because the link between the family and the personal code will be deleted.</p>\n<p>Your participation is of great importance to us – thank you very much.</p>\n<p>Kind regards,</p>\n<p>The Team of the Developmental Psychology Department<br>University of Bern</p>",
+            "fr": "<div style=\"text-align:left;margin-bottom:16px;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/Logo_Universitaet_Bern.png\" alt=\"Universität Bern\"></div><p><strong>Chers parents / représentants légaux,</strong></p>\n<p>Dans le cadre de notre recherche actuelle, nous avons le plaisir de vous proposer une tâche d’apprentissage. Votre enfant a déjà eu l’occasion de réaliser la même tâche à l’école.</p>\n<p>La réalisation de la tâche et la réponse aux questions sont volontaires et durent environ 30 minutes.</p>\n<p>Vos réponses seront pseudonymisées, ce qui signifie qu’un code personnel vous sera attribué. Ainsi, nous ne saurons pas quelles données appartiennent à quelle personne. Le lien entre le code et la famille sera uniquement accessible à la direction du projet et sera supprimé 14 jours après que vous aurez rempli le questionnaire. Les données recueillies seront utilisées uniquement à des fins de recherche et ne seront pas transmises à des tiers.</p>\n<p>Vous pouvez demander la suppression de vos données, sans avoir à en indiquer la raison, jusqu’à 14 jours après avoir rempli le questionnaire. Passé ce délai, la suppression ne sera plus possible, car le lien entre la famille et le code personnel sera supprimé.</p>\n<p>Votre participation est très importante pour nous – nous vous en remercions vivement.</p>\n<p>Meilleures salutations,</p>\n<p>L’équipe du Département de psychologie du développement<br>Université de Berne</p>",
+            "it": "<div style=\"text-align:left;margin-bottom:16px;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/Logo_Universitaet_Bern.png\" alt=\"Universität Bern\"></div><p><strong>Gentili genitori / rappresentanti legali,</strong></p>\n<p>Nell’ambito della nostra ricerca attuale, siamo lieti di potervi presentare un’attività di apprendimento. Vostro/a figlio/a ha già avuto l’opportunità di svolgere la stessa attività a scuola.</p>\n<p>Lo svolgimento dell’attività e la risposta alle domande sono volontari e richiedono circa 30 minuti.</p>\n<p>Le vostre risposte saranno pseudonimizzate, il che significa che vi verrà assegnato un codice personale. In questo modo, non sapremo quali dati appartengono a quale persona. Il collegamento tra il codice e la famiglia sarà accessibile esclusivamente alla direzione del progetto e verrà cancellato 14 giorni dopo la compilazione del questionario. I dati raccolti saranno utilizzati esclusivamente per scopi di ricerca e non saranno trasmessi a terzi.</p>\n<p>Potete richiedere la cancellazione dei vostri dati, senza dover fornire alcuna motivazione, entro 14 giorni dalla compilazione del questionario. Trascorso questo periodo, la cancellazione non sarà più possibile, poiché il collegamento tra la famiglia e il codice personale sarà stato cancellato.</p>\n<p>La vostra partecipazione è di grande importanza per noi – vi ringraziamo molto.</p>\n<p>Cordiali saluti,</p>\n<p>Il team del Dipartimento di Psicologia dello sviluppo<br>Università di Berna</p>"
+          }
         },
         {
-            "name": "consent_declined",
-            "elements": [
-                {
-                    "html": {
-                        "en": "<div style=\"text-align:center;\"><p>Thank you. Without your consent we cannot proceed with the task. You may now close this window.</p></div><style>.sd-body:has([data-name=\"declined_msg\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "fr": "<div style=\"text-align:center;\"><p>Merci. Sans votre consentement, nous ne pouvons pas poursuivre. Vous pouvez fermer cette fenêtre.</p></div><style>.sd-body:has([data-name=\"declined_msg\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "it": "<div style=\"text-align:center;\"><p>Grazie. Senza il suo consenso non possiamo procedere. Può chiudere questa finestra.</p></div><style>.sd-body:has([data-name=\"declined_msg\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "default": "<div style=\"text-align:center;\"><p>Vielen Dank. Ohne Ihr Einverständnis können wir die Aufgabe nicht durchführen. Sie können das Fenster nun schliessen.</p></div><style>.sd-body:has([data-name=\"declined_msg\"]) .sd-body__navigation { justify-content: center; }</style>"
-                    },
-                    "name": "declined_msg",
-                    "type": "html"
-                }
-            ],
-            "visibleIf": "{EV} = '2'",
-            "navigationButtonsVisibility": "hide"
-        },
-        {
-            "name": "code",
-            "elements": [
-                {
-                    "name": "ID_1",
-                    "type": "text",
-                    "title": {
-                        "en": "In order to assign your answers anonymously to your child, you have received a code on the letter. Please enter this code in the text field now:<div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/ID_Brief.png\" alt=\"\"></div>",
-                        "fr": "  Pour pouvoir attribuer vos réponses de façon anonyme à votre enfant, vous avez reçu un code dans la lettre. Veuillez entrer ce code maintenant dans le champ de texte:<div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/ID_Brief.png\" alt=\"\"></div>",
-                        "it": "Per poter attribuire le vostre risposte in modo anonimo a vostro figlio, avete ricevuto un codice sulla lettera. Inserite ora questo codice nel campo di testo:<div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/ID_Brief.png\" alt=\"\"></div>",
-                        "default": "Um Ihre Antworten anonym Ihrem Kind zuordnen zu können, haben Sie einen Code auf dem Brief erhalten. Bitte geben Sie diesen Code jetzt in das Textfeld ein:<div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/ID_Brief.png\" alt=\"\"></div>"
-                    },
-                    "isRequired": true,
-                    "validators": [
-                        {
-                            "text": {
-                                "en": "Please enter the code from the letter.",
-                                "fr": "Veuillez saisir le code figurant sur la lettre.",
-                                "it": "Inserisca il codice riportato nella lettera.",
-                                "default": "Bitte geben Sie den Code vom Brief ein."
-                            },
-                            "type": "textvalidator",
-                            "minLength": 3
-                        }
-                    ]
-                },
-                {
-                    "name": "extra_param_code",
-                    "type": "text",
-                    "title": "extra_param_code",
-                    "visible": false,
-                    "clearIfInvisible": "none",
-                    "defaultValueExpression": "{ID_1}"
-                }
-            ],
-            "visibleIf": "{EV} = '1'"
-        },
-        {
-            "name": "quiet_place",
-            "visibleIf": "{EV} = '1'",
-            "elements": [
-                {
-                    "html": {
-                        "en": "<div style=\"text-align:center;\"><p style=\"font-size:24px;line-height:1.5;\">Complete the task in a <strong>quiet</strong> place.</p>\n<p style=\"font-size:24px;line-height:1.5;\">That way, you won't be disturbed.</p><img src=\"{{ASSET_BASE}}/aufmerksamkeit_2c_ausrufezeichen.png\" alt=\"\" style=\"display:block;margin:1.5em auto 0;max-width:100%;width:260px;height:auto;object-fit:contain;\"></div><style>.sd-body:has([data-name=\"A2\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "fr": "<div style=\"text-align:center;\"><p style=\"font-size:24px;line-height:1.5;\">Faites la tâche dans un endroit <strong>calme</strong>.<br>Ainsi, vous ne serez pas dérangé(e).</p><img src=\"{{ASSET_BASE}}/aufmerksamkeit_2c_ausrufezeichen.png\" alt=\"\" style=\"display:block;margin:1.5em auto 0;max-width:100%;width:260px;height:auto;object-fit:contain;\"></div><style>.sd-body:has([data-name=\"A2\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "it": "<div style=\"text-align:center;\"><p style=\"font-size:24px;line-height:1.5;\">Svolga il compito in un luogo <strong>tranquillo</strong>.<br>In questo modo non verrà disturbato/a.</p><img src=\"{{ASSET_BASE}}/aufmerksamkeit_2c_ausrufezeichen.png\" alt=\"\" style=\"display:block;margin:1.5em auto 0;max-width:100%;width:260px;height:auto;object-fit:contain;\"></div><style>.sd-body:has([data-name=\"A2\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "default": "<div style=\"text-align:center;\"><p style=\"font-size:24px;line-height:1.5;\">Machen Sie die Aufgabe an einem <strong>ruhigen</strong> Ort.</p>\n<p style=\"font-size:24px;line-height:1.5;\">So werden Sie nicht gestört.</p><img src=\"{{ASSET_BASE}}/aufmerksamkeit_2c_ausrufezeichen.png\" alt=\"\" style=\"display:block;margin:1.5em auto 0;max-width:100%;width:260px;height:auto;object-fit:contain;\"></div><style>.sd-body:has([data-name=\"A2\"]) .sd-body__navigation { justify-content: center; }</style>"
-                    },
-                    "name": "A2",
-                    "type": "html"
-                }
-            ]
+          "type": "radiogroup",
+          "name": "EV",
+          "title": {
+            "en": "Do you consent to participating in the learning task?",
+            "fr": "Acceptez-vous de participer à l'exercice d'apprentissage?",
+            "it": "Acconsente alla partecipazione al compito di apprendimento?",
+            "default": "Sind Sie mit der Teilnahme an der Aufgabe einverstanden?"
+          },
+          "isRequired": true,
+          "choices": [
+            {
+              "value": "1",
+              "text": {
+                "en": "Yes",
+                "fr": "Oui",
+                "it": "Si",
+                "default": "Ja"
+              }
+            },
+            {
+              "value": "2",
+              "text": {
+                "en": "No",
+                "fr": "Non",
+                "it": "No",
+                "default": "Nein"
+              }
+            }
+          ]
         }
-    ],
-    "title": {
-        "en": "Kanji – Part 1: Consent and Code",
-        "fr": "Kanji – Partie 1: consentement et code",
-        "it": "Kanji – Parte 1: consenso e codice",
-        "default": "Kanji – Teil 1: Einverständnis und Code"
+      ]
     },
-    "locale": "de",
-    "completedHtml": {
-        "en": "",
-        "fr": "",
-        "it": "",
-        "default": ""
-    },
-    "checkErrorsMode": "onValueChanged",
-    "showProgressBar": "off",
-    "showQuestionNumbers": "off",
-    "showPrevButton": false,
-    "pageNextText": {
-        "en": "Continue",
-        "fr": "Continuer",
-        "it": "Continua",
-        "default": "Weiter"
-    },
-    "completeText": {
-        "en": "Continue",
-        "fr": "Continuer",
-        "it": "Continua",
-        "default": "Weiter"
-    },
-    "theme": {
-        "themeName": "borderless",
-        "colorPalette": "light",
-        "isPanelless": false,
-        "cssVariables": {
-            "--sjs2-color-project-brand-600": "rgba(35, 101, 200, 1)",
-            "--sjs2-color-utility-surface-survey": "rgba(231, 240, 255, 1)",
-            "--sjs2-color-utility-surface-designer": "rgba(231, 240, 255, 1)",
-            "--sjs2-color-bg-basic-secondary": "rgba(238, 245, 255, 1)",
-            "--sjs2-color-bg-basic-primary-dim": "rgba(241, 246, 255, 1)",
-            "--sjs2-color-bg-basic-secondary-dim": "rgba(223, 233, 250, 1)",
-            "--sjs2-color-bg-neutral-tertiary-dim": "rgba(231, 240, 255, 1)",
-            "--sjs2-color-bg-brand-secondary": "rgba(35, 101, 200, 0.1)",
-            "--sjs2-color-bg-brand-primary-dim": "rgba(26, 86, 175, 1)",
-            "--sjs2-color-bg-note-secondary": "rgba(67, 127, 217, 0.1)",
-            "--sjs2-color-bg-positive-secondary": "rgba(25, 179, 148, 0.1)",
-            "--sjs2-color-bg-warning-secondary": "rgba(255, 152, 20, 0.1)",
-            "--sjs2-color-bg-alert-secondary": "rgba(229, 10, 62, 0.1)",
-            "--sjs2-color-fg-basic-primary": "#010915",
-            "--sjs2-color-fg-brand-primary-disabled": "rgba(255, 255, 255, 0.25)",
-            "--sjs2-color-border-basic-secondary": "rgba(220, 229, 241, 1)",
-            "--sjs2-color-border-basic-secondary-overlay": "rgba(4,7,10,0.16)",
-            "--sjs2-color-component-buttongroup-item-false-readonly-bg": "rgba(from var(--sjs2-color-bg-basic-secondary) r g b / var(--sjs2-opacity-hidden))",
-            "--sjs2-color-component-buttongroup-item-true-default-border": "rgba(from var(--sjs2-color-border-basic-secondary) r g b / var(--sjs2-opacity-hidden))",
-            "--sjs2-color-component-buttongroup-item-true-readonly-bg": "rgba(from var(--sjs2-color-bg-basic-secondary) r g b / var(--sjs2-opacity-hidden))",
-            "--sjs2-border-spread-form-default": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-form-hovered": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-form-pressed": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-form-design": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-surface-default": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-surface-disabled": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-effect-component-formbox-focused": "var(--sjs2-border-offset-x-form-focused) var(--sjs2-border-offset-y-form-focused) var(--sjs2-border-blur-form-focused) var(--sjs2-border-spread-form-focused) var(--sjs2-color-component-formbox-focused-border)",
-            "--sjs2-border-effect-component-formbox-invalid-focused": "var(--sjs2-border-offset-x-form-invalid-focused) var(--sjs2-border-offset-y-form-invalid-focused) var(--sjs2-border-blur-form-invalid-focused) var(--sjs2-border-spread-form-invalid-focused) var(--sjs2-color-component-formbox-invalid-focused-border)",
-            "--sjs2-border-effect-component-formbox-highlighted": "var(--sjs2-border-offset-x-form-highlighted) var(--sjs2-border-offset-y-form-highlighted) var(--sjs2-border-blur-form-highlighted) var(--sjs2-border-spread-form-highlighted) var(--sjs2-color-component-formbox-highlighted-border)",
-            "--sjs2-border-effect-surface-default": "0px 0px 0px 0px rgba(0, 0, 0, 0.15)",
-            "--sjs2-border-effect-floating-default": "0px 2px 6px 0px rgba(0, 0, 0, 0.1), 0px 8px 16px 0px rgba(0, 0, 0, 0.1)",
-            "--sjs2-typography-font-size-component-question-title": "20px",
-            "--sjs2-typography-font-size-component-label-content": "16px"
+    {
+      "name": "consent_declined",
+      "visibleIf": "{EV} = '2'",
+      "showNavigationButtons": false,
+      "elements": [
+        {
+          "type": "html",
+          "name": "declined_msg",
+          "html": {
+            "en": "<div style=\"text-align:center;\"><p>Thank you. Without your consent we cannot proceed with the task. You may now close this window.</p></div><style>.sd-body:has([data-name=\"declined_msg\"]) .sd-body__navigation { justify-content: center; }</style>",
+            "fr": "<div style=\"text-align:center;\"><p>Merci. Sans votre consentement, nous ne pouvons pas poursuivre. Vous pouvez fermer cette fenêtre.</p></div><style>.sd-body:has([data-name=\"declined_msg\"]) .sd-body__navigation { justify-content: center; }</style>",
+            "it": "<div style=\"text-align:center;\"><p>Grazie. Senza il suo consenso non possiamo procedere. Può chiudere questa finestra.</p></div><style>.sd-body:has([data-name=\"declined_msg\"]) .sd-body__navigation { justify-content: center; }</style>",
+            "default": "<div style=\"text-align:center;\"><p>Vielen Dank. Ohne Ihr Einverständnis können wir die Aufgabe nicht durchführen. Sie können das Fenster nun schliessen.</p></div><style>.sd-body:has([data-name=\"declined_msg\"]) .sd-body__navigation { justify-content: center; }</style>"
+          }
         }
+      ]
     },
-    "showTitle": false,
-    "requiredText": "*"
+    {
+      "name": "code",
+      "visibleIf": "{EV} = '1'",
+      "elements": [
+        {
+          "type": "text",
+          "name": "ID_1",
+          "title": {
+            "en": "In order to assign your answers anonymously to your child, you have received a code on the letter.<br><br><strong>Please enter this code in the text field now:</strong><div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/ID_Brief.png\" alt=\"\"></div>",
+            "fr": "Pour pouvoir attribuer vos réponses de façon anonyme à votre enfant, vous avez reçu un code dans la lettre.<br><br><strong>Veuillez entrer ce code maintenant dans le champ de texte :</strong><div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/ID_Brief.png\" alt=\"\"></div>",
+            "it": "Per poter attribuire le vostre risposte in modo anonimo a vostro figlio, avete reçu un code sur la lettre.<br><br><strong>Inserite ora questo codice nel campo di testo:</strong><div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/ID_Brief.png\" alt=\"\"></div>",
+            "default": "Um Ihre Antworten anonym Ihrem Kind zuordnen zu können, haben Sie einen Code auf dem Brief erhalten.<br><br><strong>Bitte geben Sie diesen Code jetzt in das Textfeld ein:</strong><div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/ID_Brief.png\" alt=\"\"></div>"
+          },
+          "isRequired": true,
+          "validators": [
+            {
+              "type": "text",
+              "text": {
+                "en": "Please enter the code from the letter.",
+                "fr": "Veuillez saisir le code figurant sur la lettre.",
+                "it": "Inserisca il codice riportato nella lettera.",
+                "default": "Bitte geben Sie den Code vom Brief ein."
+              },
+              "minLength": 3
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "extra_param_code",
+          "visible": false,
+          "title": "extra_param_code",
+          "defaultValueExpression": "{ID_1}",
+          "clearIfInvisible": "none"
+        }
+      ]
+    },
+    {
+      "name": "quiet_place",
+      "visibleIf": "{EV} = '1'",
+      "elements": [
+        {
+          "type": "html",
+          "name": "A2",
+          "html": {
+            "en": "<div style=\"text-align:center;\"><p style=\"font-size:24px;line-height:1.5;\">Complete the task in a <strong>quiet</strong> place.</p>\n<p style=\"font-size:24px;line-height:1.5;\">That way, you won't be disturbed.</p><img src=\"/kanjis/assets/aufmerksamkeit_2c_ausrufezeichen.png\" alt=\"\" style=\"display:block;margin:1.5em auto 0;max-width:100%;width:260px;height:auto;object-fit:contain;\"></div><style>.sd-body:has([data-name=\"A2\"]) .sd-body__navigation { justify-content: center; }</style>",
+            "fr": "<div style=\"text-align:center;\"><p style=\"font-size:24px;line-height:1.5;\">Faites la tâche dans un endroit <strong>calme</strong>.<br>Ainsi, vous ne serez pas dérangé(e).</p><img src=\"/kanjis/assets/aufmerksamkeit_2c_ausrufezeichen.png\" alt=\"\" style=\"display:block;margin:1.5em auto 0;max-width:100%;width:260px;height:auto;object-fit:contain;\"></div><style>.sd-body:has([data-name=\"A2\"]) .sd-body__navigation { justify-content: center; }</style>",
+            "it": "<div style=\"text-align:center;\"><p style=\"font-size:24px;line-height:1.5;\">Svolga il compito in un luogo <strong>tranquillo</strong>.<br>In questo modo non verrà disturbato/a.</p><img src=\"/kanjis/assets/aufmerksamkeit_2c_ausrufezeichen.png\" alt=\"\" style=\"display:block;margin:1.5em auto 0;max-width:100%;width:260px;height:auto;object-fit:contain;\"></div><style>.sd-body:has([data-name=\"A2\"]) .sd-body__navigation { justify-content: center; }</style>",
+            "default": "<div style=\"text-align:center;\"><p style=\"font-size:24px;line-height:1.5;\">Machen Sie die Aufgabe an einem <strong>ruhigen</strong> Ort.</p>\n<p style=\"font-size:24px;line-height:1.5;\">So werden Sie nicht gestört.</p><img src=\"/kanjis/assets/aufmerksamkeit_2c_ausrufezeichen.png\" alt=\"\" style=\"display:block;margin:1.5em auto 0;max-width:100%;width:260px;height:auto;object-fit:contain;\"></div><style>.sd-body:has([data-name=\"A2\"]) .sd-body__navigation { justify-content: center; }</style>"
+          }
+        }
+      ]
+    }
+  ],
+  "showPrevButton": false,
+  "showTitle": false,
+  "checkErrorsMode": "onValueChanged",
+  "pageNextText": {
+    "en": "Continue",
+    "fr": "Continuer",
+    "it": "Continua",
+    "default": "Weiter"
+  },
+  "completeText": {
+    "en": "Continue",
+    "fr": "Continuer",
+    "it": "Continua",
+    "default": "Weiter"
+  }
 }

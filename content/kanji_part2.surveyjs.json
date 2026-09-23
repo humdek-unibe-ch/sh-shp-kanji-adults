@@ -1,156 +1,116 @@
 {
-    "title": {
-        "default": "Kanji – Teil 2: Gerät und Abschlusscode",
-        "en": "Kanji – Part 2: Device and Closing Code",
-        "fr": "Kanji – Partie 2: appareil et code final",
-        "it": "Kanji – Parte 2: dispositivo e codice finale"
-    },
-    "locale": "de",
-    "showQuestionNumbers": "off",
-    "showProgressBar": "off",
-    "pages": [
+  "locale": "de",
+  "title": {
+    "default": "Kanji – Teil 2: Gerät und Abschlusscode",
+    "en": "Kanji – Part 2: Device and Closing Code",
+    "fr": "Kanji – Partie 2: appareil et code final",
+    "it": "Kanji – Parte 2: dispositivo e codice finale"
+  },
+  "description": {
+    "de": "<p><br></p>"
+  },
+  "completedHtml": {
+    "default": "<div style=\"max-width:68ch;margin:16px auto;padding:clamp(16px,4vw,24px) clamp(16px,5vw,28px);background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.08);text-align:center;\"><div style=\"text-align:center;margin:0 0 0.8em;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/Logo_Universitaet_Bern.png\" alt=\"Universität Bern\"></div><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><strong>Vielen Dank für Ihre Zeit und Mühe! Ihre Antworten wurden gespeichert.</strong></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Ein Mehrperspektivenansatz ist uns besonders wichtig. Daher versuchen wir Eltern durch Fragebogen wie diesen mit einzubeziehen.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Um an der Verlosung der 30.- CHF Migros-Gutscheine teilzunehmen, klicken Sie hier:</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><a href=\"/kanjis/kanji-adults-prize-draw\">Link Verlosung</a></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Sie dürfen den Fragebogen nun schliessen.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Besten Dank für Ihre Unterstützung!</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Herzliche Grüsse,</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Das Team der Abteilung Entwicklungspsychologie der Universität Bern</p></div>",
+    "en": "<div style=\"max-width:68ch;margin:16px auto;padding:clamp(16px,4vw,24px) clamp(16px,5vw,28px);background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.08);text-align:center;\"><div style=\"text-align:center;margin:0 0 0.8em;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/Logo_Universitaet_Bern.png\" alt=\"University of Bern\"></div><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><strong>Thank you very much for your time and effort! Your responses have been saved.</strong></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">A multi-perspective approach is particularly important to us. That's why we try to involve parents through questionnaires like this one.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">To participate in the draw for the 30 CHF Migros vouchers, please click here:</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><a href=\"/kanjis/kanji-adults-prize-draw\">Link to the draw</a></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">You may now close the questionnaire.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Thank you again for your support!</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Best regards,</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">The Developmental Psychology Department Team<br>University of Bern</p></div>",
+    "fr": "<div style=\"max-width:68ch;margin:16px auto;padding:clamp(16px,4vw,24px) clamp(16px,5vw,28px);background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.08);text-align:center;\"><div style=\"text-align:center;margin:0 0 0.8em;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/Logo_Universitaet_Bern.png\" alt=\"Université de Berne\"></div><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><strong>Merci beaucoup pour votre temps et vos efforts ! Vos réponses ont été enregistrées.</strong></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Une approche multiperspectiviste est particulièrement importante pour nous. C'est pourquoi nous essayons d'impliquer les parents à travers des questionnaires comme celui-ci.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Pour participer au tirage au sort des bons Migros d'une valeur de 30 CHF, cliquez ici:</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><a href=\"/kanjis/kanji-adults-prize-draw\">Lien vers le tirage au sort</a></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Vous pouvez maintenant fermer le questionnaire.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Merci beaucoup pour votre aide !</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Cordialement,</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">L'équipe du département de psychologie du développement de l'Université de Berne</p></div>",
+    "it": "<div style=\"max-width:68ch;margin:16px auto;padding:clamp(16px,4vw,24px) clamp(16px,5vw,28px);background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.08);text-align:center;\"><div style=\"text-align:center;margin:0 0 0.8em;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/Logo_Universitaet_Bern.png\" alt=\"Università di Berna\"></div><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><strong>Grazie mille per il vostro tempo e il vostro impegno! Le vostre risposte sono state salvate.</strong></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Un approccio multiprospettico è particolarmente importante per noi. Per questo motivo cerchiamo di coinvolgere i genitori attraverso questionari come questo.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Per partecipare all'estrazione dei buoni Migros del valore di 30 CHF, cliccate qui:</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><a href=\"/kanjis/kanji-adults-prize-draw\">Link al sorteggio</a></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Potete ora chiudere il questionario.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Grazie di cuore per il vostro sostegno!</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Cordiali saluti,</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Il team del Dipartimento di Psicologia dello Sviluppo dell'Università di Berna</p></div>"
+  },
+  "pages": [
+    {
+      "name": "device",
+      "elements": [
         {
-            "name": "device",
-            "elements": [
-                {
-                    "type": "radiogroup",
-                    "name": "Device",
-                    "title": {
-                        "default": "Auf welchem Gerät haben Sie die Umfrage ausgefüllt?",
-                        "en": "Which device did you use to complete the learning task?",
-                        "fr": "Sur quel appareil avez-vous répondu au sondage?",
-                        "it": "Su quale dispositivo ha compilato il sondaggio?"
-                    },
-                    "isRequired": true,
-                    "choices": [
-                        {
-                            "value": "1",
-                            "text": {
-                                "default": "Laptop / Computer",
-                                "en": "laptop / computer",
-                                "fr": "Ordinateur portable / Ordinateur",
-                                "it": "Laptop / Computer"
-                            }
-                        },
-                        {
-                            "value": "2",
-                            "text": {
-                                "default": "Tablet",
-                                "en": "tablet",
-                                "fr": "Tablettes",
-                                "it": "Tablet"
-                            }
-                        },
-                        {
-                            "value": "3",
-                            "text": {
-                                "default": "Handy",
-                                "en": "mobile phone",
-                                "fr": "téléphone portable",
-                                "it": "Smartphone"
-                            }
-                        }
-                    ]
-                }
-            ]
+          "type": "radiogroup",
+          "name": "Device",
+          "title": {
+            "default": "Auf welchem Gerät haben Sie die Umfrage ausgefüllt?",
+            "en": "Which device did you use to complete the learning task?",
+            "fr": "Sur quel appareil avez-vous répondu au sondage?",
+            "it": "Su quale dispositivo ha compilato il sondaggio?"
+          },
+          "isRequired": true,
+          "choices": [
+            {
+              "value": "1",
+              "text": {
+                "default": "Laptop / Computer",
+                "en": "laptop / computer",
+                "fr": "Ordinateur portable / Ordinateur",
+                "it": "Laptop / Computer"
+              }
+            },
+            {
+              "value": "2",
+              "text": {
+                "default": "Tablet",
+                "en": "tablet",
+                "fr": "Tablettes",
+                "it": "Tablet"
+              }
+            },
+            {
+              "value": "3",
+              "text": {
+                "default": "Handy",
+                "en": "mobile phone",
+                "fr": "téléphone portable",
+                "it": "Smartphone"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "closing_code",
+      "elements": [
+        {
+          "type": "text",
+          "name": "ID_2",
+          "title": {
+            "default": "Um die Lernaufgabe abzuschliessen und Ihre Antworten eindeutig Ihrem Kind zuordnen zu können, geben Sie bitte erneut den Code in das Textfeld ein:<div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/ID_Brief.png\" alt=\"\"></div>",
+            "en": "To complete the learning task and ensure that your answers are clearly assigned to your child, please re-enter the code in the text field:  <div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/ID_Brief.png\" alt=\"\"></div>",
+            "fr": "Pour terminer le questionnaire et pouvoir attribuer clairement vos réponses à votre enfant, veuillez entrer à nouveau le code dans le champ de texte:  <div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/ID_Brief.png\" alt=\"\"></div>",
+            "it": "Per concludere il sondaggio e poter attribuire chiaramente le sue risposte a suo figlio/a, la preghiamo di inserire nuovamente il codice nel campo di testo:<div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"/kanjis/assets/ID_Brief.png\" alt=\"\"></div>"
+          },
+          "isRequired": true,
+          "validators": [
+            {
+              "type": "text",
+              "text": {
+                "default": "Bitte geben Sie den Code vom Brief ein.",
+                "en": "Please enter the code from the letter.",
+                "fr": "Veuillez saisir le code figurant sur la lettre.",
+                "it": "Inserisca il codice riportato nella lettera."
+              },
+              "minLength": 3
+            }
+          ]
         },
         {
-            "name": "closing_code",
-            "elements": [
-                {
-                    "type": "text",
-                    "name": "ID_2",
-                    "title": {
-                        "default": "Um die Lernaufgabe abzuschliessen und Ihre Antworten eindeutig Ihrem Kind zuordnen zu können, geben Sie bitte erneut den Code in das Textfeld ein:<div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/ID_Brief.png\" alt=\"\"></div>",
-                        "en": "To complete the learning task and ensure that your answers are clearly assigned to your child, please re-enter the code in the text field:  <div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/ID_Brief.png\" alt=\"\"></div>",
-                        "fr": "Pour terminer le questionnaire et pouvoir attribuer clairement vos réponses à votre enfant, veuillez entrer à nouveau le code dans le champ de texte:  <div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/ID_Brief.png\" alt=\"\"></div>",
-                        "it": "Per concludere il sondaggio e poter attribuire chiaramente le sue risposte a suo figlio/a, la preghiamo di inserire nuovamente il codice nel campo di testo:<div style=\"margin:.75em 0;\"><img style=\"max-width:100%;width:420px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/ID_Brief.png\" alt=\"\"></div>"
-                    },
-                    "isRequired": true,
-                    "validators": [
-                        {
-                            "type": "textvalidator",
-                            "minLength": 3,
-                            "text": {
-                                "default": "Bitte geben Sie den Code vom Brief ein.",
-                                "en": "Please enter the code from the letter.",
-                                "fr": "Veuillez saisir le code figurant sur la lettre.",
-                                "it": "Inserisca il codice riportato nella lettera."
-                            }
-                        }
-                    ]
-                },
-                {
-                    "type": "text",
-                    "name": "Finished_Study",
-                    "title": "Finished_Study",
-                    "visible": false,
-                    "defaultValue": "1",
-                    "clearIfInvisible": "none"
-                }
-            ]
+          "type": "text",
+          "name": "Finished_Study",
+          "visible": false,
+          "title": "Finished_Study",
+          "defaultValue": "1",
+          "clearIfInvisible": "none"
         }
-    ],
-    "completedHtml": {
-        "default": "<div style=\"max-width:68ch;margin:16px auto;padding:clamp(16px,4vw,24px) clamp(16px,5vw,28px);background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.08);text-align:center;\"><div style=\"text-align:center;margin:0 0 0.8em;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/Logo_Universitaet_Bern.png\" alt=\"Universität Bern\"></div><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><strong>Vielen Dank für Ihre Zeit und Mühe! Ihre Antworten wurden gespeichert.</strong></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Ein Mehrperspektivenansatz ist uns besonders wichtig. Daher versuchen wir Eltern durch Fragebogen wie diesen mit einzubeziehen.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Um an der Verlosung der 30.- CHF Migros-Gutscheine teilzunehmen, klicken Sie hier:</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><a href=\"{{BASE_PATH}}/kanji-adults-prize-draw\">Link Verlosung</a></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Sie dürfen den Fragebogen nun schliessen.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Besten Dank für Ihre Unterstützung!</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Herzliche Grüsse,</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Das Team der Abteilung Entwicklungspsychologie der Universität Bern</p></div>",
-        "en": "<div style=\"max-width:68ch;margin:16px auto;padding:clamp(16px,4vw,24px) clamp(16px,5vw,28px);background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.08);text-align:center;\"><div style=\"text-align:center;margin:0 0 0.8em;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/Logo_Universitaet_Bern.png\" alt=\"University of Bern\"></div><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><strong>Thank you very much for your time and effort! Your responses have been saved.</strong></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">A multi-perspective approach is particularly important to us. That's why we try to involve parents through questionnaires like this one.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">To participate in the draw for the 30 CHF Migros vouchers, please click here:</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><a href=\"{{BASE_PATH}}/kanji-adults-prize-draw\">Link to the draw</a></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">You may now close the questionnaire.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Thank you again for your support!</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Best regards,</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">The Developmental Psychology Department Team<br>University of Bern</p></div>",
-        "fr": "<div style=\"max-width:68ch;margin:16px auto;padding:clamp(16px,4vw,24px) clamp(16px,5vw,28px);background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.08);text-align:center;\"><div style=\"text-align:center;margin:0 0 0.8em;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/Logo_Universitaet_Bern.png\" alt=\"Université de Berne\"></div><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><strong>Merci beaucoup pour votre temps et vos efforts ! Vos réponses ont été enregistrées.</strong></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Une approche multiperspectiviste est particulièrement importante pour nous. C'est pourquoi nous essayons d'impliquer les parents à travers des questionnaires comme celui-ci.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Pour participer au tirage au sort des bons Migros d'une valeur de 30 CHF, cliquez ici:</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><a href=\"{{BASE_PATH}}/kanji-adults-prize-draw\">Lien vers le tirage au sort</a></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Vous pouvez maintenant fermer le questionnaire.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Merci beaucoup pour votre aide !</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Cordialement,</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">L'équipe du département de psychologie du développement de l'Université de Berne</p></div>",
-        "it": "<div style=\"max-width:68ch;margin:16px auto;padding:clamp(16px,4vw,24px) clamp(16px,5vw,28px);background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.08);text-align:center;\"><div style=\"text-align:center;margin:0 0 0.8em;\"><img style=\"max-width:25%;min-width:160px;height:auto;object-fit:contain;\" src=\"{{ASSET_BASE}}/Logo_Universitaet_Bern.png\" alt=\"Università di Berna\"></div><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><strong>Grazie mille per il vostro tempo e il vostro impegno! Le vostre risposte sono state salvate.</strong></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Un approccio multiprospettico è particolarmente importante per noi. Per questo motivo cerchiamo di coinvolgere i genitori attraverso questionari come questo.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Per partecipare all'estrazione dei buoni Migros del valore di 30 CHF, cliccate qui:</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\"><a href=\"{{BASE_PATH}}/kanji-adults-prize-draw\">Link al sorteggio</a></p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Potete ora chiudere il questionario.</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Grazie di cuore per il vostro sostegno!</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Cordiali saluti,</p><p style=\"font-size:20px;line-height:1.6;margin:0 0 1.4em;\">Il team del Dipartimento di Psicologia dello Sviluppo dell'Università di Berna</p></div>"
-    },
-    "checkErrorsMode": "onValueChanged",
-    "showPrevButton": false,
-    "pageNextText": {
-        "en": "Continue",
-        "fr": "Continuer",
-        "it": "Continua",
-        "default": "Weiter"
-    },
-    "completeText": {
-        "en": "Continue",
-        "fr": "Continuer",
-        "it": "Continua",
-        "default": "Weiter"
-    },
-    "theme": {
-        "themeName": "borderless",
-        "colorPalette": "light",
-        "isPanelless": false,
-        "cssVariables": {
-            "--sjs2-color-project-brand-600": "rgba(35, 101, 200, 1)",
-            "--sjs2-color-utility-surface-survey": "rgba(231, 240, 255, 1)",
-            "--sjs2-color-utility-surface-designer": "rgba(231, 240, 255, 1)",
-            "--sjs2-color-bg-basic-secondary": "rgba(238, 245, 255, 1)",
-            "--sjs2-color-bg-basic-primary-dim": "rgba(241, 246, 255, 1)",
-            "--sjs2-color-bg-basic-secondary-dim": "rgba(223, 233, 250, 1)",
-            "--sjs2-color-bg-neutral-tertiary-dim": "rgba(231, 240, 255, 1)",
-            "--sjs2-color-bg-brand-secondary": "rgba(35, 101, 200, 0.1)",
-            "--sjs2-color-bg-brand-primary-dim": "rgba(26, 86, 175, 1)",
-            "--sjs2-color-bg-note-secondary": "rgba(67, 127, 217, 0.1)",
-            "--sjs2-color-bg-positive-secondary": "rgba(25, 179, 148, 0.1)",
-            "--sjs2-color-bg-warning-secondary": "rgba(255, 152, 20, 0.1)",
-            "--sjs2-color-bg-alert-secondary": "rgba(229, 10, 62, 0.1)",
-            "--sjs2-color-fg-basic-primary": "#010915",
-            "--sjs2-color-fg-brand-primary-disabled": "rgba(255, 255, 255, 0.25)",
-            "--sjs2-color-border-basic-secondary": "rgba(220, 229, 241, 1)",
-            "--sjs2-color-border-basic-secondary-overlay": "rgba(4,7,10,0.16)",
-            "--sjs2-color-component-buttongroup-item-false-readonly-bg": "rgba(from var(--sjs2-color-bg-basic-secondary) r g b / var(--sjs2-opacity-hidden))",
-            "--sjs2-color-component-buttongroup-item-true-default-border": "rgba(from var(--sjs2-color-border-basic-secondary) r g b / var(--sjs2-opacity-hidden))",
-            "--sjs2-color-component-buttongroup-item-true-readonly-bg": "rgba(from var(--sjs2-color-bg-basic-secondary) r g b / var(--sjs2-opacity-hidden))",
-            "--sjs2-border-spread-form-default": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-form-hovered": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-form-pressed": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-form-design": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-surface-default": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-spread-surface-disabled": "var(--sjs2-border-width-x000)",
-            "--sjs2-border-effect-component-formbox-focused": "var(--sjs2-border-offset-x-form-focused) var(--sjs2-border-offset-y-form-focused) var(--sjs2-border-blur-form-focused) var(--sjs2-border-spread-form-focused) var(--sjs2-color-component-formbox-focused-border)",
-            "--sjs2-border-effect-component-formbox-invalid-focused": "var(--sjs2-border-offset-x-form-invalid-focused) var(--sjs2-border-offset-y-form-invalid-focused) var(--sjs2-border-blur-form-invalid-focused) var(--sjs2-border-spread-form-invalid-focused) var(--sjs2-color-component-formbox-invalid-focused-border)",
-            "--sjs2-border-effect-component-formbox-highlighted": "var(--sjs2-border-offset-x-form-highlighted) var(--sjs2-border-offset-y-form-highlighted) var(--sjs2-border-blur-form-highlighted) var(--sjs2-border-spread-form-highlighted) var(--sjs2-color-component-formbox-highlighted-border)",
-            "--sjs2-border-effect-surface-default": "0px 0px 0px 0px rgba(0, 0, 0, 0.15)",
-            "--sjs2-border-effect-floating-default": "0px 2px 6px 0px rgba(0, 0, 0, 0.1), 0px 8px 16px 0px rgba(0, 0, 0, 0.1)",
-            "--sjs2-typography-font-size-component-question-title": "20px",
-            "--sjs2-typography-font-size-component-label-content": "16px"
-        }
-    },
-    "showTitle": false,
-    "requiredText": "*"
+      ]
+    }
+  ],
+  "showPrevButton": false,
+  "showTitle": false,
+  "checkErrorsMode": "onValueChanged",
+  "pageNextText": {
+    "en": "Continue",
+    "fr": "Continuer",
+    "it": "Continua",
+    "default": "Weiter"
+  },
+  "completeText": {
+    "en": "Continue",
+    "fr": "Continuer",
+    "it": "Continua",
+    "default": "Weiter"
+  }
 }
