@@ -19,7 +19,7 @@
 #       kanji_recall_B.xlsx
 #     kanji_data/questionnaires/
 #       kanji_part1.xlsx         one per questionnaire: part1, demographics,
-#       kanji_demographics.xlsx    pause1, pause2, pause3 and part2. Every row,
+#       kanji_demographics.xlsx    pause1 … pause4 and part2. Every row,
 #       kanji_pause1.xlsx …        finished or not; triggerType says which
 #     kanji_data/
 #       kanji_timing.xlsx        when each participant started and finished the
@@ -108,7 +108,8 @@ tables <- c(
   "Kanji_Task1", "Kanji_Pause1",
   "Kanji_Task2", "Kanji_Pause2",
   "Kanji_Task3", "Kanji_Pause3",
-  "Kanji_Task4", "Kanji_Part2"
+  "Kanji_Task4", "Kanji_Pause4",
+  "Kanji_Part2"
 )
 
 fetch_table <- function(tbl) {
@@ -399,7 +400,8 @@ timing <- full_join(
 # Each file holds one sheet named like the file. Excel caps a sheet name at 31
 # characters and forbids : \ / ? * [ ], so the names are kept short.
 survey_tables <- intersect(c("Kanji_Part1", "Kanji_Demographics", "Kanji_Pause1",
-                             "Kanji_Pause2", "Kanji_Pause3", "Kanji_Part2"), names(all_rows))
+                             "Kanji_Pause2", "Kanji_Pause3", "Kanji_Pause4",
+                             "Kanji_Part2"), names(all_rows))
 recall_out <- c(if (nrow(kanji_recall) > 0) list(Recall = kanji_recall), recall_files)
 survey_out <- set_names(all_rows[survey_tables], sub("^Kanji_", "", survey_tables))
 

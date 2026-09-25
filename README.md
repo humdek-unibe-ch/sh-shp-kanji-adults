@@ -17,6 +17,7 @@ components.
    ```
    ID_Brief.png  Logo_Universitaet_Bern.png  aufmerksamkeit_2c_ausrufezeichen.png
    Vignette_Franz.jpg  Vignette_Geo.jpg  Vignette_Math.jpg  Vignette_Deut.jpg
+   00_ablenkung_konfetti_luftb.png
    ```
 
    `@asset_base` is `@base_path` + `/assets`; `@base_path` must match
@@ -59,6 +60,7 @@ vignettes fill the retention interval between learning a list and recalling it.
 | `kanji-adults-task-3` | Kanji Aufgabe 3: Lernen Liste B | `Kanji_Task3` |
 | `kanji-adults-pause-3` | Kanji – Pause 3: Mathematik und Aufsatz | `Kanji_Pause3` |
 | `kanji-adults-task-4` | Kanji Aufgabe 4: Abfrage Liste B, Abschluss | `Kanji_Task4` |
+| `kanji-adults-pause-4` | Kanji – Pause 4: Aufsatz | `Kanji_Pause4` |
 | `kanji-adults-questions` | Kanji – Teil 2: Gerät und Abschlusscode | `Kanji_Part2` |
 | `kanji-adults-prize-draw` | Kanji – Verlosung | `Kanji_PrizeDraw` |
 
@@ -135,8 +137,9 @@ Ten tables, one row per participant, joined on `extra_param_code`.
 | `Kanji_Task2` | the first list's `extra_data_trials_recall_*` |
 | `Kanji_Pause2` | `P2_*` ratings |
 | `Kanji_Task3` | the second list's `extra_data_trials_learn_*` |
-| `Kanji_Pause3` | `P3_*` ratings |
+| `Kanji_Pause3` | `P3_Vignette_Math_*` ratings |
 | `Kanji_Task4` | the second list's `extra_data_trials_recall_*` |
+| `Kanji_Pause4` | `P3_Vignette_Deut_*` ratings; the essay vignette moved here from Pause 3 and kept its name |
 | `Kanji_Part2` | `Device`, `ID_2`, `Finished_Study` |
 
 Block columns are named after the list shown (`recall_A` is list A wherever

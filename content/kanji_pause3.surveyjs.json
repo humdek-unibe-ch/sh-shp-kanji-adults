@@ -31,10 +31,10 @@
                     "type": "html",
                     "name": "P3_2",
                     "html": {
-                        "default": "<div><p>Es folgen nun zwei kurze Geschichten aus dem Familienalltag. Diese beschreiben Situationen mit Ihrem Kind. Nach jeder Geschichte stehen mehrere Sätze. Diese zeigen mögliche Vorgehensweisen von Eltern.</p>\n<p>Bitte sagen Sie wie oft jeder Satz auf Sie zutrifft. Es gibt dabei keine falsche oder richtige Antwort. Wichtig ist nur, dass Sie ehrlich einschätzen, wie Sie selbst typischerweise handeln.</p></div><style>.sd-body:has([data-name=\"P3_2\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "en": "<div><p>Below are some short stories from everyday family life. They describe situations involving your child. After each story, there are several sentences. These show possible ways for parents to respond.</p>\n<p>Please say how often each sentence applies to you. There are no right or wrong answers. The important thing is that you honestly assess how you typically behave.</p></div><style>.sd-body:has([data-name=\"P3_2\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "fr": "<div><p>Voici maintenant de courtes histoires de la vie familiale. Elles décrivent des situations avec votre enfant. Après chaque histoire, vous trouverez plusieurs phrases qui montrent des façons possibles d'agir des parents.</p>\n<p>Veuillez indiquer à quelle fréquence chaque phrase vous correspond. Il n’y a pas de bonne ou de mauvaise réponse. L’important est seulement d’évaluer honnêtement comment vous agissez habituellement.</p></div><style>.sd-body:has([data-name=\"P3_2\"]) .sd-body__navigation { justify-content: center; }</style>",
-                        "it": "<div><p>Ora seguono brevi racconti dalla vita quotidiana di una famiglia. Queste descrivono situazioni con il proprio figlio. Dopo ogni racconto seguono diverse frasi che indicano possibili comportamenti dei genitori.<br>Vi preghiamo di indicare con quale frequenza ogni frase si applica al vostro caso. Non esistono risposte giuste o sbagliate. L'importante è che valutiate onestamente come vi comportate di solito.</p></div><style>.sd-body:has([data-name=\"P3_2\"]) .sd-body__navigation { justify-content: center; }</style>"
+                        "default": "<div><p>Es folgt nun eine kurze Geschichte aus dem Familienalltag. Diese beschreibt eine Situation mit Ihrem Kind. Nach der Geschichte stehen mehrere Sätze. Diese zeigen mögliche Vorgehensweisen von Eltern.</p>\n<p>Bitte sagen Sie wie oft jeder Satz auf Sie zutrifft. Es gibt dabei keine falsche oder richtige Antwort.<br>Wichtig ist nur, dass Sie ehrlich einschätzen, wie Sie selbst typischerweise handeln.</p></div><style>.sd-body:has([data-name=\"P3_2\"]) .sd-body__navigation { justify-content: center; }</style>",
+                        "en": "<div><p>Below are some short stories from everyday family life. They describe situations involving your child. After each story, there are several sentences. These show possible ways for parents to respond.</p>\n<p>Please say how often each sentence applies to you.<br>There are no right or wrong answers.<br>The important thing is that you honestly assess how you typically behave.</p></div><style>.sd-body:has([data-name=\"P3_2\"]) .sd-body__navigation { justify-content: center; }</style>",
+                        "fr": "<div><p>Voici maintenant de courtes histoires de la vie familiale. Elles décrivent des situations avec votre enfant. Après chaque histoire, vous trouverez plusieurs phrases qui montrent des façons possibles d'agir des parents.</p>\n<p>Veuillez indiquer à quelle fréquence chaque phrase vous correspond.<br>Il n’y a pas de bonne ou de mauvaise réponse.<br>L’important est seulement d’évaluer honnêtement comment vous agissez habituellement.</p></div><style>.sd-body:has([data-name=\"P3_2\"]) .sd-body__navigation { justify-content: center; }</style>",
+                        "it": "<div><p>Ora seguono brevi racconti dalla vita quotidiana di una famiglia. Queste descrivono situazioni con il proprio figlio.</p>\n<p>Dopo ogni racconto seguono diverse frasi che indicano possibili comportamenti dei genitori.<br>Vi preghiamo di indicare con quale frequenza ogni frase si applica al vostro caso. Non esistono risposte giuste o sbagliate.</p>\n<p>L'importante è che valutiate onestamente come vi comportate di solito.</p></div><style>.sd-body:has([data-name=\"P3_2\"]) .sd-body__navigation { justify-content: center; }</style>"
                     }
                 }
             ]
@@ -152,120 +152,6 @@
                                 "en": "After studying, I ask my child how many problems they think they solved correctly on their own. ",
                                 "fr": "Après la révision, je demande à mon enfant combien d'exercices il pense avoir résolus correctement et tout seul.",
                                 "it": "Dopo lo studio chiedo a mio figlio quanti compiti pensa di aver risolto correttamente e da solo. "
-                            }
-                        }
-                    ]
-                },
-                {
-                    "type": "matrix",
-                    "name": "P3_Vignette_Deut",
-                    "title": {
-                        "default": "<div style=\"display:flex;align-items:flex-start;gap:1em;flex-wrap:wrap;\"><div style=\"flex:1 1 20em;min-width:14em;\"><p><strong>Aufsatz schreiben für den Deutschunterricht</strong></p><p>Ihr Kind hat in der Schule eine Hausaufgabe für den Deutschunterricht erhalten. Für die Aufgabe hat Ihr Kind eine Woche Zeit. Es soll einen Aufsatz über sein schönstes Ferienerlebnis schreiben. Der Aufsatz soll beschreiben, was passiert ist, wo das Erlebnis stattgefunden hat und warum es so besonders schön war. Ihrem Kind fallen viele mögliche Erlebnisse ein, sodass es sich schwer entscheiden kann. Zudem gehört Deutsch nicht zu seinen Lieblingsfächern, weshalb es eher langsam mit der Aufgabe vorankommt.</p>\n<p>Wie wahrscheinlich ist es, dass Sie Folgendes sagen oder tun:</p></div><img style=\"width:320px;max-width:40%;height:auto;object-fit:contain;flex:0 0 auto;\" src=\"{{ASSET_BASE}}/Vignette_Deut.jpg\" alt=\"\"></div>",
-                        "en": "<div style=\"display:flex;align-items:flex-start;gap:1em;flex-wrap:wrap;\"><div style=\"flex:1 1 20em;min-width:14em;\"><p><strong>Writing an Essay for German Class</strong></p><p>Your child has been assigned homework for German class. Your child has one week to complete the assignment. They are writing an essay about their best vacation experience. The essay should describe what happened, where the experience took place, and why it was so special. Your child can think of many possible experiences, making it hard to decide. Additionally, German isn’t one of their favorite subjects, which is why they’re making slow progress on the assignment.</p>\n<p>How likely is it that you would do or say the following</p></div><img style=\"width:320px;max-width:40%;height:auto;object-fit:contain;flex:0 0 auto;\" src=\"{{ASSET_BASE}}/Vignette_Deut.jpg\" alt=\"\"></div>",
-                        "fr": "<div style=\"display:flex;align-items:flex-start;gap:1em;flex-wrap:wrap;\"><div style=\"flex:1 1 20em;min-width:14em;\"><p><strong>Rédiger une dissertation pour le cours d'allemand</strong></p><p>Votre enfant a reçu un devoir à faire à la maison pour son cours d'allemand. Il dispose d'une semaine pour réaliser ce devoir. Il doit rédiger une dissertation sur son plus beau souvenir de vacances. La rédaction doit décrire ce qui s'est passé, où l'expérience a eu lieu et pourquoi elle était si particulière. Votre enfant a tellement d'expériences en tête qu'il a du mal à se décider. De plus, l'allemand ne fait pas partie de ses matières préférées, c'est pourquoi il avance plutôt lentement dans son travail.</p>\n<p>Quelle est la probabilité que vous disiez ou faisiez ce qui suit?</p></div><img style=\"width:320px;max-width:40%;height:auto;object-fit:contain;flex:0 0 auto;\" src=\"{{ASSET_BASE}}/Vignette_Deut.jpg\" alt=\"\"></div>",
-                        "it": "<div style=\"display:flex;align-items:flex-start;gap:1em;flex-wrap:wrap;\"><div style=\"flex:1 1 20em;min-width:14em;\"><p><strong>Scrivere un tema per la lezione di tedesco</strong></p><p>Vostro figlio ha ricevuto a scuola un compito per la lezione di tedesco. Ha una settimana di tempo per svolgerlo. Deve scrivere un tema sulla sua esperienza più bella delle vacanze. Il tema deve descrivere cosa è successo, dove si è svolta l'esperienza e perché è stata così bella. A vostro figlio vengono in mente tante esperienze possibili, tanto che fa fatica a decidere. Inoltre, il tedesco non è tra le sue materie preferite, motivo per cui procede piuttosto lentamente con il compito.</p>\n<p>Quanto è probabile che lei dica o faccia quanto segue:</p></div><img style=\"width:320px;max-width:40%;height:auto;object-fit:contain;flex:0 0 auto;\" src=\"{{ASSET_BASE}}/Vignette_Deut.jpg\" alt=\"\"></div>"
-                    },
-                    "isAllRowRequired": true,
-                    "columns": [
-                        {
-                            "value": "1",
-                            "text": {
-                                "default": "Sehr unwahrscheinlich",
-                                "en": "Very unlikely",
-                                "fr": "Très improbable",
-                                "it": "Molto improbabile"
-                            }
-                        },
-                        {
-                            "value": "2",
-                            "text": {
-                                "default": "Unwahrscheinlich",
-                                "en": "Unlikely",
-                                "fr": "Improbable",
-                                "it": "Improbabile"
-                            }
-                        },
-                        {
-                            "value": "3",
-                            "text": {
-                                "default": "Vielleicht",
-                                "en": "Maybe",
-                                "fr": "Peut-être",
-                                "it": "Forse"
-                            }
-                        },
-                        {
-                            "value": "4",
-                            "text": {
-                                "default": "Wahrscheinlich",
-                                "en": "Likely",
-                                "fr": "Probable",
-                                "it": "Probabile"
-                            }
-                        },
-                        {
-                            "value": "5",
-                            "text": {
-                                "default": "Sehr wahrscheinlich",
-                                "en": "Very likely",
-                                "fr": "Très probable",
-                                "it": "Molto probabile"
-                            }
-                        }
-                    ],
-                    "rows": [
-                        {
-                            "value": "1",
-                            "text": {
-                                "default": "Ich ermutige mein Kind, die Geschichte vor dem Schreiben zu strukturieren, damit der Text verständlich wird.",
-                                "en": "I encourage my child to outline the story before writing so that the text is easy to understand.",
-                                "fr": "J'encourage mon enfant à structurer son histoire avant de se mettre à écrire, afin que le texte soit compréhensible.",
-                                "it": "Incoraggio mio figlio a strutturare la storia prima di iniziare a scrivere, in modo che il testo risulti comprensibile."
-                            }
-                        },
-                        {
-                            "value": "2",
-                            "text": {
-                                "default": "Wenn mein Kind nicht weiss, wie es mit dem Schreiben beginnen soll, ermutige ich es, einen anderen Einstieg zu wählen.",
-                                "en": "If my child doesn’t know how to start writing, I encourage them to choose a different opening.",
-                                "fr": "Si mon enfant ne sait pas par où commencer, je l'encourage à choisir une autre introduction.",
-                                "it": "Se mio figlio non sa da dove cominciare a scrivere, lo incoraggio a scegliere un altro punto di partenza. "
-                            }
-                        },
-                        {
-                            "value": "3",
-                            "text": {
-                                "default": "Ich ermutige mein Kind, zu planen, an welchen Tagen es am Aufsatz arbeitet und wann es ihn fertigstellen möchte.",
-                                "en": "I encourage my child to plan which days they will work on the essay and when they want to finish it.",
-                                "fr": "J'encourage mon enfant à planifier les jours où il travaillera sur sa rédaction et la date à laquelle il souhaite la terminer. ",
-                                "it": "Incoraggio mio figlio a pianificare in quali giorni lavorare al tema e quando desidera finirlo. "
-                            }
-                        },
-                        {
-                            "value": "4",
-                            "text": {
-                                "default": "Ich rege mein Kind dazu an, den geschriebenen Text gründlich durchzulesen, um Fehler, Wiederholungen und Unstimmigkeiten zu entdecken.  ",
-                                "en": "I encourage my child to read through the written text thoroughly to identify errors, repetitions, and inconsistencies. ",
-                                "fr": "J'incite mon enfant à relire attentivement le texte rédigé afin de repérer les erreurs, les répétitions et les incohérences.",
-                                "it": "Incoraggio mio figlio a rileggere attentamente il testo scritto per individuare errori, ripetizioni e incongruenze."
-                            }
-                        },
-                        {
-                            "value": "5",
-                            "text": {
-                                "default": "Ich erkläre meinem Kind, dass es mehr üben muss, wenn ihm das Schreiben schwerfällt.",
-                                "en": "I explain to my child that they need to practice more if they find writing difficult",
-                                "fr": "J'explique à mon enfant qu'il doit s'entraîner davantage s'il a des difficultés à écrire.",
-                                "it": "Spiego a mio figlio che deve esercitarsi di più se ha difficoltà a scrivere."
-                            }
-                        },
-                        {
-                            "value": "6",
-                            "text": {
-                                "default": "Ich frage mein Kind, nach dem es fertig ist, wie zufrieden es mit dem Text ist.",
-                                "en": "After my child is finished, I ask them how satisfied they are with the text.",
-                                "fr": "Une fois qu'il a terminé, je demande à mon enfant s'il est satisfait de son texte.",
-                                "it": "Quando ha finito, chiedo a mio figlio quanto è soddisfatto del testo. "
                             }
                         }
                     ]
