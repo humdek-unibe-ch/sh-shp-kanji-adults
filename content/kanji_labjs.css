@@ -356,9 +356,9 @@
 /* The page keeps the site header and footer so a participant stopped here has
    somewhere to go. While the experiment is on the page it is a timed task and
    the stage is sized to the viewport, so the chrome is hidden for that case
-   only. */
-body:has(.selfHelp-lab-js-holder) #nav-menu,
-body:has(.selfHelp-lab-js-holder) .footer-holder {
+   only. The CMS page preview renders the task too, so keep its header there. */
+body:has(.selfHelp-lab-js-holder):not(:has(#multiple-users-warning)) #nav-menu,
+body:has(.selfHelp-lab-js-holder):not(:has(#multiple-users-warning)) .footer-holder {
   /* !important because the footer carries bootstrap d-flex. */
   display: none !important;
 }
